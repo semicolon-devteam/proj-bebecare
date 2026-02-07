@@ -1,0 +1,61 @@
+{
+  "name": "BebeCare - 임신·출산·육아 슈퍼앱",
+  "short_name": "BebeCare",
+  "description": "AI 기반 맞춤 정보 제공 서비스",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "lifestyle", "productivity"],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "platform": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "AI 상담",
+      "short_name": "AI 상담",
+      "description": "AI 기반 육아 조언",
+      "url": "/chat",
+      "icons": [
+        {
+          "src": "/icon-ai.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "타임라인",
+      "short_name": "타임라인",
+      "description": "중요한 일정 확인",
+      "url": "/timeline",
+      "icons": [
+        {
+          "src": "/icon-timeline.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
