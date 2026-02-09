@@ -1,14 +1,31 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser, signOut } from '@/lib/auth';
+import {
+  createConversation,
+  saveMessage,
+  generateConversationTitle,
+} from '@/lib/chat';
 import type { User } from '@supabase/supabase-js';
+
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
 
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     checkUser();
@@ -31,150 +48,378 @@ export default function Home() {
     router.refresh();
   };
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSendMessage = async (content: string) => {
+    if (!content.trim() || !user) return;
+
+    // Create conversation if this is the first message
+    let currentConversationId = conversationId;
+    if (!currentConversationId) {
+      const newConversation = await createConversation(
+        user.id,
+        generateConversationTitle(content)
+      );
+      if (!newConversation) {
+        console.error('Failed to create conversation');
+        return;
+      }
+      currentConversationId = newConversation.id;
+      setConversationId(currentConversationId);
+    }
+
+    // Add user message
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: content.trim(),
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue('');
+    setIsTyping(true);
+
+    // Save user message to database
+    await saveMessage(currentConversationId, 'user', userMessage.content);
+
+    try {
+      // Call OpenAI API with streaming
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage].map((msg) => ({
+            role: msg.role,
+            content: msg.content,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from AI');
+      }
+
+      // Create AI message placeholder
+      const aiMessageId = (Date.now() + 1).toString();
+      const aiMessage: Message = {
+        id: aiMessageId,
+        role: 'assistant',
+        content: '',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, aiMessage]);
+      setIsTyping(false);
+
+      // Process streaming response
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (reader) {
+        let accumulatedContent = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                if (data.content) {
+                  accumulatedContent += data.content;
+                  // Update message content in real-time
+                  setMessages((prev) =>
+                    prev.map((msg) =>
+                      msg.id === aiMessageId
+                        ? { ...msg, content: accumulatedContent }
+                        : msg
+                    )
+                  );
+                }
+              } catch (e) {
+                // Skip invalid JSON
+              }
+            }
+          }
+        }
+
+        // Save complete AI response to database
+        if (accumulatedContent && currentConversationId) {
+          await saveMessage(currentConversationId, 'assistant', accumulatedContent);
+        }
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      // Add error message
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: '죄송합니다. 일시적인 오류가 발생했습니다. 다시 시도해주세요. 😔',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+      setIsTyping(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSendMessage(inputValue);
+  };
+
+  const handleExampleClick = (example: string) => {
+    handleSendMessage(example);
+  };
+
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-100 via-purple-50 to-blue-100">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-16 w-16 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
-          <p className="text-lg font-medium text-gray-700 animate-pulse">로딩 중...</p>
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-rose-100 via-purple-100 to-blue-200">
+        {/* Animated Background Blobs */}
+        <div className="absolute top-0 -left-4 h-72 w-72 animate-float rounded-full bg-gradient-to-br from-pink-400 to-rose-400 opacity-30 blur-3xl" />
+        <div className="absolute bottom-0 -right-4 h-72 w-72 animate-float rounded-full bg-gradient-to-br from-blue-400 to-purple-400 opacity-30 blur-3xl animation-delay-1000" />
+
+        <div className="glass relative flex flex-col items-center gap-6 rounded-3xl p-12 animate-scale-in">
+          <div className="relative">
+            <div className="h-20 w-20 animate-spin rounded-full border-4 border-purple-200 border-t-blue-600"></div>
+            <div className="absolute inset-0 h-20 w-20 animate-ping rounded-full border-4 border-blue-400 opacity-20"></div>
+          </div>
+          <p className="text-xl font-bold gradient-text from-blue-600 to-purple-600 animate-pulse">
+            로딩 중...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-pink-100 via-purple-50 to-blue-100 p-4 md:p-8">
-      <div className="w-full max-w-5xl space-y-8 animate-fade-in">
-        {/* Header Section */}
-        <div className="text-center space-y-4 animate-slide-down">
-          <div className="inline-block rounded-2xl bg-white/80 backdrop-blur-sm px-8 py-6 shadow-2xl border border-white/20">
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              BebeCare
-            </h1>
-            <p className="mt-3 text-xl md:text-2xl font-semibold text-gray-700">임신·출산·육아 슈퍼앱</p>
-            <p className="mt-2 text-sm md:text-base text-gray-600">
-              AI 기반 맞춤 정보 제공 서비스 ✨
-            </p>
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-gradient-to-br from-rose-100 via-purple-100 to-blue-200">
+      {/* Animated Background Elements */}
+      <div className="absolute top-0 -left-4 h-96 w-96 animate-float rounded-full bg-gradient-to-br from-pink-400 to-rose-400 opacity-20 blur-3xl" />
+      <div className="absolute bottom-0 -right-4 h-96 w-96 animate-float rounded-full bg-gradient-to-br from-blue-400 to-purple-400 opacity-20 blur-3xl animation-delay-2000" />
+      <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 animate-float rounded-full bg-gradient-to-br from-purple-400 to-indigo-400 opacity-10 blur-3xl animation-delay-1000" />
+
+      {user ? (
+        // ChatGPT-style Chat Interface
+        <div className="relative z-10 flex h-screen flex-col">
+          {/* Header */}
+          <header className="glass border-b border-white/20 px-4 py-4 animate-slide-down">
+            <div className="mx-auto flex max-w-4xl items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">👶</span>
+                <h1 className="text-2xl md:text-3xl font-black gradient-text from-blue-600 via-purple-600 to-pink-600">
+                  BebeCare AI
+                </h1>
+                <span className="text-3xl">💕</span>
+              </div>
+              <button
+                onClick={handleSignOut}
+                className="rounded-xl px-4 py-2 text-sm font-bold text-gray-700 hover:bg-white/50 transition-all duration-300"
+              >
+                로그아웃
+              </button>
+            </div>
+          </header>
+
+          {/* Chat Messages Area */}
+          <div className="flex-1 overflow-y-auto px-4 py-8">
+            <div className="mx-auto max-w-3xl space-y-6">
+              {messages.length === 0 ? (
+                // Welcome Screen
+                <div className="space-y-8 animate-fade-in">
+                  <div className="text-center space-y-4">
+                    <div className="inline-flex items-center gap-2 animate-scale-in">
+                      <span className="text-5xl">🤖</span>
+                      <h2 className="text-4xl md:text-5xl font-black gradient-text from-blue-600 to-purple-600">
+                        안녕하세요!
+                      </h2>
+                    </div>
+                    <p className="text-xl text-gray-700">
+                      임신·출산·육아에 대해 무엇이든 물어보세요
+                    </p>
+                  </div>
+
+                  {/* Example Questions */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {[
+                      '임신 초기 증상은 어떤 게 있나요?',
+                      '신생아 목욕은 어떻게 시키나요?',
+                      '예방접종 일정을 알려주세요',
+                      '이유식은 언제부터 시작하나요?',
+                    ].map((example, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleExampleClick(example)}
+                        className="glass group rounded-2xl p-6 text-left hover-lift hover:border-purple-300 animate-scale-in"
+                        style={{ animationDelay: `${index * 100}ms` }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl flex-shrink-0">💬</span>
+                          <p className="text-base font-medium text-gray-800 group-hover:gradient-text group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300">
+                            {example}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                // Chat Messages
+                <>
+                  {messages.map((message, index) => (
+                    <div
+                      key={message.id}
+                      className={`flex gap-4 animate-slide-up ${
+                        message.role === 'user' ? 'justify-end' : 'justify-start'
+                      }`}
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      {message.role === 'assistant' && (
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                          <span className="text-xl">🤖</span>
+                        </div>
+                      )}
+                      <div
+                        className={`max-w-[80%] rounded-2xl px-6 py-4 ${
+                          message.role === 'user'
+                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                            : 'glass text-gray-800'
+                        }`}
+                      >
+                        <p className="text-base leading-relaxed whitespace-pre-wrap">
+                          {message.content}
+                        </p>
+                      </div>
+                      {message.role === 'user' && (
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
+                          <span className="text-xl">👤</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {isTyping && (
+                    <div className="flex gap-4 animate-slide-up">
+                      <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <span className="text-xl">🤖</span>
+                      </div>
+                      <div className="glass rounded-2xl px-6 py-4">
+                        <div className="flex gap-2">
+                          <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"></div>
+                          <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce animation-delay-100"></div>
+                          <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce animation-delay-500"></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Input Area */}
+          <div className="glass border-t border-white/20 px-4 py-4">
+            <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
+              <div className="glass relative flex items-center gap-3 rounded-3xl p-2">
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="메시지를 입력하세요..."
+                  className="flex-1 bg-transparent px-4 py-3 text-gray-800 placeholder-gray-500 outline-none"
+                  disabled={isTyping}
+                />
+                <button
+                  type="submit"
+                  disabled={!inputValue.trim() || isTyping}
+                  className="flex-shrink-0 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 font-bold text-white hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-lg"
+                >
+                  <span className="text-lg">전송</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-
-        {user ? (
-          <div className="space-y-6 animate-fade-in">
-            {/* Welcome Card */}
-            <div className="rounded-2xl bg-gradient-to-r from-green-400 to-emerald-500 p-8 text-center shadow-xl transform hover:scale-105 transition-transform duration-300">
-              <p className="text-2xl font-bold text-white drop-shadow-lg">
-                환영합니다! 🎉
-              </p>
-              <p className="mt-3 text-lg text-white/90 font-medium">{user.email}</p>
-            </div>
-
-            {/* Feature Cards */}
-            <div className="grid gap-5 md:grid-cols-2">
-              <div className="group rounded-2xl bg-white/80 backdrop-blur-sm p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:border-blue-200 cursor-pointer transform hover:-translate-y-1">
-                <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-3 shadow-lg">
-                    <span className="text-2xl">📋</span>
+      ) : (
+        // Landing Page for Non-logged Users
+        <div className="relative z-10 flex min-h-screen items-center justify-center p-4 md:p-8">
+          <div className="w-full max-w-6xl space-y-10 animate-fade-in">
+            {/* Header Section */}
+            <div className="text-center space-y-6 animate-slide-down">
+              <div className="glass inline-block rounded-3xl px-10 py-8 animate-glow">
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-3">
+                    <span className="text-5xl animate-float">👶</span>
+                    <h1 className="text-6xl md:text-8xl font-black gradient-text from-blue-600 via-purple-600 to-pink-600">
+                      BebeCare
+                    </h1>
+                    <span className="text-5xl animate-float animation-delay-500">💕</span>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
-                      맞춤 정보
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-                      임신 주차, 아이 개월 수에 맞는 정보를 받아보세요
+                  <div className="space-y-3">
+                    <p className="text-2xl md:text-3xl font-bold text-gray-800">
+                      임신·출산·육아 슈퍼앱
                     </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="group rounded-2xl bg-white/80 backdrop-blur-sm p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:border-purple-200 cursor-pointer transform hover:-translate-y-1">
-                <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-gradient-to-br from-purple-500 to-pink-600 p-3 shadow-lg">
-                    <span className="text-2xl">🤖</span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800 group-hover:text-purple-600 transition-colors">
-                      AI 상담
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-                      AI 기반 개인화된 육아 조언을 받아보세요
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="group rounded-2xl bg-white/80 backdrop-blur-sm p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:border-pink-200 cursor-pointer transform hover:-translate-y-1">
-                <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-gradient-to-br from-pink-500 to-rose-600 p-3 shadow-lg">
-                    <span className="text-2xl">📅</span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800 group-hover:text-pink-600 transition-colors">
-                      타임라인
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-                      중요한 일정과 체크리스트를 관리하세요
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="group rounded-2xl bg-white/80 backdrop-blur-sm p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20 hover:border-green-200 cursor-pointer transform hover:-translate-y-1">
-                <div className="flex items-start gap-4">
-                  <div className="rounded-full bg-gradient-to-br from-green-500 to-emerald-600 p-3 shadow-lg">
-                    <span className="text-2xl">💰</span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800 group-hover:text-green-600 transition-colors">
-                      정부지원
-                    </h3>
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-                      지역별 정부 지원금 정보를 확인하세요
-                    </p>
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-lg md:text-xl text-gray-700 font-medium">
+                        AI 기반 맞춤 정보 제공 서비스
+                      </span>
+                      <span className="text-2xl animate-pulse">✨</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Logout Button */}
-            <button
-              onClick={handleSignOut}
-              className="w-full rounded-xl bg-white/80 backdrop-blur-sm px-6 py-4 font-semibold text-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-            >
-              로그아웃
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-6 animate-fade-in">
-            {/* Hero Message */}
-            <div className="rounded-2xl bg-white/80 backdrop-blur-sm p-8 text-center shadow-xl border border-white/20">
-              <p className="text-xl md:text-2xl font-semibold text-gray-800 leading-relaxed">
-                BebeCare와 함께 <br className="md:hidden" />
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  행복한 임신·출산·육아
-                </span>를 <br className="md:hidden" />
-                시작하세요 💝
-              </p>
-            </div>
+            {/* Hero Message and CTA */}
+            <div className="space-y-8 animate-fade-in">
+              {/* Hero Message */}
+              <div className="glass rounded-3xl p-10 text-center animate-scale-in">
+                <p className="text-2xl md:text-3xl font-bold text-gray-800 leading-relaxed">
+                  BebeCare와 함께{' '}
+                  <br className="md:hidden" />
+                  <span className="gradient-text from-blue-600 via-purple-600 to-pink-600 text-3xl md:text-4xl">
+                    행복한 임신·출산·육아
+                  </span>
+                  를{' '}
+                  <br className="md:hidden" />
+                  시작하세요{' '}
+                  <span className="inline-block animate-pulse text-4xl">💝</span>
+                </p>
+              </div>
 
-            {/* CTA Buttons */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <button
-                onClick={() => router.push('/login')}
-                className="group relative rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-4 font-bold text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
-              >
-                <span className="relative z-10">로그인</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </button>
-              <button
-                onClick={() => router.push('/signup')}
-                className="rounded-xl bg-white/80 backdrop-blur-sm px-8 py-4 font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-blue-200 hover:border-purple-300 transform hover:-translate-y-1"
-              >
-                회원가입
-              </button>
+              {/* CTA Buttons */}
+              <div className="grid gap-5 md:grid-cols-2 md:gap-6">
+                <button
+                  onClick={() => router.push('/login')}
+                  className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-10 py-6 font-black text-white shadow-2xl hover-lift hover-glow animate-scale-in"
+                >
+                  <span className="relative z-10 text-xl">로그인</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></div>
+                </button>
+                <button
+                  onClick={() => router.push('/signup')}
+                  className="glass group rounded-2xl px-10 py-6 font-black hover-lift hover:border-purple-300 animate-scale-in animation-delay-100"
+                >
+                  <span className="text-xl gradient-text from-blue-600 to-purple-600 group-hover:from-purple-600 group-hover:to-pink-600 transition-all duration-300">
+                    회원가입
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

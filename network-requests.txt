@@ -1,0 +1,14 @@
+[GET] http://localhost:3002/ => [200] OK
+[GET] http://localhost:3002/_next/static/css/app/layout.css?v=1770616773963 => [200] OK
+[GET] http://localhost:3002/_next/static/chunks/webpack.js?v=1770616773963 => [200] OK
+[GET] http://localhost:3002/_next/static/chunks/main-app.js?v=1770616773963 => [200] OK
+[GET] http://localhost:3002/_next/static/chunks/app-pages-internals.js => [200] OK
+[GET] http://localhost:3002/_next/static/chunks/app/page.js => [200] OK
+[GET] http://localhost:3002/?_rsc=fsnpp => [200] OK
+[GET] http://localhost:3002/_next/static/webpack/59ef921587f94cf3.webpack.hot-update.json => [200] OK
+[GET] http://localhost:3002/_next/static/webpack/webpack.59ef921587f94cf3.hot-update.js => [200] OK
+[GET] http://localhost:3002/_next/static/css/app/layout.css?v=1770617053754 => [200] OK
+[GET] http://localhost:3002/manifest.json => [200] OK
+[GET] http://localhost:3002/icon-192x192.png => [404] Not Found
+[GET] http://localhost:3002/_next/static/webpack/e2780d009cf9c554.webpack.hot-update.json => [200] OK
+[GET] http://localhost:3002/_next/static/webpack/webpack.e2780d009cf9c554.hot-update.js => [200] OK
