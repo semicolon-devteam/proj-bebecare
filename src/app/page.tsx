@@ -187,7 +187,7 @@ export default function Home() {
         <div className="absolute top-0 -left-4 h-72 w-72 animate-float rounded-full bg-gradient-to-br from-pink-400 to-rose-400 opacity-30 blur-3xl" />
         <div className="glass relative flex flex-col items-center gap-6 rounded-3xl p-12 animate-scale-in">
           <div className="h-20 w-20 animate-spin rounded-full border-4 border-purple-200 border-t-blue-600" />
-          <p className="text-xl font-bold bg-gradient-to-r gradient-text from-blue-600 to-purple-600 animate-pulse">
+          <p className="text-xl font-bold text-purple-600 animate-pulse">
             로딩 중...
           </p>
         </div>
@@ -398,57 +398,55 @@ export default function Home() {
           )}
         </div>
       ) : (
-        /* Landing Page */
-        <div className="relative z-10 flex min-h-screen items-center justify-center p-4 md:p-8">
-          <div className="w-full max-w-6xl space-y-10 animate-fade-in">
-            <div className="text-center space-y-6 animate-slide-down">
-              <div className="glass inline-block rounded-3xl px-10 py-8 animate-glow">
-                <div className="space-y-4">
-                  <div className="inline-flex items-center gap-3">
-                    <span className="text-5xl animate-float">👶</span>
-                    <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r gradient-text from-blue-600 via-purple-600 to-pink-600">
+        /* Landing Page — Mobile First */
+        <div className="relative z-10 flex min-h-screen items-center justify-center px-5 py-8 md:p-8">
+          <div className="w-full max-w-lg md:max-w-2xl space-y-6 md:space-y-10 animate-fade-in">
+            {/* Hero */}
+            <div className="text-center space-y-4 animate-slide-down">
+              <div className="glass rounded-3xl px-6 py-6 md:px-10 md:py-8 animate-glow">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-center gap-2 md:gap-3">
+                    <span className="text-3xl md:text-5xl animate-float">👶</span>
+                    <h1 className="text-4xl md:text-7xl font-black text-purple-600">
                       BebeCare
                     </h1>
-                    <span className="text-5xl animate-float animation-delay-500">💕</span>
+                    <span className="text-3xl md:text-5xl animate-float animation-delay-500">💕</span>
                   </div>
-                  <div className="space-y-3">
-                    <p className="text-2xl md:text-3xl font-bold text-gray-800">
-                      임신·출산·육아 슈퍼앱
-                    </p>
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="text-lg md:text-xl text-gray-700 font-medium">
-                        AI 기반 맞춤 정보 제공 서비스
-                      </span>
-                      <span className="text-2xl animate-pulse">✨</span>
-                    </div>
-                  </div>
+                  <p className="text-lg md:text-2xl font-bold text-gray-800">
+                    임신·출산·육아 슈퍼앱
+                  </p>
+                  <p className="text-sm md:text-base text-gray-600 font-medium">
+                    AI 기반 맞춤 정보 제공 서비스 ✨
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="space-y-8 animate-fade-in">
-              <div className="glass rounded-3xl p-10 text-center animate-scale-in">
-                <p className="text-2xl md:text-3xl font-bold text-gray-800 leading-relaxed">
-                  BebeCare와 함께{' '}
-                  <br className="md:hidden" />
-                  <span className="bg-gradient-to-r gradient-text from-blue-600 via-purple-600 to-pink-600 text-3xl md:text-4xl">
+
+            {/* CTA */}
+            <div className="space-y-5 animate-fade-in">
+              <div className="glass rounded-2xl p-6 md:p-10 text-center animate-scale-in">
+                <p className="text-lg md:text-2xl font-bold text-gray-800 leading-relaxed">
+                  BebeCare와 함께
+                  <br />
+                  <span className="text-xl md:text-3xl font-black text-purple-600">
                     행복한 임신·출산·육아
                   </span>
-                  를 시작하세요{' '}
-                  <span className="inline-block animate-pulse text-4xl">💝</span>
+                  <br />
+                  를 시작하세요 💝
                 </p>
               </div>
-              <div className="grid gap-5 md:grid-cols-2 md:gap-6">
+              <div className="grid grid-cols-2 gap-3 md:gap-5">
                 <button
                   onClick={() => router.push('/login')}
-                  className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-10 py-6 font-black text-white shadow-2xl hover-lift hover-glow animate-scale-in"
+                  className="rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 md:px-10 md:py-6 font-black text-white shadow-xl hover-lift animate-scale-in"
                 >
-                  <span className="relative z-10 text-xl">로그인</span>
+                  <span className="text-base md:text-xl">로그인</span>
                 </button>
                 <button
                   onClick={() => router.push('/signup')}
-                  className="glass group rounded-2xl px-10 py-6 font-black hover-lift hover:border-purple-300 animate-scale-in animation-delay-100"
+                  className="glass rounded-2xl px-6 py-4 md:px-10 md:py-6 font-black hover-lift hover:border-purple-300 animate-scale-in animation-delay-100"
                 >
-                  <span className="text-xl bg-gradient-to-r gradient-text from-blue-600 to-purple-600">
+                  <span className="text-base md:text-xl text-purple-600">
                     회원가입
                   </span>
                 </button>
