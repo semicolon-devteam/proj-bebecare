@@ -39,13 +39,13 @@ export default function Home() {
         const completed = await isOnboardingCompleted(currentUser.id);
         if (!completed) {
           router.push('/onboarding');
-          return;
+          return; // loading 유지한 채 redirect
         }
       }
       setUser(currentUser);
+      setLoading(false);
     } catch (error) {
       console.error('Error checking user:', error);
-    } finally {
       setLoading(false);
     }
   };
