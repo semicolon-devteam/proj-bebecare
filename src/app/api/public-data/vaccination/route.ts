@@ -1,8 +1,16 @@
 export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-// 어린이 필수 예방접종 코드 매핑
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
+
+// 폴백용 스케줄 (캐시 없을 때)
 const VACCINATION_CODES: Record<string, { code: string; ageMonths: number[]; label: string }> = {
   BCG: { code: '01', ageMonths: [0, 1], label: 'BCG (결핵)' },
   HepB: { code: '02', ageMonths: [0, 1, 6], label: 'B형간염' },
@@ -20,17 +28,49 @@ const VACCINATION_CODES: Record<string, { code: string; ageMonths: number[]; lab
 
 /**
  * GET /api/public-data/vaccination?vcnCd=01
- * 또는 ?ageMonths=2 (해당 월령에 필요한 접종 정보)
+ * 또는 ?ageMonths=2
+ * 
+ * DB 캐시 우선, 없으면 정적 데이터 폴백
  */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const vcnCd = searchParams.get('vcnCd');
     const ageMonthsParam = searchParams.get('ageMonths');
+    const admin = getSupabaseAdmin();
 
-    const serviceKey = process.env.DATA_GO_KR_API_KEY;
-    if (!serviceKey) {
-      return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
+    // 단일 접종 상세 조회
+    if (vcnCd) {
+      const { data: cached } = await admin
+        .from('public_data_cache')
+        .select('data')
+        .eq('data_type', 'vaccination')
+        .eq('data_key', `detail_${vcnCd}`)
+        .single();
+
+      if (cached?.data) {
+        return NextResponse.json({ ...cached.data, source: 'cache' });
+      }
+
+      // 캐시 없으면 직접 API 호출 (폴백)
+      const serviceKey = process.env.DATA_GO_KR_API_KEY;
+      if (serviceKey) {
+        try {
+          const url = `https://apis.data.go.kr/1790387/vcninfo/getVcnInfo?serviceKey=${serviceKey}&vcnCd=${vcnCd}`;
+          const response = await fetch(url);
+          const text = await response.text();
+          const titleMatch = text.match(/<title>([^<]+)<\/title>/);
+          const messageMatch = text.match(/<message><!\[CDATA\[([\s\S]*?)\]\]><\/message>/);
+          return NextResponse.json({
+            code: vcnCd,
+            title: titleMatch?.[1] || '',
+            description: messageMatch?.[1] || '',
+            source: 'live',
+          });
+        } catch { /* fall through */ }
+      }
+
+      return NextResponse.json({ code: vcnCd, title: '', description: '', source: 'none' });
     }
 
     // 월령 기반 조회
@@ -40,36 +80,24 @@ export async function GET(request: NextRequest) {
         .filter(([, v]) => v.ageMonths.includes(ageMonths))
         .map(([name, v]) => ({ name, ...v }));
 
-      // 각 접종에 대해 API 호출
+      // 캐시에서 상세 정보 가져오기
       const results = await Promise.all(
         relevant.map(async (vac) => {
-          try {
-            const url = `https://apis.data.go.kr/1790387/vcninfo/getVcnInfo?serviceKey=${serviceKey}&vcnCd=${vac.code}`;
-            const response = await fetch(url);
-            const text = await response.text();
+          const { data: cached } = await admin
+            .from('public_data_cache')
+            .select('data')
+            .eq('data_type', 'vaccination')
+            .eq('data_key', `detail_${vac.code}`)
+            .single();
 
-            // XML에서 title과 message 추출
-            const titleMatch = text.match(/<title>([^<]+)<\/title>/);
-            const messageMatch = text.match(/<message><!\[CDATA\[([\s\S]*?)\]\]><\/message>/);
-
-            return {
-              name: vac.name,
-              label: vac.label,
-              code: vac.code,
-              recommendedMonths: vac.ageMonths,
-              title: titleMatch?.[1] || vac.label,
-              description: messageMatch?.[1]?.substring(0, 500) || '',
-            };
-          } catch {
-            return {
-              name: vac.name,
-              label: vac.label,
-              code: vac.code,
-              recommendedMonths: vac.ageMonths,
-              title: vac.label,
-              description: '',
-            };
-          }
+          return cached?.data || {
+            name: vac.name,
+            label: vac.label,
+            code: vac.code,
+            recommendedMonths: vac.ageMonths,
+            title: vac.label,
+            description: '',
+          };
         })
       );
 
@@ -77,37 +105,30 @@ export async function GET(request: NextRequest) {
         ageMonths,
         vaccinations: results,
         totalSchedule: Object.entries(VACCINATION_CODES).map(([name, v]) => ({
-          name,
-          label: v.label,
-          recommendedMonths: v.ageMonths,
+          name, label: v.label, recommendedMonths: v.ageMonths,
         })),
+        source: 'cache',
       });
     }
 
-    // 단일 접종 코드 조회
-    if (vcnCd) {
-      const url = `https://apis.data.go.kr/1790387/vcninfo/getVcnInfo?serviceKey=${serviceKey}&vcnCd=${vcnCd}`;
-      const response = await fetch(url);
-      const text = await response.text();
+    // 전체 스케줄
+    const { data: cached } = await admin
+      .from('public_data_cache')
+      .select('data')
+      .eq('data_type', 'vaccination')
+      .eq('data_key', 'schedule')
+      .single();
 
-      const titleMatch = text.match(/<title>([^<]+)<\/title>/);
-      const messageMatch = text.match(/<message><!\[CDATA\[([\s\S]*?)\]\]><\/message>/);
-
-      return NextResponse.json({
-        code: vcnCd,
-        title: titleMatch?.[1] || '',
-        description: messageMatch?.[1] || '',
-      });
+    if (cached?.data) {
+      return NextResponse.json({ schedule: cached.data, source: 'cache' });
     }
 
-    // 전체 스케줄 반환
+    // 폴백: 정적 데이터
     return NextResponse.json({
       schedule: Object.entries(VACCINATION_CODES).map(([name, v]) => ({
-        name,
-        label: v.label,
-        code: v.code,
-        recommendedMonths: v.ageMonths,
+        name, label: v.label, code: v.code, recommendedMonths: v.ageMonths,
       })),
+      source: 'static',
     });
   } catch (error) {
     console.error('Vaccination API error:', error);
