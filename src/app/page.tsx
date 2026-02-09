@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCurrentUser, signOut } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth';
 import { isOnboardingCompleted } from '@/lib/profile';
 import {
   createConversation,
@@ -67,12 +67,6 @@ export default function Home() {
       console.error('Error checking user:', error);
       setLoading(false);
     }
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    setUser(null);
-    router.refresh();
   };
 
   const scrollToBottom = () => {
@@ -235,10 +229,10 @@ export default function Home() {
                   )}
                 </button>
                 <button
-                  onClick={handleSignOut}
-                  className="rounded-xl px-4 py-2 text-sm font-bold text-white/80 hover:text-white hover:bg-white/20 transition-all duration-300"
+                  onClick={() => router.push('/mypage')}
+                  className="rounded-xl px-3 py-2 text-white/80 hover:text-white hover:bg-white/20 transition-all duration-300"
                 >
-                  로그아웃
+                  <span className="text-xl">👤</span>
                 </button>
               </div>
             </div>
