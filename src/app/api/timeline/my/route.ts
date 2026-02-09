@@ -37,6 +37,12 @@ export async function POST(request: NextRequest) {
     const userId = user.id;
     const today = new Date().toISOString().split('T')[0];
 
+    // reset=true 시 기존 이벤트 전체 삭제 후 재생성
+    const body = await request.json().catch(() => ({}));
+    if (body?.reset) {
+      await admin.from('timeline_events').delete().eq('user_id', userId);
+    }
+
     // 프로필
     const { data: profile } = await admin
       .from('profiles')
@@ -137,12 +143,32 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 정부지원은 모든 단계
-    const { data: gov } = await admin
+    // 정부지원: 전국 공통(region_filter IS NULL) + 유저 거주지역 매칭
+    const { data: govNational } = await admin
       .from('contents')
       .select('id')
-      .eq('category', 'government_support');
-    gov?.forEach(c => matchedContentIds.push(c.id));
+      .eq('category', 'government_support')
+      .is('region_filter', null);
+    govNational?.forEach(c => matchedContentIds.push(c.id));
+
+    if (profile.region_province) {
+      const { data: govRegion } = await admin
+        .from('contents')
+        .select('id')
+        .eq('category', 'government_support')
+        .eq('region_filter', profile.region_province);
+      govRegion?.forEach(c => matchedContentIds.push(c.id));
+
+      // 시/군/구 레벨 매칭도 시도
+      if (profile.region_city) {
+        const { data: govCity } = await admin
+          .from('contents')
+          .select('id')
+          .eq('category', 'government_support')
+          .ilike('title', `%${profile.region_city}%`);
+        govCity?.forEach(c => matchedContentIds.push(c.id));
+      }
+    }
 
     const uniqueIds = [...new Set(matchedContentIds)];
     if (uniqueIds.length === 0) {

@@ -16,33 +16,111 @@ const CATEGORIES = [
   { key: 'government_support', label: '정부지원', emoji: '🏛️' },
 ];
 
+// 카테고리 우선순위 (낮을수록 상단)
+const CATEGORY_ORDER: Record<string, number> = {
+  pregnancy_planning: 0,
+  pregnancy: 0,
+  postpartum: 0,
+  parenting: 0,
+  work: 1,
+  government_support: 2,
+};
+
+interface ProfileContext {
+  stage: string;
+  currentWeek?: number;
+  ageMonths?: number;
+}
+
+function computeRelevanceScore(event: TimelineEvent, profile: ProfileContext): number {
+  const c = event.content;
+  if (!c) return 999;
+
+  const catOrder = CATEGORY_ORDER[c.category] ?? 1;
+
+  // 시기 매칭 점수 (0 = 정확 매칭, 숫자 클수록 먼 시기)
+  let timeDistance = 50; // 기본값 (시기 정보 없는 콘텐츠)
+
+  if (profile.stage === 'pregnant' && profile.currentWeek && c.week_start !== null && c.week_end !== null) {
+    const midWeek = (c.week_start + c.week_end) / 2;
+    timeDistance = Math.abs(profile.currentWeek - midWeek);
+  } else if ((profile.stage === 'postpartum' || profile.stage === 'parenting') && profile.ageMonths !== undefined) {
+    if (c.month_start !== null && c.month_end !== null) {
+      const midMonth = (c.month_start + c.month_end) / 2;
+      timeDistance = Math.abs(profile.ageMonths - midMonth);
+    } else if (c.week_start !== null && c.week_end !== null) {
+      const midWeek = (c.week_start + c.week_end) / 2;
+      const ageWeeks = profile.ageMonths * 4.35;
+      timeDistance = Math.abs(ageWeeks - midWeek) / 4.35; // normalize to months
+    }
+  }
+
+  // 미읽은 콘텐츠 보너스
+  const unreadBonus = event.is_read ? 10 : 0;
+
+  // 최종 점수: catOrder * 100 + timeDistance + unreadBonus
+  return catOrder * 100 + timeDistance + unreadBonus;
+}
+
 export default function TimelineFeed({ userId }: { userId: string }) {
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [profileCtx, setProfileCtx] = useState<ProfileContext>({ stage: 'planning' });
   const hasTriedGenerate = useRef(false);
+
+  // 프로필 로드 (시기 정보용)
+  useEffect(() => {
+    async function loadProfile() {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('stage, due_date, pregnancy_start_date')
+        .eq('user_id', userId)
+        .single();
+
+      if (!profile) return;
+
+      const ctx: ProfileContext = { stage: profile.stage || 'planning' };
+
+      if (profile.stage === 'pregnant' && profile.due_date) {
+        const dueDate = new Date(profile.due_date);
+        const start = profile.pregnancy_start_date
+          ? new Date(profile.pregnancy_start_date)
+          : new Date(dueDate.getTime() - 280 * 24 * 60 * 60 * 1000);
+        const days = Math.floor((Date.now() - start.getTime()) / (24 * 60 * 60 * 1000));
+        ctx.currentWeek = Math.max(1, Math.floor(days / 7));
+      }
+
+      // 산후/육아는 첫 자녀 기준
+      if (profile.stage === 'postpartum' || profile.stage === 'parenting') {
+        const { data: children } = await supabase
+          .from('children')
+          .select('birth_date')
+          .eq('user_id', userId)
+          .order('birth_date', { ascending: false })
+          .limit(1);
+
+        if (children?.[0]) {
+          const birth = new Date(children[0].birth_date);
+          ctx.ageMonths = Math.floor((Date.now() - birth.getTime()) / (30.44 * 24 * 60 * 60 * 1000));
+        }
+      }
+
+      setProfileCtx(ctx);
+    }
+    loadProfile();
+  }, [userId]);
 
   const loadEvents = useCallback(async () => {
     setLoading(true);
     const data = await getTimelineEvents(userId, {
-      limit: 100,
+      limit: 200,
       category: selectedCategory === 'all' ? undefined : selectedCategory,
     });
-
-    // 시기 근접도 정렬: priority 높은 것 먼저, 그 다음 최신
-    const sorted = [...data].sort((a, b) => {
-      // priority 기준 (낮은 숫자 = 높은 우선순위)
-      const pa = a.content?.priority ?? 5;
-      const pb = b.content?.priority ?? 5;
-      if (pa !== pb) return pa - pb;
-      // 그 다음 생성일 최신
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-
-    setEvents(sorted);
+    setEvents(data);
     setLoading(false);
-    return sorted;
+    return data;
   }, [userId, selectedCategory]);
 
   // 이벤트가 없으면 자동 생성 트리거
@@ -56,11 +134,14 @@ export default function TimelineFeed({ userId }: { userId: string }) {
       const token = session?.access_token;
       const res = await fetch('/api/timeline/my', {
         method: 'POST',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({}),
       });
       const data = await res.json();
       if (data.created > 0) {
-        // 새로 생성됐으면 다시 로드
         await loadEvents();
       }
     } catch (e) {
@@ -72,6 +153,32 @@ export default function TimelineFeed({ userId }: { userId: string }) {
   useEffect(() => {
     loadEvents().then(generateIfEmpty);
   }, [loadEvents, generateIfEmpty]);
+
+  // 정렬 + 피드 상한 적용
+  const sortedEvents = (() => {
+    const scored = events.map(e => ({
+      event: e,
+      score: computeRelevanceScore(e, profileCtx),
+    }));
+    scored.sort((a, b) => a.score - b.score);
+
+    // "전체" 탭에서 정부지원 상한 5개
+    if (selectedCategory === 'all') {
+      let govCount = 0;
+      const MAX_GOV = 5;
+      return scored
+        .filter(({ event }) => {
+          if (event.content?.category === 'government_support') {
+            govCount++;
+            return govCount <= MAX_GOV;
+          }
+          return true;
+        })
+        .map(s => s.event);
+    }
+
+    return scored.map(s => s.event);
+  })();
 
   return (
     <div className="flex flex-col h-full">
@@ -105,7 +212,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
               </p>
             )}
           </div>
-        ) : events.length === 0 ? (
+        ) : sortedEvents.length === 0 ? (
           <div className="text-center py-20 space-y-4 animate-fade-in">
             <span className="text-6xl">📭</span>
             <p className="text-lg font-bold text-gray-600">
@@ -117,7 +224,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
           </div>
         ) : (
           <div className="space-y-3 animate-fade-in">
-            {events.map((event) => (
+            {sortedEvents.map((event) => (
               <TimelineCard
                 key={event.id}
                 event={event}

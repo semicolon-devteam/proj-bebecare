@@ -147,13 +147,31 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // 정부지원 콘텐츠는 모든 단계에 제공
-      const { data: govContents } = await supabase
+      // 정부지원: 전국 공통 + 유저 거주지역 매칭
+      const { data: govNational } = await supabase
         .from('contents')
         .select('id')
-        .eq('category', 'government_support');
+        .eq('category', 'government_support')
+        .is('region_filter', null);
+      govNational?.forEach(c => matchedContentIds.push(c.id));
 
-      govContents?.forEach(c => matchedContentIds.push(c.id));
+      if (profile.region_province) {
+        const { data: govRegion } = await supabase
+          .from('contents')
+          .select('id')
+          .eq('category', 'government_support')
+          .eq('region_filter', profile.region_province);
+        govRegion?.forEach(c => matchedContentIds.push(c.id));
+
+        if (profile.region_city) {
+          const { data: govCity } = await supabase
+            .from('contents')
+            .select('id')
+            .eq('category', 'government_support')
+            .ilike('title', `%${profile.region_city}%`);
+          govCity?.forEach(c => matchedContentIds.push(c.id));
+        }
+      }
 
       // 중복 제거
       const uniqueIds = [...new Set(matchedContentIds)];
