@@ -300,10 +300,10 @@ export default function Home() {
                       </div>
                       <div className="grid gap-4 md:grid-cols-2">
                         {[
-                          '임신 초기 증상은 어떤 게 있나요?',
-                          '신생아 목욕은 어떻게 시키나요?',
-                          '예방접종 일정을 알려주세요',
-                          '이유식은 언제부터 시작하나요?',
+                          '지금 내 시기에 맞는 조언을 해줘',
+                          '이번 주에 주의할 점이 있을까?',
+                          '우리 지역 출산 혜택 알려줘',
+                          '직장맘으로서 준비할 것들이 뭐야?',
                         ].map((example, index) => (
                           <button
                             key={index}
