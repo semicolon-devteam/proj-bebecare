@@ -213,18 +213,14 @@ export default function Home() {
         // ChatGPT-style Chat Interface
         <div className="relative z-10 flex h-screen flex-col">
           {/* Header */}
-          <header className="glass border-b border-white/20 px-4 py-4 animate-slide-down">
+          <header className="bg-pink-500 px-4 py-4 shadow-lg animate-slide-down">
             <div className="mx-auto flex max-w-4xl items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">👶</span>
-                <h1 className="text-2xl md:text-3xl font-black gradient-text from-blue-600 via-purple-600 to-pink-600">
-                  BebeCare AI
-                </h1>
-                <span className="text-3xl">💕</span>
-              </div>
+              <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+                BebeCare
+              </h1>
               <button
                 onClick={handleSignOut}
-                className="rounded-xl px-4 py-2 text-sm font-bold text-gray-700 hover:bg-white/50 transition-all duration-300"
+                className="rounded-xl px-4 py-2 text-sm font-bold text-white/80 hover:text-white hover:bg-white/20 transition-all duration-300"
               >
                 로그아웃
               </button>
