@@ -11,6 +11,7 @@ import {
 } from '@/lib/chat';
 import type { User } from '@supabase/supabase-js';
 import PushSubscription from '@/components/PushSubscription';
+import TimelineFeed from '@/components/TimelineFeed';
 import { supabase } from '@/lib/supabase';
 
 interface Message {
@@ -20,10 +21,13 @@ interface Message {
   timestamp: Date;
 }
 
+type Tab = 'timeline' | 'chat';
+
 export default function Home() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<Tab>('timeline');
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -33,6 +37,7 @@ export default function Home() {
 
   useEffect(() => {
     checkUser();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -53,7 +58,7 @@ export default function Home() {
         const completed = await isOnboardingCompleted(currentUser.id);
         if (!completed) {
           router.push('/onboarding');
-          return; // loading 유지한 채 redirect
+          return;
         }
       }
       setUser(currentUser);
@@ -81,22 +86,17 @@ export default function Home() {
   const handleSendMessage = async (content: string) => {
     if (!content.trim() || !user) return;
 
-    // Create conversation if this is the first message
     let currentConversationId = conversationId;
     if (!currentConversationId) {
       const newConversation = await createConversation(
         user.id,
         generateConversationTitle(content)
       );
-      if (!newConversation) {
-        console.error('Failed to create conversation');
-        return;
-      }
+      if (!newConversation) return;
       currentConversationId = newConversation.id;
       setConversationId(currentConversationId);
     }
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -107,16 +107,12 @@ export default function Home() {
     setInputValue('');
     setIsTyping(true);
 
-    // Save user message to database
     await saveMessage(currentConversationId, 'user', userMessage.content);
 
     try {
-      // Call OpenAI API with streaming
       const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [...messages, userMessage].map((msg) => ({
             role: msg.role,
@@ -125,72 +121,57 @@ export default function Home() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get response from AI');
-      }
+      if (!response.ok) throw new Error('AI 응답 실패');
 
-      // Create AI message placeholder
       const aiMessageId = (Date.now() + 1).toString();
-      const aiMessage: Message = {
-        id: aiMessageId,
-        role: 'assistant',
-        content: '',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiMessage]);
+      setMessages((prev) => [
+        ...prev,
+        { id: aiMessageId, role: 'assistant', content: '', timestamp: new Date() },
+      ]);
       setIsTyping(false);
 
-      // Process streaming response
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
 
       if (reader) {
         let accumulatedContent = '';
-
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-
           const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
-
-          for (const line of lines) {
+          for (const line of chunk.split('\n')) {
             if (line.startsWith('data: ')) {
               try {
                 const data = JSON.parse(line.slice(6));
                 if (data.content) {
                   accumulatedContent += data.content;
-                  // Update message content in real-time
                   setMessages((prev) =>
                     prev.map((msg) =>
-                      msg.id === aiMessageId
-                        ? { ...msg, content: accumulatedContent }
-                        : msg
+                      msg.id === aiMessageId ? { ...msg, content: accumulatedContent } : msg
                     )
                   );
                 }
-              } catch (e) {
-                // Skip invalid JSON
+              } catch {
+                // skip
               }
             }
           }
         }
-
-        // Save complete AI response to database
         if (accumulatedContent && currentConversationId) {
           await saveMessage(currentConversationId, 'assistant', accumulatedContent);
         }
       }
     } catch (error) {
-      console.error('Error sending message:', error);
-      // Add error message
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: '죄송합니다. 일시적인 오류가 발생했습니다. 다시 시도해주세요. 😔',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      console.error('Error:', error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: '죄송합니다. 일시적인 오류가 발생했습니다. 다시 시도해주세요. 😔',
+          timestamp: new Date(),
+        },
+      ]);
       setIsTyping(false);
     }
   };
@@ -200,22 +181,12 @@ export default function Home() {
     handleSendMessage(inputValue);
   };
 
-  const handleExampleClick = (example: string) => {
-    handleSendMessage(example);
-  };
-
   if (loading) {
     return (
       <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-rose-100 via-purple-100 to-blue-200">
-        {/* Animated Background Blobs */}
         <div className="absolute top-0 -left-4 h-72 w-72 animate-float rounded-full bg-gradient-to-br from-pink-400 to-rose-400 opacity-30 blur-3xl" />
-        <div className="absolute bottom-0 -right-4 h-72 w-72 animate-float rounded-full bg-gradient-to-br from-blue-400 to-purple-400 opacity-30 blur-3xl animation-delay-1000" />
-
         <div className="glass relative flex flex-col items-center gap-6 rounded-3xl p-12 animate-scale-in">
-          <div className="relative">
-            <div className="h-20 w-20 animate-spin rounded-full border-4 border-purple-200 border-t-blue-600"></div>
-            <div className="absolute inset-0 h-20 w-20 animate-ping rounded-full border-4 border-blue-400 opacity-20"></div>
-          </div>
+          <div className="h-20 w-20 animate-spin rounded-full border-4 border-purple-200 border-t-blue-600" />
           <p className="text-xl font-bold gradient-text from-blue-600 to-purple-600 animate-pulse">
             로딩 중...
           </p>
@@ -226,13 +197,11 @@ export default function Home() {
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-gradient-to-br from-rose-100 via-purple-100 to-blue-200">
-      {/* Animated Background Elements */}
+      {/* Background */}
       <div className="absolute top-0 -left-4 h-96 w-96 animate-float rounded-full bg-gradient-to-br from-pink-400 to-rose-400 opacity-20 blur-3xl" />
       <div className="absolute bottom-0 -right-4 h-96 w-96 animate-float rounded-full bg-gradient-to-br from-blue-400 to-purple-400 opacity-20 blur-3xl animation-delay-2000" />
-      <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 animate-float rounded-full bg-gradient-to-br from-purple-400 to-indigo-400 opacity-10 blur-3xl animation-delay-1000" />
 
       {user ? (
-        // ChatGPT-style Chat Interface
         <div className="relative z-10 flex h-screen flex-col">
           {/* Header */}
           <header className="bg-pink-500 px-4 py-4 shadow-lg animate-slide-down">
@@ -262,135 +231,164 @@ export default function Home() {
             </div>
           </header>
 
-          {/* Push Subscription Banner */}
+          {/* Push Subscription */}
           <div className="pt-2">
             <PushSubscription />
           </div>
 
-          {/* Chat Messages Area */}
-          <div className="flex-1 overflow-y-auto px-4 py-8">
-            <div className="mx-auto max-w-3xl space-y-6">
-              {messages.length === 0 ? (
-                // Welcome Screen
-                <div className="space-y-8 animate-fade-in">
-                  <div className="text-center space-y-4">
-                    <div className="inline-flex items-center gap-2 animate-scale-in">
-                      <span className="text-5xl">🤖</span>
-                      <h2 className="text-4xl md:text-5xl font-black gradient-text from-blue-600 to-purple-600">
-                        안녕하세요!
-                      </h2>
-                    </div>
-                    <p className="text-xl text-gray-700">
-                      임신·출산·육아에 대해 무엇이든 물어보세요
-                    </p>
-                  </div>
-
-                  {/* Example Questions */}
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {[
-                      '임신 초기 증상은 어떤 게 있나요?',
-                      '신생아 목욕은 어떻게 시키나요?',
-                      '예방접종 일정을 알려주세요',
-                      '이유식은 언제부터 시작하나요?',
-                    ].map((example, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleExampleClick(example)}
-                        className="glass group rounded-2xl p-6 text-left hover-lift hover:border-purple-300 animate-scale-in"
-                        style={{ animationDelay: `${index * 100}ms` }}
-                      >
-                        <div className="flex items-start gap-3">
-                          <span className="text-2xl flex-shrink-0">💬</span>
-                          <p className="text-base font-medium text-gray-800 group-hover:gradient-text group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300">
-                            {example}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                // Chat Messages
-                <>
-                  {messages.map((message, index) => (
-                    <div
-                      key={message.id}
-                      className={`flex gap-4 animate-slide-up ${
-                        message.role === 'user' ? 'justify-end' : 'justify-start'
-                      }`}
-                      style={{ animationDelay: `${index * 50}ms` }}
-                    >
-                      {message.role === 'assistant' && (
-                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                          <span className="text-xl">🤖</span>
-                        </div>
-                      )}
-                      <div
-                        className={`max-w-[80%] rounded-2xl px-6 py-4 ${
-                          message.role === 'user'
-                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                            : 'glass text-gray-800'
-                        }`}
-                      >
-                        <p className="text-base leading-relaxed whitespace-pre-wrap">
-                          {message.content}
-                        </p>
-                      </div>
-                      {message.role === 'user' && (
-                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
-                          <span className="text-xl">👤</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  {isTyping && (
-                    <div className="flex gap-4 animate-slide-up">
-                      <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                        <span className="text-xl">🤖</span>
-                      </div>
-                      <div className="glass rounded-2xl px-6 py-4">
-                        <div className="flex gap-2">
-                          <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"></div>
-                          <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce animation-delay-100"></div>
-                          <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce animation-delay-500"></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </>
-              )}
+          {/* Tab Bar */}
+          <div className="glass border-b border-white/20 px-4">
+            <div className="mx-auto max-w-4xl flex">
+              <button
+                onClick={() => setActiveTab('timeline')}
+                className={`flex-1 py-3 text-center text-sm font-bold transition-all duration-200 border-b-2 ${
+                  activeTab === 'timeline'
+                    ? 'border-pink-500 text-pink-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                📋 맞춤 정보
+              </button>
+              <button
+                onClick={() => setActiveTab('chat')}
+                className={`flex-1 py-3 text-center text-sm font-bold transition-all duration-200 border-b-2 ${
+                  activeTab === 'chat'
+                    ? 'border-pink-500 text-pink-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                💬 AI 상담
+              </button>
             </div>
           </div>
 
-          {/* Input Area */}
-          <div className="glass border-t border-white/20 px-4 py-4">
-            <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
-              <div className="glass relative flex items-center gap-3 rounded-3xl p-2">
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="메시지를 입력하세요..."
-                  className="flex-1 bg-transparent px-4 py-3 text-gray-800 placeholder-gray-500 outline-none"
-                  disabled={isTyping}
-                />
-                <button
-                  type="submit"
-                  disabled={!inputValue.trim() || isTyping}
-                  className="flex-shrink-0 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 font-bold text-white hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-lg"
-                >
-                  <span className="text-lg">전송</span>
-                </button>
+          {/* Content Area */}
+          {activeTab === 'timeline' ? (
+            <div className="flex-1 overflow-hidden">
+              <TimelineFeed userId={user.id} />
+            </div>
+          ) : (
+            <>
+              {/* Chat Messages */}
+              <div className="flex-1 overflow-y-auto px-4 py-8">
+                <div className="mx-auto max-w-3xl space-y-6">
+                  {messages.length === 0 ? (
+                    <div className="space-y-8 animate-fade-in">
+                      <div className="text-center space-y-4">
+                        <div className="inline-flex items-center gap-2 animate-scale-in">
+                          <span className="text-5xl">🤖</span>
+                          <h2 className="text-4xl md:text-5xl font-black gradient-text from-blue-600 to-purple-600">
+                            안녕하세요!
+                          </h2>
+                        </div>
+                        <p className="text-xl text-gray-700">
+                          임신·출산·육아에 대해 무엇이든 물어보세요
+                        </p>
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {[
+                          '임신 초기 증상은 어떤 게 있나요?',
+                          '신생아 목욕은 어떻게 시키나요?',
+                          '예방접종 일정을 알려주세요',
+                          '이유식은 언제부터 시작하나요?',
+                        ].map((example, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleSendMessage(example)}
+                            className="glass group rounded-2xl p-6 text-left hover-lift hover:border-purple-300 animate-scale-in"
+                            style={{ animationDelay: `${index * 100}ms` }}
+                          >
+                            <div className="flex items-start gap-3">
+                              <span className="text-2xl flex-shrink-0">💬</span>
+                              <p className="text-base font-medium text-gray-800">
+                                {example}
+                              </p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {messages.map((message) => (
+                        <div
+                          key={message.id}
+                          className={`flex gap-4 animate-slide-up ${
+                            message.role === 'user' ? 'justify-end' : 'justify-start'
+                          }`}
+                        >
+                          {message.role === 'assistant' && (
+                            <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                              <span className="text-xl">🤖</span>
+                            </div>
+                          )}
+                          <div
+                            className={`max-w-[80%] rounded-2xl px-6 py-4 ${
+                              message.role === 'user'
+                                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                                : 'glass text-gray-800'
+                            }`}
+                          >
+                            <p className="text-base leading-relaxed whitespace-pre-wrap">
+                              {message.content}
+                            </p>
+                          </div>
+                          {message.role === 'user' && (
+                            <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
+                              <span className="text-xl">👤</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      {isTyping && (
+                        <div className="flex gap-4 animate-slide-up">
+                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                            <span className="text-xl">🤖</span>
+                          </div>
+                          <div className="glass rounded-2xl px-6 py-4">
+                            <div className="flex gap-2">
+                              <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce" />
+                              <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce animation-delay-100" />
+                              <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce animation-delay-500" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div ref={messagesEndRef} />
+                    </>
+                  )}
+                </div>
               </div>
-            </form>
-          </div>
+
+              {/* Chat Input */}
+              <div className="glass border-t border-white/20 px-4 py-4">
+                <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
+                  <div className="glass relative flex items-center gap-3 rounded-3xl p-2">
+                    <input
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      placeholder="메시지를 입력하세요..."
+                      className="flex-1 bg-transparent px-4 py-3 text-gray-800 placeholder-gray-500 outline-none"
+                      disabled={isTyping}
+                    />
+                    <button
+                      type="submit"
+                      disabled={!inputValue.trim() || isTyping}
+                      className="flex-shrink-0 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 font-bold text-white hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                    >
+                      전송
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </>
+          )}
         </div>
       ) : (
-        // Landing Page for Non-logged Users
+        /* Landing Page */
         <div className="relative z-10 flex min-h-screen items-center justify-center p-4 md:p-8">
           <div className="w-full max-w-6xl space-y-10 animate-fade-in">
-            {/* Header Section */}
             <div className="text-center space-y-6 animate-slide-down">
               <div className="glass inline-block rounded-3xl px-10 py-8 animate-glow">
                 <div className="space-y-4">
@@ -415,10 +413,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-
-            {/* Hero Message and CTA */}
             <div className="space-y-8 animate-fade-in">
-              {/* Hero Message */}
               <div className="glass rounded-3xl p-10 text-center animate-scale-in">
                 <p className="text-2xl md:text-3xl font-bold text-gray-800 leading-relaxed">
                   BebeCare와 함께{' '}
@@ -426,28 +421,22 @@ export default function Home() {
                   <span className="gradient-text from-blue-600 via-purple-600 to-pink-600 text-3xl md:text-4xl">
                     행복한 임신·출산·육아
                   </span>
-                  를{' '}
-                  <br className="md:hidden" />
-                  시작하세요{' '}
+                  를 시작하세요{' '}
                   <span className="inline-block animate-pulse text-4xl">💝</span>
                 </p>
               </div>
-
-              {/* CTA Buttons */}
               <div className="grid gap-5 md:grid-cols-2 md:gap-6">
                 <button
                   onClick={() => router.push('/login')}
                   className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-10 py-6 font-black text-white shadow-2xl hover-lift hover-glow animate-scale-in"
                 >
                   <span className="relative z-10 text-xl">로그인</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"></div>
                 </button>
                 <button
                   onClick={() => router.push('/signup')}
                   className="glass group rounded-2xl px-10 py-6 font-black hover-lift hover:border-purple-300 animate-scale-in animation-delay-100"
                 >
-                  <span className="text-xl gradient-text from-blue-600 to-purple-600 group-hover:from-purple-600 group-hover:to-pink-600 transition-all duration-300">
+                  <span className="text-xl gradient-text from-blue-600 to-purple-600">
                     회원가입
                   </span>
                 </button>
