@@ -29,8 +29,8 @@ function buildSystemPrompt(profile: Record<string, unknown> | null): string {
   if (profile) {
     const stage = profile.stage as string | null;
     const dueDate = profile.due_date as string | null;
-    const pregnancyStart = profile.pregnancy_start as string | null;
-    const childBirthDate = profile.child_birth_date as string | null;
+    const pregnancyStart = (profile.pregnancy_start_date ?? profile.pregnancy_start) as string | null;
+    const childBirthDate = (profile.birth_date ?? profile.child_birth_date) as string | null;
     const regionProvince = profile.region_province as string | null;
     const regionCity = profile.region_city as string | null;
     const isWorking = profile.is_working as boolean | null;
