@@ -34,34 +34,54 @@ interface ProfileContext {
   childBirthDate?: Date;
 }
 
-function computeRelevanceScore(event: TimelineEvent, profile: ProfileContext): number {
+/**
+ * D-Day 값 계산 (양수 = 미래, 음수 = 과거, null = 시기 정보 없음)
+ * 예: D-23 → 23, D+40 → -40, D-Day → 0
+ */
+function computeDdayValue(event: TimelineEvent, profile: ProfileContext): number | null {
   const c = event.content;
-  if (!c) return 999;
+  if (!c) return null;
 
-  const catOrder = CATEGORY_ORDER[c.category] ?? 1;
-
-  // 시기 매칭 점수 (0 = 정확 매칭, 숫자 클수록 먼 시기)
-  let timeDistance = 50; // 기본값 (시기 정보 없는 콘텐츠)
-
-  if (profile.stage === 'pregnant' && profile.currentWeek && c.week_start !== null && c.week_end !== null) {
-    const midWeek = (c.week_start + c.week_end) / 2;
-    timeDistance = Math.abs(profile.currentWeek - midWeek);
-  } else if ((profile.stage === 'postpartum' || profile.stage === 'parenting') && profile.ageMonths !== undefined) {
-    if (c.month_start !== null && c.month_end !== null) {
-      const midMonth = (c.month_start + c.month_end) / 2;
-      timeDistance = Math.abs(profile.ageMonths - midMonth);
-    } else if (c.week_start !== null && c.week_end !== null) {
-      const midWeek = (c.week_start + c.week_end) / 2;
-      const ageWeeks = profile.ageMonths * 4.35;
-      timeDistance = Math.abs(ageWeeks - midWeek) / 4.35; // normalize to months
-    }
+  // week_start 기반 (임신 주차 기준)
+  if (c.week_start != null && profile.pregnancyStartDate) {
+    const contentDate = new Date(profile.pregnancyStartDate.getTime() + c.week_start * 7 * 24 * 60 * 60 * 1000);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    contentDate.setHours(0, 0, 0, 0);
+    return Math.round((contentDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
   }
 
-  // 미읽은 콘텐츠 보너스
-  const unreadBonus = event.is_read ? 10 : 0;
+  // month_start 기반 (출산 후)
+  if (c.month_start != null && profile.childBirthDate) {
+    const contentDate = new Date(profile.childBirthDate);
+    contentDate.setMonth(contentDate.getMonth() + c.month_start);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    contentDate.setHours(0, 0, 0, 0);
+    return Math.round((contentDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+  }
 
-  // 최종 점수: catOrder * 100 + timeDistance + unreadBonus
-  return catOrder * 100 + timeDistance + unreadBonus;
+  return null;
+}
+
+/**
+ * 정렬 점수: D-Day 임박(양수 작은 값) → 상단, D-Day 없으면 하단
+ * 미래(D-) → 값이 작을수록 상단 (0이 가장 임박)
+ * 과거(D+) → 큰 양수로 밀어냄
+ * 시기 없음 → 중간
+ */
+function computeSortScore(event: TimelineEvent, profile: ProfileContext): number {
+  const ddayValue = computeDdayValue(event, profile);
+
+  if (ddayValue === null) return 5000; // 시기 없음 → 중간 배치
+
+  if (ddayValue >= 0) {
+    // 미래: D-Day 가까울수록 상단 (0 → 가장 위)
+    return ddayValue;
+  } else {
+    // 과거: D+ 값이 클수록 아래 (최근 지난 것이 위)
+    return 10000 + Math.abs(ddayValue);
+  }
 }
 
 export default function TimelineFeed({ userId }: { userId: string }) {
@@ -70,6 +90,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
   const [generating, setGenerating] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [profileCtx, setProfileCtx] = useState<ProfileContext>({ stage: 'planning' });
+  const [showPast, setShowPast] = useState(false);
   const hasTriedGenerate = useRef(false);
 
   // 프로필 로드 (시기 정보용)
@@ -158,30 +179,38 @@ export default function TimelineFeed({ userId }: { userId: string }) {
     loadEvents().then(generateIfEmpty);
   }, [loadEvents, generateIfEmpty]);
 
-  // 정렬 + 피드 상한 적용
-  const sortedEvents = (() => {
-    const scored = events.map(e => ({
+  // D-Day 기반 정렬 + 과거 항목 필터 + 피드 상한
+  const { visibleEvents: sortedEvents, pastCount } = (() => {
+    const withDday = events.map(e => ({
       event: e,
-      score: computeRelevanceScore(e, profileCtx),
+      ddayValue: computeDdayValue(e, profileCtx),
+      sortScore: computeSortScore(e, profileCtx),
     }));
-    scored.sort((a, b) => a.score - b.score);
+
+    // D-Day 임박 순 정렬
+    withDday.sort((a, b) => a.sortScore - b.sortScore);
+
+    // 과거 항목 분리
+    const futureOrNoDate = withDday.filter(d => d.ddayValue === null || d.ddayValue >= 0);
+    const past = withDday.filter(d => d.ddayValue !== null && d.ddayValue < 0);
+
+    const base = showPast ? [...futureOrNoDate, ...past] : futureOrNoDate;
 
     // "전체" 탭에서 정부지원 상한 5개
     if (selectedCategory === 'all') {
       let govCount = 0;
       const MAX_GOV = 5;
-      return scored
-        .filter(({ event }) => {
-          if (event.content?.category === 'government_support') {
-            govCount++;
-            return govCount <= MAX_GOV;
-          }
-          return true;
-        })
-        .map(s => s.event);
+      const filtered = base.filter(({ event }) => {
+        if (event.content?.category === 'government_support') {
+          govCount++;
+          return govCount <= MAX_GOV;
+        }
+        return true;
+      });
+      return { visibleEvents: filtered.map(s => s.event), pastCount: past.length };
     }
 
-    return scored.map(s => s.event);
+    return { visibleEvents: base.map(s => s.event), pastCount: past.length };
   })();
 
   return (
@@ -204,6 +233,18 @@ export default function TimelineFeed({ userId }: { userId: string }) {
           ))}
         </div>
       </div>
+
+      {/* Past items toggle */}
+      {pastCount > 0 && (
+        <div className="px-4 pb-2">
+          <button
+            onClick={() => setShowPast(!showPast)}
+            className="text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            {showPast ? '📂 지난 항목 숨기기' : `📁 지난 항목 보기 (${pastCount})`}
+          </button>
+        </div>
+      )}
 
       {/* Events */}
       <div className="flex-1 overflow-y-auto px-4 pb-4">
