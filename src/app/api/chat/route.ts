@@ -86,26 +86,74 @@ ${profileSection}
 }
 
 /**
- * RAG: 유저 질문으로 관련 콘텐츠 검색
+ * 멀티턴 RAG 검색 쿼리 생성: 최근 유저 메시지 2-3개를 합침
  */
-async function searchRelevantContents(query: string): Promise<string> {
+function buildSearchQuery(messages: { role: string; content: string }[]): string {
+  const userMessages = messages
+    .filter((m) => m.role === 'user')
+    .slice(-3) // 최근 3개
+    .map((m) => m.content);
+  return userMessages.join(' ');
+}
+
+/** stage에 맞는 콘텐츠를 부스트하여 재정렬 */
+interface RagItem {
+  id: string;
+  title: string;
+  category: string;
+  stage: string | null;
+  summary: string;
+  body: string;
+  similarity: number;
+}
+
+function rerankByStage(items: RagItem[], userStage: string | null): RagItem[] {
+  if (!userStage) return items;
+
+  // stage 매핑: pregnant → ['pregnant', 'all'], postpartum → ['postpartum', 'all'], etc.
+  const relevantStages = new Set([userStage, 'all']);
+
+  return items
+    .map((item) => ({
+      ...item,
+      // stage 일치 시 유사도 0.1 부스트
+      boostedSimilarity:
+        item.similarity + (item.stage && relevantStages.has(item.stage) ? 0.1 : 0),
+    }))
+    .sort((a, b) => b.boostedSimilarity - a.boostedSimilarity)
+    .slice(0, 5); // top-5 유지
+}
+
+/**
+ * RAG: 멀티턴 검색 + 카테고리 필터링
+ */
+async function searchRelevantContents(
+  messages: { role: string; content: string }[],
+  userStage: string | null
+): Promise<string> {
   try {
+    const query = buildSearchQuery(messages);
+    if (!query.trim()) return '';
+
     const queryEmbedding = await createEmbedding(query);
     const supabase = getSupabaseAdmin();
 
+    // 더 많이 가져와서 reranking
     const { data, error } = await supabase.rpc('match_contents', {
       query_embedding: JSON.stringify(queryEmbedding),
-      match_threshold: 0.3,
-      match_count: 5,
+      match_threshold: 0.25,
+      match_count: 10,
     });
 
     if (error || !data || data.length === 0) {
       return '';
     }
 
-    const context = data
+    const reranked = rerankByStage(data as RagItem[], userStage);
+
+    const context = reranked
       .map(
-        (item: { title: string; category: string; summary: string; body: string; similarity: number }, i: number) =>
+        (item, i) =>
           `[참고자료 ${i + 1}] (카테고리: ${item.category}, 유사도: ${(item.similarity * 100).toFixed(0)}%)\n제목: ${item.title}\n요약: ${item.summary || ''}\n내용: ${item.body}`
       )
       .join('\n\n---\n\n');
@@ -140,12 +188,12 @@ export async function POST(req: NextRequest) {
       profile = data;
     }
 
-    // 마지막 유저 메시지로 RAG 검색
-    const lastUserMessage = [...messages].reverse().find((m: { role: string }) => m.role === 'user');
+    // 멀티턴 RAG 검색 (최근 유저 메시지 2-3개 합산)
+    const userStage = (profile?.stage as string) || null;
     let systemPrompt = buildSystemPrompt(profile);
 
-    if (lastUserMessage) {
-      const context = await searchRelevantContents(lastUserMessage.content);
+    {
+      const context = await searchRelevantContents(messages, userStage);
       if (context) {
         systemPrompt += `\n\n## 참고자료 (BebeCare 검증된 데이터)
 
