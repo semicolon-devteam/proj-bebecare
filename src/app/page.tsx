@@ -211,6 +211,12 @@ export default function Home() {
               </h1>
               <div className="flex items-center gap-2">
                 <button
+                  onClick={() => router.push('/benefits')}
+                  className="rounded-xl px-3 py-2 text-white/80 hover:text-white hover:bg-white/20 transition-all duration-300"
+                >
+                  <span className="text-xl">🏛️</span>
+                </button>
+                <button
                   onClick={() => router.push('/notifications')}
                   className="relative rounded-xl px-3 py-2 text-white/80 hover:text-white hover:bg-white/20 transition-all duration-300"
                 >
