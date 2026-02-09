@@ -20,19 +20,70 @@ function getSupabaseAdmin() {
   );
 }
 
-const BASE_SYSTEM_PROMPT = `당신은 BebeCare AI 상담사입니다. 임신, 출산, 육아 전문가로서 사용자에게 도움이 되는 조언을 제공합니다.
+/**
+ * 유저 프로필 기반 동적 시스템 프롬프트 생성
+ */
+function buildSystemPrompt(profile: Record<string, unknown> | null): string {
+  let profileSection = '';
 
-역할:
-- 친절하고 공감적인 태도로 대화합니다
-- 임신, 출산, 육아에 관한 정확하고 신뢰할 수 있는 정보를 제공합니다
-- 의학적 응급 상황이나 심각한 건강 문제는 즉시 의사 상담을 권장합니다
-- 개인의 상황을 존중하고 판단하지 않습니다
+  if (profile) {
+    const stage = profile.stage as string | null;
+    const dueDate = profile.due_date as string | null;
+    const pregnancyStart = profile.pregnancy_start as string | null;
+    const childBirthDate = profile.child_birth_date as string | null;
+    const regionProvince = profile.region_province as string | null;
+    const regionCity = profile.region_city as string | null;
+    const isWorking = profile.is_working as boolean | null;
+    const nickname = profile.nickname as string | null;
 
-대화 스타일:
-- 이모지를 적절히 사용하여 친근하게 대화합니다 (예: 👶, 💕, 😊)
-- 명확하고 이해하기 쉬운 언어를 사용합니다
-- 필요시 단계별로 설명합니다
-- 긍정적이고 격려하는 톤을 유지합니다`;
+    // 주차/월령 계산
+    let stageInfo = '';
+    const now = new Date();
+    if (stage === 'pregnant' && pregnancyStart) {
+      const start = new Date(pregnancyStart);
+      const diffWeeks = Math.floor((now.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000));
+      stageInfo = `임신 ${diffWeeks}주차`;
+      if (dueDate) stageInfo += ` (예정일: ${dueDate})`;
+    } else if ((stage === 'postpartum' || stage === 'parenting') && childBirthDate) {
+      const birth = new Date(childBirthDate);
+      const diffMonths = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+      if (diffMonths < 1) {
+        const diffDays = Math.floor((now.getTime() - birth.getTime()) / (24 * 60 * 60 * 1000));
+        stageInfo = `출산 ${diffDays}일차 (산후조리기)`;
+      } else {
+        stageInfo = `아기 ${diffMonths}개월`;
+      }
+    } else if (stage === 'planning') {
+      stageInfo = '임신 준비 중';
+    }
+
+    const region = [regionProvince, regionCity].filter(Boolean).join(' ');
+
+    profileSection = `\n## 유저 프로필
+${nickname ? `- 닉네임: ${nickname}` : ''}
+- 상태: ${stageInfo || stage || '미설정'}
+${region ? `- 지역: ${region}` : ''}
+${isWorking ? '- 직장맘: Y' : ''}
+`.replace(/\n{3,}/g, '\n\n');
+  }
+
+  return `## 역할
+BebeCare 임신·출산·육아 AI 상담사. 따뜻하고 신뢰할 수 있는 전문 상담사로서, 유저의 현재 시기에 맞는 정보를 제공한다.
+${profileSection}
+## 규칙
+1. 의학적 진단·처방 절대 불가 → "담당 의사와 상담하세요" 안내
+2. 응급 증상 키워드(출혈, 파수, 태동 감소, 고열, 경련 등) → 즉시 병원 방문 강력 권고
+3. 참고자료(RAG) 기반 답변 우선. 없으면 일반 지식으로 보충하되 자연스럽게 통합
+4. 유저의 현재 주차/월령에 맞는 맥락 유지 — 시기에 안 맞는 정보는 시기를 명시
+5. 지역 정보가 있으면 해당 지역 혜택/기관 우선 안내
+6. 불확실한 정보에는 "정확한 내용은 확인이 필요합니다" 명시
+
+## 대화 스타일
+- 이모지 적절히 사용 (👶 💕 😊)
+- 명확하고 쉬운 언어. 의학 용어는 괄호로 설명 추가
+- 필요시 단계별 설명
+- 긍정적·격려하는 톤이되, 과장하지 않음`;
+}
 
 /**
  * RAG: 유저 질문으로 관련 콘텐츠 검색
@@ -68,7 +119,7 @@ async function searchRelevantContents(query: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json();
+    const { messages, userId } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -77,9 +128,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 유저 프로필 조회
+    let profile: Record<string, unknown> | null = null;
+    if (userId) {
+      const supabase = getSupabaseAdmin();
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+      profile = data;
+    }
+
     // 마지막 유저 메시지로 RAG 검색
     const lastUserMessage = [...messages].reverse().find((m: { role: string }) => m.role === 'user');
-    let systemPrompt = BASE_SYSTEM_PROMPT;
+    let systemPrompt = buildSystemPrompt(profile);
 
     if (lastUserMessage) {
       const context = await searchRelevantContents(lastUserMessage.content);

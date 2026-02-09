@@ -118,6 +118,7 @@ export default function Home() {
             role: msg.role,
             content: msg.content,
           })),
+          userId: user?.id,
         }),
       });
 
