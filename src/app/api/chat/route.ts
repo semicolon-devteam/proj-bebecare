@@ -1,25 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 export const runtime = 'edge';
 
-export async function POST(req: NextRequest) {
-  try {
-    const { messages } = await req.json();
-
-    if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json(
-        { error: 'Messages array is required' },
-        { status: 400 }
-      );
-    }
-
-    // System prompt for BebeCare AI
-    const systemPrompt = `당신은 BebeCare AI 상담사입니다. 임신, 출산, 육아 전문가로서 사용자에게 도움이 되는 조언을 제공합니다.
+const systemPrompt = `당신은 BebeCare AI 상담사입니다. 임신, 출산, 육아 전문가로서 사용자에게 도움이 되는 조언을 제공합니다.
 
 역할:
 - 친절하고 공감적인 태도로 대화합니다
@@ -33,29 +21,34 @@ export async function POST(req: NextRequest) {
 - 필요시 단계별로 설명합니다
 - 긍정적이고 격려하는 톤을 유지합니다`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages.map((msg: { role: string; content: string }) => ({
-          role: msg.role,
-          content: msg.content,
-        })),
-      ],
-      temperature: 0.7,
+export async function POST(req: NextRequest) {
+  try {
+    const { messages } = await req.json();
+
+    if (!messages || !Array.isArray(messages)) {
+      return NextResponse.json(
+        { error: 'Messages array is required' },
+        { status: 400 }
+      );
+    }
+
+    const stream = await anthropic.messages.stream({
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
-      stream: true,
+      system: systemPrompt,
+      messages: messages.map((msg: { role: string; content: string }) => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content,
+      })),
     });
 
-    // Create a readable stream for SSE (Server-Sent Events)
     const encoder = new TextEncoder();
-    const stream = new ReadableStream({
+    const readableStream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of completion) {
-            const content = chunk.choices[0]?.delta?.content || '';
-            if (content) {
-              const data = encoder.encode(`data: ${JSON.stringify({ content })}\n\n`);
+          for await (const event of stream) {
+            if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+              const data = encoder.encode(`data: ${JSON.stringify({ content: event.delta.text })}\n\n`);
               controller.enqueue(data);
             }
           }
@@ -67,7 +60,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return new Response(stream, {
+    return new Response(readableStream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -75,7 +68,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('OpenAI API error:', error);
+    console.error('Anthropic API error:', error);
     return NextResponse.json(
       { error: 'Failed to process chat request' },
       { status: 500 }
