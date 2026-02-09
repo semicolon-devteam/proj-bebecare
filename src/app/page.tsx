@@ -187,7 +187,7 @@ export default function Home() {
         <div className="absolute top-0 -left-4 h-72 w-72 animate-float rounded-full bg-gradient-to-br from-pink-400 to-rose-400 opacity-30 blur-3xl" />
         <div className="glass relative flex flex-col items-center gap-6 rounded-3xl p-12 animate-scale-in">
           <div className="h-20 w-20 animate-spin rounded-full border-4 border-purple-200 border-t-blue-600" />
-          <p className="text-xl font-bold gradient-text from-blue-600 to-purple-600 animate-pulse">
+          <p className="text-xl font-bold bg-gradient-to-r gradient-text from-blue-600 to-purple-600 animate-pulse">
             로딩 중...
           </p>
         </div>
@@ -289,7 +289,7 @@ export default function Home() {
                       <div className="text-center space-y-4">
                         <div className="inline-flex items-center gap-2 animate-scale-in">
                           <span className="text-5xl">🤖</span>
-                          <h2 className="text-4xl md:text-5xl font-black gradient-text from-blue-600 to-purple-600">
+                          <h2 className="text-4xl md:text-5xl font-black bg-gradient-to-r gradient-text from-blue-600 to-purple-600">
                             안녕하세요!
                           </h2>
                         </div>
@@ -406,7 +406,7 @@ export default function Home() {
                 <div className="space-y-4">
                   <div className="inline-flex items-center gap-3">
                     <span className="text-5xl animate-float">👶</span>
-                    <h1 className="text-6xl md:text-8xl font-black gradient-text from-blue-600 via-purple-600 to-pink-600">
+                    <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r gradient-text from-blue-600 via-purple-600 to-pink-600">
                       BebeCare
                     </h1>
                     <span className="text-5xl animate-float animation-delay-500">💕</span>
@@ -430,7 +430,7 @@ export default function Home() {
                 <p className="text-2xl md:text-3xl font-bold text-gray-800 leading-relaxed">
                   BebeCare와 함께{' '}
                   <br className="md:hidden" />
-                  <span className="gradient-text from-blue-600 via-purple-600 to-pink-600 text-3xl md:text-4xl">
+                  <span className="bg-gradient-to-r gradient-text from-blue-600 via-purple-600 to-pink-600 text-3xl md:text-4xl">
                     행복한 임신·출산·육아
                   </span>
                   를 시작하세요{' '}
@@ -448,7 +448,7 @@ export default function Home() {
                   onClick={() => router.push('/signup')}
                   className="glass group rounded-2xl px-10 py-6 font-black hover-lift hover:border-purple-300 animate-scale-in animation-delay-100"
                 >
-                  <span className="text-xl gradient-text from-blue-600 to-purple-600">
+                  <span className="text-xl bg-gradient-to-r gradient-text from-blue-600 to-purple-600">
                     회원가입
                   </span>
                 </button>
