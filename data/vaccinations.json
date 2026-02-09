@@ -1,0 +1,175 @@
+{
+  "title": "국가예방접종 일정 (영유아)",
+  "source": "https://nip.kdca.go.kr/irgd/scheduleVaccine.do",
+  "reference": "질병관리청 예방접종도우미",
+  "collected_at": "2026-02-10T02:12:00+09:00",
+  "note": "2025-2026년 국가예방접종 지원사업 기준. 크롤링 차단으로 공식 가이드라인 기반 직접 작성.",
+  "vaccinations": [
+    {
+      "id": "bcg",
+      "name": "BCG (피내용)",
+      "disease": "결핵",
+      "doses": [
+        { "dose": 1, "age_months": 0, "age_label": "출생 직후", "interval": null }
+      ],
+      "total_doses": 1,
+      "notes": "출생 시 1회 접종. 피내용 권장."
+    },
+    {
+      "id": "hepb",
+      "name": "B형간염 (HepB)",
+      "disease": "B형간염",
+      "doses": [
+        { "dose": 1, "age_months": 0, "age_label": "출생 직후", "interval": null },
+        { "dose": 2, "age_months": 1, "age_label": "1개월", "interval": "1차 접종 후 1개월" },
+        { "dose": 3, "age_months": 6, "age_label": "6개월", "interval": "1차 접종 후 6개월" }
+      ],
+      "total_doses": 3,
+      "notes": "모체가 HBsAg 양성인 경우 출생 후 12시간 이내 HBIG와 동시 접종"
+    },
+    {
+      "id": "dtap",
+      "name": "DTaP (디프테리아/파상풍/백일해)",
+      "disease": "디프테리아, 파상풍, 백일해",
+      "doses": [
+        { "dose": 1, "age_months": 2, "age_label": "2개월", "interval": null },
+        { "dose": 2, "age_months": 4, "age_label": "4개월", "interval": "1차 후 2개월" },
+        { "dose": 3, "age_months": 6, "age_label": "6개월", "interval": "2차 후 2개월" },
+        { "dose": 4, "age_months": 18, "age_label": "15~18개월", "interval": "3차 후 6개월 이상" },
+        { "dose": 5, "age_months": 60, "age_label": "만 4~6세", "interval": "추가접종" }
+      ],
+      "total_doses": 5,
+      "notes": "만 11~12세에 Tdap으로 추가접종 권장"
+    },
+    {
+      "id": "ipv",
+      "name": "폴리오 (IPV)",
+      "disease": "폴리오",
+      "doses": [
+        { "dose": 1, "age_months": 2, "age_label": "2개월", "interval": null },
+        { "dose": 2, "age_months": 4, "age_label": "4개월", "interval": "1차 후 2개월" },
+        { "dose": 3, "age_months": 6, "age_label": "6개월", "interval": "2차 후 2개월" },
+        { "dose": 4, "age_months": 60, "age_label": "만 4~6세", "interval": "추가접종" }
+      ],
+      "total_doses": 4,
+      "notes": "DTaP-IPV 혼합백신으로 접종 가능"
+    },
+    {
+      "id": "hib",
+      "name": "Hib (b형 헤모필루스 인플루엔자)",
+      "disease": "b형 헤모필루스 인플루엔자",
+      "doses": [
+        { "dose": 1, "age_months": 2, "age_label": "2개월", "interval": null },
+        { "dose": 2, "age_months": 4, "age_label": "4개월", "interval": "1차 후 2개월" },
+        { "dose": 3, "age_months": 6, "age_label": "6개월", "interval": "2차 후 2개월" },
+        { "dose": 4, "age_months": 15, "age_label": "12~15개월", "interval": "추가접종" }
+      ],
+      "total_doses": 4,
+      "notes": "백신 종류에 따라 기초접종 2~3회. PRP-OMP는 기초 2회."
+    },
+    {
+      "id": "pcv",
+      "name": "폐렴구균 (PCV13)",
+      "disease": "폐렴구균",
+      "doses": [
+        { "dose": 1, "age_months": 2, "age_label": "2개월", "interval": null },
+        { "dose": 2, "age_months": 4, "age_label": "4개월", "interval": "1차 후 2개월" },
+        { "dose": 3, "age_months": 6, "age_label": "6개월", "interval": "2차 후 2개월" },
+        { "dose": 4, "age_months": 15, "age_label": "12~15개월", "interval": "추가접종" }
+      ],
+      "total_doses": 4,
+      "notes": "13가 단백결합 백신(PCV13) 사용"
+    },
+    {
+      "id": "rv",
+      "name": "로타바이러스 (RV)",
+      "disease": "로타바이러스 위장관염",
+      "doses": [
+        { "dose": 1, "age_months": 2, "age_label": "2개월", "interval": null },
+        { "dose": 2, "age_months": 4, "age_label": "4개월", "interval": "1차 후 2개월" },
+        { "dose": 3, "age_months": 6, "age_label": "6개월", "interval": "2차 후 2개월 (RV5만 해당)" }
+      ],
+      "total_doses": 3,
+      "notes": "RV1(로타릭스)은 2회, RV5(로타텍)은 3회 접종. 경구 투여. 2023년 3월부터 국가예방접종 무료지원."
+    },
+    {
+      "id": "mmr",
+      "name": "MMR (홍역/유행성이하선염/풍진)",
+      "disease": "홍역, 유행성이하선염, 풍진",
+      "doses": [
+        { "dose": 1, "age_months": 12, "age_label": "12~15개월", "interval": null },
+        { "dose": 2, "age_months": 60, "age_label": "만 4~6세", "interval": "추가접종" }
+      ],
+      "total_doses": 2,
+      "notes": "홍역 유행 시 6~11개월에 긴급접종 가능 (0차로 간주)"
+    },
+    {
+      "id": "var",
+      "name": "수두 (VAR)",
+      "disease": "수두",
+      "doses": [
+        { "dose": 1, "age_months": 12, "age_label": "12~15개월", "interval": null }
+      ],
+      "total_doses": 1,
+      "notes": "1회 접종. 만 4~6세 2차 접종 권고(선택)"
+    },
+    {
+      "id": "hepa",
+      "name": "A형간염 (HepA)",
+      "disease": "A형간염",
+      "doses": [
+        { "dose": 1, "age_months": 12, "age_label": "12~23개월", "interval": null },
+        { "dose": 2, "age_months": 18, "age_label": "1차 접종 후 6개월 이상", "interval": "1차 후 6~18개월" }
+      ],
+      "total_doses": 2,
+      "notes": "생후 12개월 이후 2회 접종 (6~18개월 간격)"
+    },
+    {
+      "id": "je_inactivated",
+      "name": "일본뇌염 (불활성화 백신)",
+      "disease": "일본뇌염",
+      "doses": [
+        { "dose": 1, "age_months": 12, "age_label": "12~23개월", "interval": null },
+        { "dose": 2, "age_months": 13, "age_label": "1차 후 7~30일", "interval": "1차 후 7~30일" },
+        { "dose": 3, "age_months": 24, "age_label": "2차 후 12개월", "interval": "2차 후 12개월" },
+        { "dose": 4, "age_months": 72, "age_label": "만 6세", "interval": "추가접종" },
+        { "dose": 5, "age_months": 144, "age_label": "만 12세", "interval": "추가접종" }
+      ],
+      "total_doses": 5,
+      "notes": "불활성화 백신 기준. 기초 3회 + 추가 2회."
+    },
+    {
+      "id": "je_live",
+      "name": "일본뇌염 (약독화 생백신)",
+      "disease": "일본뇌염",
+      "doses": [
+        { "dose": 1, "age_months": 12, "age_label": "12~23개월", "interval": null },
+        { "dose": 2, "age_months": 24, "age_label": "1차 후 12개월", "interval": "1차 후 12개월" }
+      ],
+      "total_doses": 2,
+      "notes": "약독화 생백신(이모젭) 기준 2회 접종"
+    },
+    {
+      "id": "hpv",
+      "name": "HPV (사람유두종바이러스)",
+      "disease": "자궁경부암 등 HPV 관련 질환",
+      "doses": [
+        { "dose": 1, "age_months": 144, "age_label": "만 11~12세", "interval": null },
+        { "dose": 2, "age_months": 150, "age_label": "1차 후 6~12개월", "interval": "1차 후 6~12개월" }
+      ],
+      "total_doses": 2,
+      "notes": "만 12세 여아 국가예방접종 무료지원. 2가(서바릭스) 또는 4가(가다실). 9~14세는 2회, 15세 이상은 3회."
+    },
+    {
+      "id": "flu",
+      "name": "인플루엔자 (Flu)",
+      "disease": "인플루엔자",
+      "doses": [
+        { "dose": 1, "age_months": 6, "age_label": "6개월 이상", "interval": null },
+        { "dose": 2, "age_months": 7, "age_label": "첫 해 1차 후 4주", "interval": "첫 접종 해에만 4주 후 2차" }
+      ],
+      "total_doses": 1,
+      "notes": "매년 접종. 생후 6개월~만 13세 국가무료접종. 처음 접종하는 해에는 4주 간격 2회."
+    }
+  ]
+}

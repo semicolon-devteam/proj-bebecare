@@ -1,0 +1,125 @@
+{
+  "title": "지자체 출산장려금/지원금 (2025-2026)",
+  "source": "각 지자체 홈페이지 및 정부24",
+  "collected_at": "2026-02-10T02:12:00+09:00",
+  "note": "2025년 기준 주요 광역시도 출산지원금. 시군구별 추가 지원금은 별도. 정책 변동 가능.",
+  "grants": [
+    {
+      "region": "서울특별시",
+      "region_code": "11",
+      "amounts": [
+        { "child_order": 1, "amount": 1000000, "amount_label": "100만원" },
+        { "child_order": 2, "amount": 1500000, "amount_label": "150만원" },
+        { "child_order": 3, "amount": 2000000, "amount_label": "200만원" }
+      ],
+      "conditions": "서울시 주민등록 거주자, 출생신고 완료",
+      "how_to_apply": "서울시 임신출산정보센터, 주민센터 방문 또는 정부24 온라인 신청",
+      "notes": "자치구별 추가 축하금 50~300만원 별도 지급. 강남구·서초구 등 고액 지원.",
+      "source": "https://www.seoul.go.kr"
+    },
+    {
+      "region": "경기도",
+      "region_code": "41",
+      "amounts": [
+        { "child_order": 1, "amount": 1000000, "amount_label": "100만원" },
+        { "child_order": 2, "amount": 1500000, "amount_label": "150만원" },
+        { "child_order": 3, "amount": 2000000, "amount_label": "200만원" }
+      ],
+      "conditions": "경기도 주민등록 거주자",
+      "how_to_apply": "주민센터 방문 또는 정부24 온라인 신청",
+      "notes": "시군별 추가 출산축하금 별도 (수원시 100만원, 화성시 최대 1억원 등)",
+      "source": "https://www.gg.go.kr"
+    },
+    {
+      "region": "부산광역시",
+      "region_code": "26",
+      "amounts": [
+        { "child_order": 1, "amount": 1000000, "amount_label": "100만원" },
+        { "child_order": 2, "amount": 2000000, "amount_label": "200만원" },
+        { "child_order": 3, "amount": 3000000, "amount_label": "300만원" }
+      ],
+      "conditions": "부산시 주민등록 거주자, 출생일 기준 부산 거주",
+      "how_to_apply": "주민센터 방문 또는 정부24",
+      "notes": "구군별 추가 지원금 별도",
+      "source": "https://www.busan.go.kr"
+    },
+    {
+      "region": "대구광역시",
+      "region_code": "27",
+      "amounts": [
+        { "child_order": 1, "amount": 1000000, "amount_label": "100만원" },
+        { "child_order": 2, "amount": 1500000, "amount_label": "150만원" },
+        { "child_order": 3, "amount": 3000000, "amount_label": "300만원" }
+      ],
+      "conditions": "대구시 주민등록 거주자",
+      "how_to_apply": "주민센터 방문신청",
+      "notes": "군위군 등 일부 지역 추가 지원",
+      "source": "https://www.daegu.go.kr"
+    },
+    {
+      "region": "인천광역시",
+      "region_code": "28",
+      "amounts": [
+        { "child_order": 1, "amount": 1000000, "amount_label": "100만원" },
+        { "child_order": 2, "amount": 1500000, "amount_label": "150만원" },
+        { "child_order": 3, "amount": 2000000, "amount_label": "200만원" }
+      ],
+      "conditions": "인천시 주민등록 거주자",
+      "how_to_apply": "주민센터 방문 또는 정부24",
+      "notes": "강화군·옹진군 등 도서지역 추가 지원",
+      "source": "https://www.incheon.go.kr"
+    },
+    {
+      "region": "광주광역시",
+      "region_code": "29",
+      "amounts": [
+        { "child_order": 1, "amount": 1000000, "amount_label": "100만원" },
+        { "child_order": 2, "amount": 1500000, "amount_label": "150만원" },
+        { "child_order": 3, "amount": 2000000, "amount_label": "200만원" }
+      ],
+      "conditions": "광주시 주민등록 거주자",
+      "how_to_apply": "주민센터 방문 또는 정부24",
+      "notes": "구별 추가 축하금 별도",
+      "source": "https://www.gwangju.go.kr"
+    },
+    {
+      "region": "대전광역시",
+      "region_code": "30",
+      "amounts": [
+        { "child_order": 1, "amount": 1000000, "amount_label": "100만원" },
+        { "child_order": 2, "amount": 1500000, "amount_label": "150만원" },
+        { "child_order": 3, "amount": 2000000, "amount_label": "200만원" }
+      ],
+      "conditions": "대전시 주민등록 거주자",
+      "how_to_apply": "주민센터 방문 또는 정부24",
+      "notes": "구별 추가 지원금 별도",
+      "source": "https://www.daejeon.go.kr"
+    },
+    {
+      "region": "울산광역시",
+      "region_code": "31",
+      "amounts": [
+        { "child_order": 1, "amount": 1000000, "amount_label": "100만원" },
+        { "child_order": 2, "amount": 2000000, "amount_label": "200만원" },
+        { "child_order": 3, "amount": 3000000, "amount_label": "300만원" }
+      ],
+      "conditions": "울산시 주민등록 거주자",
+      "how_to_apply": "주민센터 방문 또는 정부24",
+      "notes": "구군별 추가 지원",
+      "source": "https://www.ulsan.go.kr"
+    },
+    {
+      "region": "세종특별자치시",
+      "region_code": "36",
+      "amounts": [
+        { "child_order": 1, "amount": 1500000, "amount_label": "150만원" },
+        { "child_order": 2, "amount": 2000000, "amount_label": "200만원" },
+        { "child_order": 3, "amount": 3000000, "amount_label": "300만원" }
+      ],
+      "conditions": "세종시 주민등록 거주자",
+      "how_to_apply": "주민센터 방문 또는 정부24",
+      "notes": "젊은 도시 특성상 출산장려 정책 적극적. 셋째 이상 파격 지원.",
+      "source": "https://www.sejong.go.kr"
+    }
+  ]
+}

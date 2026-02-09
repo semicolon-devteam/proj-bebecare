@@ -10,6 +10,8 @@ import {
   generateConversationTitle,
 } from '@/lib/chat';
 import type { User } from '@supabase/supabase-js';
+import PushSubscription from '@/components/PushSubscription';
+import { supabase } from '@/lib/supabase';
 
 interface Message {
   id: string;
@@ -26,11 +28,23 @@ export default function Home() {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     checkUser();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from('notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .is('read_at', null)
+        .then(({ count }) => setUnreadCount(count || 0));
+    }
+  }, [user]);
 
   const checkUser = async () => {
     try {
@@ -226,14 +240,32 @@ export default function Home() {
               <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
                 BebeCare
               </h1>
-              <button
-                onClick={handleSignOut}
-                className="rounded-xl px-4 py-2 text-sm font-bold text-white/80 hover:text-white hover:bg-white/20 transition-all duration-300"
-              >
-                로그아웃
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => router.push('/notifications')}
+                  className="relative rounded-xl px-3 py-2 text-white/80 hover:text-white hover:bg-white/20 transition-all duration-300"
+                >
+                  <span className="text-xl">🔔</span>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  className="rounded-xl px-4 py-2 text-sm font-bold text-white/80 hover:text-white hover:bg-white/20 transition-all duration-300"
+                >
+                  로그아웃
+                </button>
+              </div>
             </div>
           </header>
+
+          {/* Push Subscription Banner */}
+          <div className="pt-2">
+            <PushSubscription />
+          </div>
 
           {/* Chat Messages Area */}
           <div className="flex-1 overflow-y-auto px-4 py-8">

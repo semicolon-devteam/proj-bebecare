@@ -1,0 +1,180 @@
+{
+  "title": "정부 출산/육아 지원제도 상세 (2025-2026)",
+  "source": "복지로(bokjiro.go.kr), 정부24(gov.kr)",
+  "collected_at": "2026-02-10T02:12:00+09:00",
+  "note": "2025년 기준 정부 출산·육아 지원제도. 정책 변동 가능하므로 최신 정보 확인 권장.",
+  "benefits": [
+    {
+      "id": "first_meet",
+      "name": "첫만남이용권",
+      "category": "출산",
+      "target": "2022년 1월 1일 이후 출생아 (출생신고 후)",
+      "amount": "첫째 200만원, 둘째 이상 300만원",
+      "amount_detail": {
+        "first_child": 2000000,
+        "second_child_plus": 3000000
+      },
+      "payment_method": "국민행복카드 바우처 (일시 지급)",
+      "how_to_apply": "주민센터 방문 또는 정부24·복지로 온라인 신청",
+      "deadline": "출생일로부터 1년 이내",
+      "required_documents": ["출생증명서 또는 출생신고서", "신청인 신분증", "국민행복카드"],
+      "notes": "2024년부터 둘째 이상 300만원으로 인상. 바우처로 지급되며 유흥업소 등 사용 제한.",
+      "source": "https://www.bokjiro.go.kr"
+    },
+    {
+      "id": "parent_allowance",
+      "name": "부모급여",
+      "category": "육아",
+      "target": "만 0~1세 아동 (2022년 1월 1일 이후 출생)",
+      "amount": "0세: 월 100만원, 1세: 월 50만원",
+      "amount_detail": {
+        "age_0_monthly": 1000000,
+        "age_1_monthly": 500000
+      },
+      "payment_method": "현금 계좌 입금 (어린이집 이용 시 보육료 차액 지급)",
+      "how_to_apply": "주민센터 방문 또는 복지로·정부24 온라인 신청",
+      "deadline": "출생일로부터 60일 이내 신청 시 출생월부터 소급 지급",
+      "required_documents": ["신청인 신분증", "통장 사본", "출생신고 확인"],
+      "notes": "2025년 기준. 어린이집 이용 시 보육료 바우처로 지급 후 차액 현금 지급. 양육수당과 중복 불가.",
+      "source": "https://www.bokjiro.go.kr"
+    },
+    {
+      "id": "child_allowance",
+      "name": "아동수당",
+      "category": "육아",
+      "target": "만 8세 미만 모든 아동 (0~95개월)",
+      "amount": "월 10만원",
+      "amount_detail": {
+        "monthly": 100000
+      },
+      "payment_method": "현금 계좌 입금 (매월 25일)",
+      "how_to_apply": "주민센터 방문 또는 복지로·정부24 온라인 신청",
+      "deadline": "출생일로부터 60일 이내 신청 시 출생월부터 소급",
+      "required_documents": ["신청인 신분증", "통장 사본"],
+      "notes": "소득 무관 보편 지급. 만 8세 생일이 속한 달까지 지급.",
+      "source": "https://www.bokjiro.go.kr"
+    },
+    {
+      "id": "childcare_allowance",
+      "name": "양육수당",
+      "category": "육아",
+      "target": "어린이집·유치원 미이용 만 5세 이하 아동",
+      "amount": "월 10만원 (연령 무관 동일)",
+      "amount_detail": {
+        "monthly": 100000
+      },
+      "payment_method": "현금 계좌 입금",
+      "how_to_apply": "주민센터 방문 또는 복지로 온라인 신청",
+      "deadline": "수시 신청 가능",
+      "required_documents": ["신청인 신분증", "통장 사본"],
+      "notes": "부모급여 대상(0~1세)은 부모급여로 통합 지급. 만 2~5세 어린이집 미이용 시 양육수당 월 10만원.",
+      "source": "https://www.bokjiro.go.kr"
+    },
+    {
+      "id": "happy_card",
+      "name": "국민행복카드 (임신·출산 진료비)",
+      "category": "임신·출산",
+      "target": "임산부 (임신 확인 후)",
+      "amount": "단태아 100만원, 다태아 140만원, 분만취약지 추가 20만원",
+      "amount_detail": {
+        "single": 1000000,
+        "multiple": 1400000,
+        "vulnerable_area_bonus": 200000
+      },
+      "payment_method": "국민행복카드 바우처 (산부인과·약국 등 지정 의료기관)",
+      "how_to_apply": "카드사(BC, 삼성, 롯데, 신한) 신청 → 건강보험공단 자격 확인",
+      "deadline": "임신 확인 후 ~ 분만 후 2년까지 사용",
+      "required_documents": ["임신확인서", "신분증"],
+      "notes": "임신·출산 관련 의료비에 사용. 잔액은 출산 후 2년까지 영유아 의료비로 사용 가능.",
+      "source": "https://www.bokjiro.go.kr"
+    },
+    {
+      "id": "childcare_fee",
+      "name": "영아보육료 (어린이집)",
+      "category": "보육",
+      "target": "어린이집 이용 만 0~5세",
+      "amount": "0세반 월 54만원, 1세반 월 47.5만원, 2세반 월 39.4만원, 3~5세반 월 28만원 (누리과정)",
+      "amount_detail": {
+        "age_0": 540000,
+        "age_1": 475000,
+        "age_2": 394000,
+        "age_3_5_nuri": 280000
+      },
+      "payment_method": "국민행복카드 바우처로 어린이집에 직접 지급",
+      "how_to_apply": "주민센터 또는 복지로에서 보육료 지원 신청",
+      "deadline": "수시",
+      "required_documents": ["신분증", "국민행복카드"],
+      "notes": "소득 무관 전 계층 지원. 만 3~5세는 누리과정 보육료.",
+      "source": "https://www.bokjiro.go.kr"
+    },
+    {
+      "id": "parental_leave_pay",
+      "name": "육아휴직급여",
+      "category": "육아",
+      "target": "만 8세 이하 자녀가 있는 근로자 (고용보험 가입)",
+      "amount": "통상임금의 80% (상한 월 150만원, 하한 월 70만원). 6+6 부모육아휴직제: 부모 동시 사용 시 첫 6개월간 통상임금 100% (상한 월 450만원)",
+      "amount_detail": {
+        "rate": "80%",
+        "max_monthly": 1500000,
+        "min_monthly": 700000,
+        "six_plus_six_max": 4500000
+      },
+      "payment_method": "고용보험에서 계좌 입금",
+      "how_to_apply": "사업주에게 육아휴직 신청 → 고용보험 홈페이지에서 급여 신청",
+      "deadline": "육아휴직 시작일 이후 1개월부터 신청 가능",
+      "required_documents": ["육아휴직 확인서 (사업주 발급)", "통장 사본", "가족관계증명서"],
+      "notes": "2025년 기준 6+6 부모육아휴직제 도입. 부모 모두 육아휴직 사용 시 첫 6개월 급여 대폭 인상.",
+      "source": "https://www.ei.go.kr"
+    },
+    {
+      "id": "postpartum_care",
+      "name": "산후조리 도우미 (건강보험 산후조리원비 지원)",
+      "category": "출산",
+      "target": "출산 가정 (소득 기준별 차등)",
+      "amount": "표준형: 2주 서비스, 본인부담 소득별 차등 (약 6~36만원)",
+      "amount_detail": {
+        "service_period": "2주 (출산 후 40일 이내)",
+        "copay_range": "소득 구간별 6~36만원"
+      },
+      "payment_method": "바우처 (국민행복카드)",
+      "how_to_apply": "주민센터 또는 복지로에서 신청",
+      "deadline": "출산 예정일 40일 전부터 ~ 출산 후 30일 이내",
+      "required_documents": ["출산(예정)일 확인 서류", "건강보험증", "소득 증빙"],
+      "notes": "건강보험 가입자 대상. 산모·신생아 건강관리 지원사업.",
+      "source": "https://www.bokjiro.go.kr"
+    },
+    {
+      "id": "electric_subsidy",
+      "name": "영아 전기요금 감면",
+      "category": "생활지원",
+      "target": "만 3세 미만 영아가 있는 가구",
+      "amount": "월 1.6만원 할인 (2025년 기준)",
+      "amount_detail": {
+        "monthly_discount": 16000
+      },
+      "payment_method": "전기요금 자동 감면",
+      "how_to_apply": "한국전력 홈페이지 또는 고객센터(123) 신청",
+      "deadline": "수시",
+      "required_documents": ["주민등록등본", "가족관계증명서"],
+      "notes": "자동 감면 아님, 별도 신청 필요.",
+      "source": "https://www.kepco.co.kr"
+    },
+    {
+      "id": "child_medical_fee",
+      "name": "영유아 의료비 지원 (건강보험)",
+      "category": "의료",
+      "target": "만 6세 미만 영유아",
+      "amount": "입원 본인부담 5%, 외래 본인부담 경감",
+      "amount_detail": {
+        "inpatient_copay": "5%",
+        "outpatient_copay": "일반 대비 경감"
+      },
+      "payment_method": "건강보험 자동 적용",
+      "how_to_apply": "별도 신청 불필요 (건강보험 자동 적용)",
+      "deadline": null,
+      "required_documents": [],
+      "notes": "만 1세 미만은 입원 본인부담 면제. 외래 진료 시에도 본인부담 경감.",
+      "source": "https://www.nhis.or.kr"
+    }
+  ]
+}
