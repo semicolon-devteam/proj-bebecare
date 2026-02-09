@@ -2,9 +2,13 @@
 export interface Profile {
   id: string;
   user_id: string;
+  stage: 'planning' | 'pregnant' | 'postpartum' | 'parenting';
+  onboarding_completed: boolean;
   is_pregnant: boolean;
   due_date: string | null;
   pregnancy_week: number | null;
+  pregnancy_start_date: string | null;
+  birth_date: string | null;
   is_working: boolean;
   region_province: string;
   region_city: string;

@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser, signOut } from '@/lib/auth';
+import { isOnboardingCompleted } from '@/lib/profile';
 import {
   createConversation,
   saveMessage,
@@ -34,6 +35,13 @@ export default function Home() {
   const checkUser = async () => {
     try {
       const currentUser = await getCurrentUser();
+      if (currentUser) {
+        const completed = await isOnboardingCompleted(currentUser.id);
+        if (!completed) {
+          router.push('/onboarding');
+          return;
+        }
+      }
       setUser(currentUser);
     } catch (error) {
       console.error('Error checking user:', error);
