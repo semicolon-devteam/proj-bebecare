@@ -23,45 +23,70 @@ function getSupabaseAdmin() {
 /**
  * 유저 프로필 기반 동적 시스템 프롬프트 생성
  */
-function buildSystemPrompt(profile: Record<string, unknown> | null): string {
+function buildSystemPrompt(profile: Record<string, unknown> | null, children: Record<string, unknown>[] = []): string {
   let profileSection = '';
 
   if (profile) {
     const stage = profile.stage as string | null;
-    const dueDate = profile.due_date as string | null;
-    const pregnancyStart = (profile.pregnancy_start_date ?? profile.pregnancy_start) as string | null;
-    const childBirthDate = (profile.birth_date ?? profile.child_birth_date) as string | null;
     const regionProvince = profile.region_province as string | null;
     const regionCity = profile.region_city as string | null;
     const isWorking = profile.is_working as boolean | null;
     const nickname = profile.nickname as string | null;
 
-    // 주차/월령 계산
-    let stageInfo = '';
+    // 아이 정보 기반 상태 텍스트 생성
+    let childrenInfo = '';
     const now = new Date();
-    if (stage === 'pregnant' && pregnancyStart) {
-      const start = new Date(pregnancyStart);
-      const diffWeeks = Math.floor((now.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000));
-      stageInfo = `임신 ${diffWeeks}주차`;
-      if (dueDate) stageInfo += ` (예정일: ${dueDate})`;
-    } else if ((stage === 'postpartum' || stage === 'parenting') && childBirthDate) {
-      const birth = new Date(childBirthDate);
-      const diffMonths = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
-      if (diffMonths < 1) {
-        const diffDays = Math.floor((now.getTime() - birth.getTime()) / (24 * 60 * 60 * 1000));
-        stageInfo = `출산 ${diffDays}일차 (산후조리기)`;
-      } else {
-        stageInfo = `아기 ${diffMonths}개월`;
+    if (children.length > 0) {
+      const lines = children.map((child, i) => {
+        const label = (child.nickname as string) || (child.name as string) || `${i + 1}번째 아이`;
+        const status = child.status as string;
+        const pregnancyStart = child.pregnancy_start_date as string | null;
+        const dueDate = child.due_date as string | null;
+        const birthDate = child.birth_date as string | null;
+
+        if (status === 'expecting' && pregnancyStart) {
+          const start = new Date(pregnancyStart);
+          const weeks = Math.floor((now.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000));
+          const duePart = dueDate ? ` (예정일: ${dueDate})` : '';
+          return `- ${label}: 임신 ${weeks}주차${duePart}`;
+        } else if (status === 'born' && birthDate) {
+          const birth = new Date(birthDate);
+          const diffMonths = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+          if (diffMonths < 1) {
+            const diffDays = Math.floor((now.getTime() - birth.getTime()) / (24 * 60 * 60 * 1000));
+            return `- ${label}: 생후 ${diffDays}일`;
+          }
+          return `- ${label}: 생후 ${diffMonths}개월`;
+        }
+        return `- ${label}: ${status === 'expecting' ? '임신 중' : '출산'}`;
+      });
+      childrenInfo = `\n### 아이 정보\n${lines.join('\n')}`;
+    } else {
+      // Fallback to profile-level data
+      const dueDate = profile.due_date as string | null;
+      const pregnancyStart = (profile.pregnancy_start_date ?? profile.pregnancy_start) as string | null;
+      const childBirthDate = (profile.birth_date ?? profile.child_birth_date) as string | null;
+      let stageInfo = '';
+      if (stage === 'pregnant' && pregnancyStart) {
+        const start = new Date(pregnancyStart);
+        const diffWeeks = Math.floor((now.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000));
+        stageInfo = `임신 ${diffWeeks}주차`;
+        if (dueDate) stageInfo += ` (예정일: ${dueDate})`;
+      } else if ((stage === 'postpartum' || stage === 'parenting') && childBirthDate) {
+        const birth = new Date(childBirthDate);
+        const diffMonths = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+        stageInfo = diffMonths < 1 ? `출산 ${Math.floor((now.getTime() - birth.getTime()) / (24 * 60 * 60 * 1000))}일차` : `아기 ${diffMonths}개월`;
+      } else if (stage === 'planning') {
+        stageInfo = '임신 준비 중';
       }
-    } else if (stage === 'planning') {
-      stageInfo = '임신 준비 중';
+      childrenInfo = stageInfo ? `\n- 상태: ${stageInfo}` : '';
     }
 
     const region = [regionProvince, regionCity].filter(Boolean).join(' ');
 
     profileSection = `\n## 유저 프로필
 ${nickname ? `- 닉네임: ${nickname}` : ''}
-- 상태: ${stageInfo || stage || '미설정'}
+- 단계: ${stage || '미설정'}${childrenInfo}
 ${region ? `- 지역: ${region}` : ''}
 ${isWorking ? '- 직장맘: Y' : ''}
 `.replace(/\n{3,}/g, '\n\n');
@@ -107,11 +132,16 @@ interface RagItem {
   similarity: number;
 }
 
-function rerankByStage(items: RagItem[], userStage: string | null): RagItem[] {
-  if (!userStage) return items;
+function rerankByStage(items: RagItem[], userStage: string | null, children: Record<string, unknown>[] = []): RagItem[] {
+  if (!userStage && children.length === 0) return items;
 
-  // stage 매핑: pregnant → ['pregnant', 'all'], postpartum → ['postpartum', 'all'], etc.
-  const relevantStages = new Set([userStage, 'all']);
+  // Collect all relevant stages from children + profile
+  const relevantStages = new Set(['all']);
+  if (userStage) relevantStages.add(userStage);
+  for (const child of children) {
+    if (child.status === 'expecting') { relevantStages.add('pregnant'); relevantStages.add('pregnancy'); }
+    if (child.status === 'born') { relevantStages.add('postpartum'); relevantStages.add('parenting'); }
+  }
 
   return items
     .map((item) => ({
@@ -129,7 +159,8 @@ function rerankByStage(items: RagItem[], userStage: string | null): RagItem[] {
  */
 async function searchRelevantContents(
   messages: { role: string; content: string }[],
-  userStage: string | null
+  userStage: string | null,
+  children: Record<string, unknown>[] = []
 ): Promise<string> {
   try {
     const query = buildSearchQuery(messages);
@@ -149,7 +180,7 @@ async function searchRelevantContents(
       return '';
     }
 
-    const reranked = rerankByStage(data as RagItem[], userStage);
+    const reranked = rerankByStage(data as RagItem[], userStage, children);
 
     const context = reranked
       .map(
@@ -176,24 +207,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 유저 프로필 조회
+    // 유저 프로필 + 아이 정보 조회
     let profile: Record<string, unknown> | null = null;
+    let childrenData: Record<string, unknown>[] = [];
     if (userId) {
       const supabase = getSupabaseAdmin();
-      const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-      profile = data;
+      const [profileRes, childrenRes] = await Promise.all([
+        supabase.from('profiles').select('*').eq('user_id', userId).single(),
+        supabase.from('children').select('*').eq('user_id', userId).order('created_at', { ascending: true }),
+      ]);
+      profile = profileRes.data;
+      childrenData = (childrenRes.data || []) as Record<string, unknown>[];
     }
 
     // 멀티턴 RAG 검색 (최근 유저 메시지 2-3개 합산)
     const userStage = (profile?.stage as string) || null;
-    let systemPrompt = buildSystemPrompt(profile);
+    let systemPrompt = buildSystemPrompt(profile, childrenData);
 
     {
-      const context = await searchRelevantContents(messages, userStage);
+      const context = await searchRelevantContents(messages, userStage, childrenData);
       if (context) {
         systemPrompt += `\n\n## 참고자료 (BebeCare 검증된 데이터)
 
