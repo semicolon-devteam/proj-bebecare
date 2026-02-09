@@ -31,12 +31,82 @@ const categoryColor: Record<string, string> = {
   government_support: 'from-violet-400 to-purple-500',
 };
 
+export interface ProfileContext {
+  stage: string;
+  currentWeek?: number;
+  ageMonths?: number;
+  pregnancyStartDate?: Date;
+  childBirthDate?: Date;
+}
+
+function computeDday(event: TimelineEvent, profile: ProfileContext): string | null {
+  const c = event.content;
+  if (!c) return null;
+
+  // 임신 콘텐츠: week_start 기반
+  if (c.stage === 'pregnant' && c.week_start !== null && profile.pregnancyStartDate) {
+    // 해당 콘텐츠의 시작 날짜 = 임신 시작일 + week_start * 7일
+    const contentStartDate = new Date(profile.pregnancyStartDate.getTime() + c.week_start * 7 * 24 * 60 * 60 * 1000);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    contentStartDate.setHours(0, 0, 0, 0);
+    const diffDays = Math.round((contentStartDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+
+    if (diffDays > 0) return `D-${diffDays}`;
+    if (diffDays === 0) return 'D-Day';
+    return `D+${Math.abs(diffDays)}`;
+  }
+
+  // 산후/육아 콘텐츠: month_start 기반
+  if ((c.stage === 'postpartum' || c.stage === 'parenting') && c.month_start !== null && profile.childBirthDate) {
+    const contentStartDate = new Date(profile.childBirthDate);
+    contentStartDate.setMonth(contentStartDate.getMonth() + c.month_start);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    contentStartDate.setHours(0, 0, 0, 0);
+    const diffDays = Math.round((contentStartDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+
+    if (diffDays > 0) return `D-${diffDays}`;
+    if (diffDays === 0) return 'D-Day';
+    return `D+${Math.abs(diffDays)}`;
+  }
+
+  // week 기반 산후 콘텐츠
+  if (c.stage === 'postpartum' && c.week_start !== null && profile.childBirthDate) {
+    const contentStartDate = new Date(profile.childBirthDate.getTime() + c.week_start * 7 * 24 * 60 * 60 * 1000);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    contentStartDate.setHours(0, 0, 0, 0);
+    const diffDays = Math.round((contentStartDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+
+    if (diffDays > 0) return `D-${diffDays}`;
+    if (diffDays === 0) return 'D-Day';
+    return `D+${Math.abs(diffDays)}`;
+  }
+
+  return null;
+}
+
+function getDdayColor(dday: string): string {
+  if (dday === 'D-Day') return 'bg-red-500 text-white';
+  if (dday.startsWith('D-')) {
+    const num = parseInt(dday.slice(2));
+    if (num <= 7) return 'bg-orange-500 text-white';
+    if (num <= 30) return 'bg-amber-500 text-white';
+    return 'bg-gray-400 text-white';
+  }
+  // D+ (past)
+  return 'bg-blue-400 text-white';
+}
+
 export default function TimelineCard({
   event,
   onUpdate,
+  profile,
 }: {
   event: TimelineEvent;
   onUpdate: () => void;
+  profile?: ProfileContext;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [bookmarked, setBookmarked] = useState(event.is_bookmarked);
@@ -45,6 +115,8 @@ export default function TimelineCard({
   const emoji = categoryEmoji[category] || '📌';
   const label = categoryLabel[category] || category;
   const color = categoryColor[category] || 'from-gray-400 to-gray-500';
+
+  const dday = profile ? computeDday(event, profile) : null;
 
   const handleExpand = async () => {
     setExpanded(!expanded);
@@ -82,6 +154,13 @@ export default function TimelineCard({
             >
               {emoji} {label}
             </span>
+            {dday && (
+              <span
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold flex-shrink-0 ${getDdayColor(dday)}`}
+              >
+                {dday}
+              </span>
+            )}
             {!event.is_read && (
               <span className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
             )}

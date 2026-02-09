@@ -30,6 +30,8 @@ interface ProfileContext {
   stage: string;
   currentWeek?: number;
   ageMonths?: number;
+  pregnancyStartDate?: Date;
+  childBirthDate?: Date;
 }
 
 function computeRelevanceScore(event: TimelineEvent, profile: ProfileContext): number {
@@ -90,6 +92,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
           : new Date(dueDate.getTime() - 280 * 24 * 60 * 60 * 1000);
         const days = Math.floor((Date.now() - start.getTime()) / (24 * 60 * 60 * 1000));
         ctx.currentWeek = Math.max(1, Math.floor(days / 7));
+        ctx.pregnancyStartDate = start;
       }
 
       // 산후/육아는 첫 자녀 기준
@@ -104,6 +107,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
         if (children?.[0]) {
           const birth = new Date(children[0].birth_date);
           ctx.ageMonths = Math.floor((Date.now() - birth.getTime()) / (30.44 * 24 * 60 * 60 * 1000));
+          ctx.childBirthDate = birth;
         }
       }
 
@@ -229,6 +233,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
                 key={event.id}
                 event={event}
                 onUpdate={loadEvents}
+                profile={profileCtx}
               />
             ))}
           </div>
