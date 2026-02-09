@@ -39,49 +39,34 @@ export interface ProfileContext {
   childBirthDate?: Date;
 }
 
+function formatDday(diffDays: number): string {
+  if (diffDays > 0) return `D-${diffDays}`;
+  if (diffDays === 0) return 'D-Day';
+  return `D+${Math.abs(diffDays)}`;
+}
+
+function diffFromToday(targetDate: Date): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  targetDate.setHours(0, 0, 0, 0);
+  return Math.round((targetDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
+}
+
 function computeDday(event: TimelineEvent, profile: ProfileContext): string | null {
   const c = event.content;
   if (!c) return null;
 
-  // 임신 콘텐츠: week_start 기반
-  if (c.stage === 'pregnant' && c.week_start !== null && profile.pregnancyStartDate) {
-    // 해당 콘텐츠의 시작 날짜 = 임신 시작일 + week_start * 7일
-    const contentStartDate = new Date(profile.pregnancyStartDate.getTime() + c.week_start * 7 * 24 * 60 * 60 * 1000);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    contentStartDate.setHours(0, 0, 0, 0);
-    const diffDays = Math.round((contentStartDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
-
-    if (diffDays > 0) return `D-${diffDays}`;
-    if (diffDays === 0) return 'D-Day';
-    return `D+${Math.abs(diffDays)}`;
+  // week_start 기반 (임신 주차 기준) — 카테고리 무관
+  if (c.week_start != null && profile.pregnancyStartDate) {
+    const contentDate = new Date(profile.pregnancyStartDate.getTime() + c.week_start * 7 * 24 * 60 * 60 * 1000);
+    return formatDday(diffFromToday(contentDate));
   }
 
-  // 산후/육아 콘텐츠: month_start 기반
-  if ((c.stage === 'postpartum' || c.stage === 'parenting') && c.month_start !== null && profile.childBirthDate) {
-    const contentStartDate = new Date(profile.childBirthDate);
-    contentStartDate.setMonth(contentStartDate.getMonth() + c.month_start);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    contentStartDate.setHours(0, 0, 0, 0);
-    const diffDays = Math.round((contentStartDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
-
-    if (diffDays > 0) return `D-${diffDays}`;
-    if (diffDays === 0) return 'D-Day';
-    return `D+${Math.abs(diffDays)}`;
-  }
-
-  // week 기반 산후 콘텐츠
-  if (c.stage === 'postpartum' && c.week_start !== null && profile.childBirthDate) {
-    const contentStartDate = new Date(profile.childBirthDate.getTime() + c.week_start * 7 * 24 * 60 * 60 * 1000);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    contentStartDate.setHours(0, 0, 0, 0);
-    const diffDays = Math.round((contentStartDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000));
-
-    if (diffDays > 0) return `D-${diffDays}`;
-    if (diffDays === 0) return 'D-Day';
-    return `D+${Math.abs(diffDays)}`;
+  // month_start 기반 (출산 후 월령 기준) — 카테고리 무관
+  if (c.month_start != null && profile.childBirthDate) {
+    const contentDate = new Date(profile.childBirthDate);
+    contentDate.setMonth(contentDate.getMonth() + c.month_start);
+    return formatDday(diffFromToday(contentDate));
   }
 
   return null;
