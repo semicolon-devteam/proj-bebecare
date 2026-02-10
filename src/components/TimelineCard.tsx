@@ -3,15 +3,7 @@
 import { useState } from 'react';
 import type { TimelineEvent } from '@/lib/timeline';
 import { markEventRead, toggleBookmark, dismissEvent } from '@/lib/timeline';
-
-const categoryEmoji: Record<string, string> = {
-  pregnancy_planning: '📋',
-  pregnancy: '🤰',
-  postpartum: '🤱',
-  parenting: '👶',
-  work: '💼',
-  government_support: '🏛️',
-};
+import { X, Star } from 'lucide-react';
 
 const categoryLabel: Record<string, string> = {
   pregnancy_planning: '임신 계획',
@@ -22,13 +14,22 @@ const categoryLabel: Record<string, string> = {
   government_support: '정부 지원',
 };
 
-const categoryColor: Record<string, string> = {
-  pregnancy_planning: 'from-amber-400 to-orange-500',
-  pregnancy: 'from-pink-400 to-rose-500',
-  postpartum: 'from-purple-400 to-indigo-500',
-  parenting: 'from-blue-400 to-cyan-500',
-  work: 'from-emerald-400 to-teal-500',
-  government_support: 'from-violet-400 to-purple-500',
+const categoryBarColor: Record<string, string> = {
+  pregnancy_planning: 'bg-amber-500',
+  pregnancy: 'bg-dusty-rose',
+  postpartum: 'bg-purple-600',
+  parenting: 'bg-cyan-600',
+  work: 'bg-teal-600',
+  government_support: 'bg-violet-600',
+};
+
+const categoryDotColor: Record<string, string> = {
+  pregnancy_planning: 'bg-amber-500',
+  pregnancy: 'bg-dusty-rose',
+  postpartum: 'bg-purple-600',
+  parenting: 'bg-cyan-600',
+  work: 'bg-teal-600',
+  government_support: 'bg-violet-600',
 };
 
 export interface ProfileContext {
@@ -56,13 +57,11 @@ function computeDday(event: TimelineEvent, profile: ProfileContext): string | nu
   const c = event.content;
   if (!c) return null;
 
-  // week_start 기반 (임신 주차 기준) — 카테고리 무관
   if (c.week_start != null && profile.pregnancyStartDate) {
     const contentDate = new Date(profile.pregnancyStartDate.getTime() + c.week_start * 7 * 24 * 60 * 60 * 1000);
     return formatDday(diffFromToday(contentDate));
   }
 
-  // month_start 기반 (출산 후 월령 기준) — 카테고리 무관
   if (c.month_start != null && profile.childBirthDate) {
     const contentDate = new Date(profile.childBirthDate);
     contentDate.setMonth(contentDate.getMonth() + c.month_start);
@@ -72,16 +71,15 @@ function computeDday(event: TimelineEvent, profile: ProfileContext): string | nu
   return null;
 }
 
-function getDdayColor(dday: string): string {
-  if (dday === 'D-Day') return 'bg-red-500 text-white';
+function getDdayStyle(dday: string): string {
+  if (dday === 'D-Day') return 'bg-red-50 text-red-600 border border-red-200';
   if (dday.startsWith('D-')) {
     const num = parseInt(dday.slice(2));
-    if (num <= 7) return 'bg-orange-500 text-white';
-    if (num <= 30) return 'bg-amber-500 text-white';
-    return 'bg-gray-400 text-white';
+    if (num <= 7) return 'bg-orange-50 text-orange-600 border border-orange-200';
+    if (num <= 30) return 'bg-amber-50 text-amber-600 border border-amber-200';
+    return 'bg-gray-50 text-gray-500 border border-gray-200';
   }
-  // D+ (past)
-  return 'bg-blue-400 text-white';
+  return 'bg-blue-50 text-blue-500 border border-blue-200';
 }
 
 export default function TimelineCard({
@@ -97,9 +95,9 @@ export default function TimelineCard({
   const [bookmarked, setBookmarked] = useState(event.is_bookmarked);
 
   const category = event.content?.category || 'pregnancy';
-  const emoji = categoryEmoji[category] || '📌';
   const label = categoryLabel[category] || category;
-  const color = categoryColor[category] || 'from-gray-400 to-gray-500';
+  const barColor = categoryBarColor[category] || 'bg-gray-400';
+  const dotColor = categoryDotColor[category] || 'bg-gray-400';
 
   const dday = profile ? computeDday(event, profile) : null;
 
@@ -126,52 +124,58 @@ export default function TimelineCard({
   return (
     <div
       onClick={handleExpand}
-      className={`glass rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover-lift ${
-        !event.is_read ? 'border-l-4 border-l-blue-500' : ''
+      className={`card card-hover overflow-hidden cursor-pointer ${
+        !event.is_read ? 'border-l-2 border-l-dusty-rose' : ''
       }`}
     >
+      {/* Category color bar */}
+      <div className={`h-1 ${barColor}`} />
+
       {/* Header */}
       <div className="p-4 pb-2">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span
-              className={`inline-flex items-center gap-1 rounded-full bg-gradient-to-r ${color} px-2.5 py-0.5 text-xs font-bold text-white flex-shrink-0`}
-            >
-              {emoji} {label}
+            <div className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${dotColor}`} />
+            <span className="text-xs font-semibold text-gray-500">
+              {label}
             </span>
             {dday && (
               <span
-                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold flex-shrink-0 ${getDdayColor(dday)}`}
+                className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold flex-shrink-0 ${getDdayStyle(dday)}`}
               >
                 {dday}
               </span>
             )}
             {!event.is_read && (
-              <span className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+              <span className="h-1.5 w-1.5 rounded-full bg-dusty-rose flex-shrink-0" />
             )}
           </div>
-          <div className="flex items-center gap-1 flex-shrink-0">
+          <div className="flex items-center gap-0.5 flex-shrink-0">
             <button
               onClick={handleBookmark}
-              className="p-1.5 rounded-lg hover:bg-white/50 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              {bookmarked ? '⭐' : '☆'}
+              {bookmarked ? (
+                <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+              ) : (
+                <Star className="h-4 w-4 text-gray-300" />
+              )}
             </button>
             <button
               onClick={handleDismiss}
-              className="p-1.5 rounded-lg hover:bg-white/50 transition-colors text-gray-400 hover:text-gray-600"
+              className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              ✕
+              <X className="h-4 w-4 text-gray-300 hover:text-gray-500" />
             </button>
           </div>
         </div>
 
-        <h3 className="mt-2 text-base font-bold text-gray-800 leading-snug">
+        <h3 className="mt-2 text-sm font-bold text-gray-900 leading-snug">
           {event.content?.title}
         </h3>
 
         {event.content?.summary && !expanded && (
-          <p className="mt-1 text-sm text-gray-600 line-clamp-2">
+          <p className="mt-1 text-sm text-gray-500 line-clamp-2">
             {event.content.summary}
           </p>
         )}
@@ -179,8 +183,8 @@ export default function TimelineCard({
 
       {/* Expanded Body */}
       {expanded && (
-        <div className="px-4 pb-4 animate-fade-in">
-          <div className="mt-2 text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+        <div className="px-4 pb-4">
+          <div className="mt-2 text-sm text-gray-600 leading-relaxed whitespace-pre-line">
             {event.content?.body}
           </div>
           {event.content?.tags && event.content.tags.length > 0 && (
@@ -188,7 +192,7 @@ export default function TimelineCard({
               {event.content.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-600"
+                  className="rounded-md bg-gray-50 border border-gray-200 px-2 py-0.5 text-xs text-gray-500"
                 >
                   #{tag}
                 </span>

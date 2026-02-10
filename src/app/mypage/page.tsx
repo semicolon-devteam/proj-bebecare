@@ -7,6 +7,7 @@ import { getProfile, createOrUpdateProfile } from '@/lib/profile';
 import { getChildren, addChild, updateChild, deleteChild, deriveStageFromChildren } from '@/lib/children';
 import type { Child, ChildInput } from '@/lib/children';
 import { REGION_DATA } from '@/lib/regions';
+import { ChevronLeft, Baby, Briefcase, MapPin, Settings, LogOut, Plus, Pencil, Trash2, Heart, FileText, Save, Check } from 'lucide-react';
 
 export default function MyPage() {
   const router = useRouter();
@@ -15,12 +16,10 @@ export default function MyPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Children
   const [children, setChildren] = useState<Child[]>([]);
   const [showAddChild, setShowAddChild] = useState(false);
   const [editingChild, setEditingChild] = useState<Child | null>(null);
 
-  // Add/Edit child form
   const [childStatus, setChildStatus] = useState<'expecting' | 'born'>('expecting');
   const [childNickname, setChildNickname] = useState('');
   const [childDueDate, setChildDueDate] = useState('');
@@ -28,12 +27,10 @@ export default function MyPage() {
   const [childBirthDate, setChildBirthDate] = useState('');
   const [childGender, setChildGender] = useState('');
 
-  // Profile fields
   const [isWorking, setIsWorking] = useState(false);
   const [regionProvince, setRegionProvince] = useState('');
   const [regionCity, setRegionCity] = useState('');
 
-  // Derived
   const stage = deriveStageFromChildren(children);
 
   useEffect(() => {
@@ -116,7 +113,6 @@ export default function MyPage() {
     if (result) {
       const updated = await getChildren(userId);
       setChildren(updated);
-      // Sync stage to profile
       const newStage = deriveStageFromChildren(updated);
       await createOrUpdateProfile(userId, { stage: newStage });
     }
@@ -194,65 +190,77 @@ export default function MyPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-rose-100 via-purple-100 to-blue-200">
-        <div className="animate-pulse text-2xl">⏳</div>
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-100 via-purple-100 to-blue-200">
-      <header className="bg-pink-500 px-4 py-4 shadow-lg">
+    <div className="min-h-screen bg-surface">
+      <header className="border-b border-border bg-white px-4 py-3">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <button onClick={() => router.push('/')} className="text-white/80 hover:text-white text-2xl">←</button>
-          <h1 className="text-xl font-black text-white">마이페이지</h1>
+          <button onClick={() => router.push('/')} className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <h1 className="text-lg font-bold text-gray-900">마이페이지</h1>
           <div className="w-8" />
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-4 py-6 space-y-6">
-        {/* 아이 목록 */}
-        <div className="glass rounded-2xl p-5 space-y-4">
+      <div className="mx-auto max-w-2xl px-4 py-6 space-y-4">
+        {/* Children list */}
+        <div className="card rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-gray-800">👶 내 아이</h3>
+            <div className="flex items-center gap-2">
+              <Baby className="h-4 w-4 text-gray-400" />
+              <h3 className="font-bold text-gray-900 text-sm">내 아이</h3>
+            </div>
             <button
               onClick={() => { resetChildForm(); setShowAddChild(true); }}
-              className="rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 px-4 py-2 text-sm font-bold text-white"
+              className="flex items-center gap-1 rounded-lg bg-dusty-rose px-3 py-1.5 text-xs font-semibold text-white hover:bg-dusty-rose-dark transition-colors"
             >
-              + 아이 추가
+              <Plus className="h-3.5 w-3.5" />
+              아이 추가
             </button>
           </div>
 
           {children.length === 0 ? (
-            <p className="text-center text-gray-500 py-4">아직 등록된 아이가 없어요</p>
+            <p className="text-center text-sm text-gray-400 py-4">아직 등록된 아이가 없어요</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {children.map((child) => {
                 const week = getChildWeek(child);
                 const age = getChildAge(child);
                 return (
-                  <div key={child.id} className="glass rounded-xl p-4 space-y-2">
+                  <div key={child.id} className="rounded-lg border border-border p-3.5 space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl">{child.status === 'expecting' ? '🤰' : '👶'}</span>
+                      <div className="flex items-center gap-2.5">
+                        <div className={`h-8 w-8 rounded-full flex items-center justify-center ${child.status === 'expecting' ? 'bg-pink-50' : 'bg-blue-50'}`}>
+                          {child.status === 'expecting' ? <Heart className="h-4 w-4 text-dusty-rose" /> : <Baby className="h-4 w-4 text-blue-500" />}
+                        </div>
                         <div>
-                          <p className="font-bold text-gray-800">{child.nickname || child.name || '이름 없음'}</p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm font-bold text-gray-900">{child.nickname || child.name || '이름 없음'}</p>
+                          <p className="text-xs text-gray-500">
                             {child.status === 'expecting'
                               ? week !== null ? `임신 ${week}주차` : '임신 중'
                               : age || '출산'}
                             {child.status === 'expecting' && child.due_date && (
-                              <span className="ml-2 text-pink-600">예정일: {child.due_date}</span>
+                              <span className="ml-1.5 text-dusty-rose">예정일: {child.due_date}</span>
                             )}
                             {child.status === 'born' && child.birth_date && (
-                              <span className="ml-2 text-blue-600">출산일: {child.birth_date}</span>
+                              <span className="ml-1.5 text-blue-500">출산일: {child.birth_date}</span>
                             )}
                           </p>
                         </div>
                       </div>
-                      <div className="flex gap-2">
-                        <button onClick={() => openEditChild(child)} className="text-sm text-purple-600 font-bold">수정</button>
-                        <button onClick={() => handleDeleteChild(child.id)} className="text-sm text-red-400 font-bold">삭제</button>
+                      <div className="flex gap-1">
+                        <button onClick={() => openEditChild(child)} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+                          <Pencil className="h-3.5 w-3.5 text-gray-400" />
+                        </button>
+                        <button onClick={() => handleDeleteChild(child.id)} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+                          <Trash2 className="h-3.5 w-3.5 text-gray-300 hover:text-red-400" />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -262,51 +270,47 @@ export default function MyPage() {
           )}
         </div>
 
-        {/* 아이 추가/수정 폼 */}
+        {/* Add/Edit child form */}
         {showAddChild && (
-          <div className="glass rounded-2xl p-5 space-y-4 border-2 border-purple-300">
-            <h3 className="font-bold text-gray-800">{editingChild ? '✏️ 아이 정보 수정' : '➕ 아이 추가'}</h3>
+          <div className="card rounded-xl p-5 space-y-4 border-2 border-dusty-rose/30">
+            <h3 className="font-bold text-gray-900 text-sm">{editingChild ? '아이 정보 수정' : '아이 추가'}</h3>
 
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setChildStatus('expecting')}
-                className={`rounded-xl py-3 text-sm font-bold transition-all ${
-                  childStatus === 'expecting'
-                    ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg'
-                    : 'glass text-gray-600'
+                className={`rounded-lg py-2.5 text-sm font-semibold transition-all ${
+                  childStatus === 'expecting' ? 'bg-dusty-rose text-white' : 'bg-gray-50 text-gray-500 border border-border'
                 }`}
               >
-                🤰 임신 중
+                임신 중
               </button>
               <button
                 onClick={() => setChildStatus('born')}
-                className={`rounded-xl py-3 text-sm font-bold transition-all ${
-                  childStatus === 'born'
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                    : 'glass text-gray-600'
+                className={`rounded-lg py-2.5 text-sm font-semibold transition-all ${
+                  childStatus === 'born' ? 'bg-dusty-rose text-white' : 'bg-gray-50 text-gray-500 border border-border'
                 }`}
               >
-                👶 출산 후
+                출산 후
               </button>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">별명/이름 (선택)</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">별명/이름 (선택)</label>
               <input type="text" value={childNickname} onChange={(e) => setChildNickname(e.target.value)}
-                placeholder="예: 첫째, 콩이" className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-400" />
+                placeholder="예: 첫째, 콩이" className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-dusty-rose/20 focus:border-dusty-rose" />
             </div>
 
             {childStatus === 'expecting' && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">마지막 생리 시작일</label>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">마지막 생리 시작일</label>
                   <input type="date" value={childPregnancyStart} onChange={(e) => handleLastPeriodChange(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-400" />
+                    className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-dusty-rose/20 focus:border-dusty-rose" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">출산 예정일</label>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">출산 예정일</label>
                   <input type="date" value={childDueDate} onChange={(e) => setChildDueDate(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-pink-400" />
+                    className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-dusty-rose/20 focus:border-dusty-rose" />
                 </div>
               </>
             )}
@@ -314,15 +318,15 @@ export default function MyPage() {
             {childStatus === 'born' && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">출산일</label>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">출산일</label>
                   <input type="date" value={childBirthDate} onChange={(e) => setChildBirthDate(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                    className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-dusty-rose/20 focus:border-dusty-rose" />
                 </div>
                 <div className="flex gap-2">
-                  {[{ value: 'male', label: '👦 남아' }, { value: 'female', label: '👧 여아' }].map((g) => (
+                  {[{ value: 'male', label: '남아' }, { value: 'female', label: '여아' }].map((g) => (
                     <button key={g.value} onClick={() => setChildGender(g.value)}
-                      className={`flex-1 rounded-xl py-2 text-sm font-bold transition-all ${
-                        childGender === g.value ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' : 'bg-white/50 text-gray-600'
+                      className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
+                        childGender === g.value ? 'bg-dusty-rose text-white' : 'bg-gray-50 text-gray-500'
                       }`}>{g.label}</button>
                   ))}
                 </div>
@@ -331,55 +335,67 @@ export default function MyPage() {
 
             <div className="flex gap-3">
               <button onClick={() => { setShowAddChild(false); resetChildForm(); }}
-                className="flex-1 rounded-xl border border-gray-300 py-3 text-sm font-bold text-gray-600">취소</button>
+                className="flex-1 rounded-lg border border-border py-2.5 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors">취소</button>
               <button onClick={handleSaveChild} disabled={saving}
-                className="flex-1 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 py-3 text-sm font-bold text-white disabled:opacity-50">
+                className="flex-1 rounded-lg bg-dusty-rose py-2.5 text-sm font-semibold text-white disabled:opacity-50 hover:bg-dusty-rose-dark transition-colors">
                 {saving ? '저장 중...' : editingChild ? '수정하기' : '추가하기'}
               </button>
             </div>
           </div>
         )}
 
-        {/* 현재 상태 요약 */}
-        <div className="glass rounded-2xl p-6 text-center space-y-2">
-          <span className="text-5xl">{stage === 'pregnant' ? '🤰' : stage === 'postpartum' ? '👶' : '📋'}</span>
-          <h2 className="text-2xl font-black text-gray-800">
+        {/* Current status */}
+        <div className="card rounded-xl p-5 text-center space-y-2">
+          <div className={`mx-auto h-12 w-12 rounded-full flex items-center justify-center ${
+            stage === 'pregnant' ? 'bg-pink-50' : stage === 'postpartum' ? 'bg-blue-50' : 'bg-gray-50'
+          }`}>
+            {stage === 'pregnant' ? <Heart className="h-6 w-6 text-dusty-rose" /> :
+             stage === 'postpartum' ? <Baby className="h-6 w-6 text-blue-500" /> :
+             <FileText className="h-6 w-6 text-gray-400" />}
+          </div>
+          <h2 className="text-lg font-bold text-gray-900">
             {stage === 'pregnant' ? '임신 중' : stage === 'postpartum' ? '출산 후' : '임신 준비 중'}
           </h2>
-          <p className="text-sm text-gray-500">아이 정보 기반으로 자동 설정됩니다</p>
+          <p className="text-xs text-gray-400">아이 정보 기반으로 자동 설정됩니다</p>
         </div>
 
-        {/* 직장 여부 */}
-        <div className="glass rounded-2xl p-5 space-y-3">
-          <h3 className="font-bold text-gray-800">💼 직장 여부</h3>
-          <div className="grid grid-cols-2 gap-3">
+        {/* Working status */}
+        <div className="card rounded-xl p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <Briefcase className="h-4 w-4 text-gray-400" />
+            <h3 className="font-bold text-gray-900 text-sm">직장 여부</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
             <button onClick={() => setIsWorking(true)}
-              className={`rounded-xl py-3 text-sm font-bold transition-all duration-300 ${
-                isWorking ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg' : 'glass text-gray-600'
-              }`}>💼 직장맘</button>
+              className={`rounded-lg py-2.5 text-sm font-semibold transition-all ${
+                isWorking ? 'bg-dusty-rose text-white' : 'bg-gray-50 text-gray-500 border border-border'
+              }`}>직장맘</button>
             <button onClick={() => setIsWorking(false)}
-              className={`rounded-xl py-3 text-sm font-bold transition-all duration-300 ${
-                !isWorking ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg' : 'glass text-gray-600'
-              }`}>🏠 전업맘</button>
+              className={`rounded-lg py-2.5 text-sm font-semibold transition-all ${
+                !isWorking ? 'bg-dusty-rose text-white' : 'bg-gray-50 text-gray-500 border border-border'
+              }`}>전업맘</button>
           </div>
         </div>
 
-        {/* 지역 */}
-        <div className="glass rounded-2xl p-5 space-y-3">
-          <h3 className="font-bold text-gray-800">📍 지역</h3>
+        {/* Region */}
+        <div className="card rounded-xl p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-gray-400" />
+            <h3 className="font-bold text-gray-900 text-sm">지역</h3>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">시/도</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">시/도</label>
               <select value={regionProvince} onChange={(e) => { setRegionProvince(e.target.value); setRegionCity(''); }}
-                className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                className="w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-dusty-rose/20 focus:border-dusty-rose">
                 <option value="">선택</option>
                 {Object.keys(REGION_DATA).map((p) => <option key={p} value={p}>{p}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">시/군/구</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">시/군/구</label>
               <select value={regionCity} onChange={(e) => setRegionCity(e.target.value)} disabled={!regionProvince}
-                className="w-full rounded-xl border border-gray-200 bg-white/70 px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                className="w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-dusty-rose/20 focus:border-dusty-rose disabled:opacity-50">
                 <option value="">선택</option>
                 {(REGION_DATA[regionProvince] || []).map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -387,17 +403,25 @@ export default function MyPage() {
           </div>
         </div>
 
-        {/* 저장 버튼 */}
+        {/* Save button */}
         <button onClick={handleSaveProfile} disabled={saving}
-          className="w-full rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 py-4 text-lg font-black text-white shadow-xl hover:from-pink-600 hover:to-purple-700 disabled:opacity-50 transition-all duration-300">
-          {saving ? '저장 중...' : saved ? '✅ 저장 완료!' : '💾 저장하기'}
+          className="w-full flex items-center justify-center gap-2 rounded-xl bg-dusty-rose py-3.5 text-sm font-bold text-white hover:bg-dusty-rose-dark disabled:opacity-50 transition-colors">
+          {saving ? '저장 중...' : saved ? (
+            <><Check className="h-4 w-4" /> 저장 완료!</>
+          ) : (
+            <><Save className="h-4 w-4" /> 저장하기</>
+          )}
         </button>
 
-        {/* 계정 관리 */}
-        <div className="glass rounded-2xl p-5 space-y-3">
-          <h3 className="font-bold text-gray-800">⚙️ 계정</h3>
+        {/* Account */}
+        <div className="card rounded-xl p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <Settings className="h-4 w-4 text-gray-400" />
+            <h3 className="font-bold text-gray-900 text-sm">계정</h3>
+          </div>
           <button onClick={handleSignOut}
-            className="w-full rounded-xl border border-gray-300 py-3 text-sm font-bold text-gray-600 hover:bg-white/50 transition-all duration-300">
+            className="w-full flex items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors">
+            <LogOut className="h-4 w-4" />
             로그아웃
           </button>
         </div>

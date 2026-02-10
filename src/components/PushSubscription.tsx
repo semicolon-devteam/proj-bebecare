@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { Bell, X } from 'lucide-react';
 
 /** Promise with timeout helper */
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
@@ -39,8 +40,6 @@ export default function PushSubscription() {
       const subscription = await registration.pushManager.getSubscription();
       setSubscribed(!!subscription);
     } catch {
-      // SW not ready or no subscription — hide banner for granted users
-      // (이미 permission granted인데 SW 문제면 배너 안 보여줌)
       setSubscribed(true);
     }
   };
@@ -68,7 +67,7 @@ export default function PushSubscription() {
       const json = subscription.toJSON();
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        setSubscribed(true); // permission granted면 배너 숨김
+        setSubscribed(true);
         return;
       }
 
@@ -92,29 +91,26 @@ export default function PushSubscription() {
       setSubscribed(true);
     } catch (error) {
       console.error('Push subscription error:', error);
-      // 에러 시에도 배너 숨김 (무한 로딩 방지)
       setSubscribed(true);
     } finally {
       setLoading(false);
     }
   };
 
-  // Already subscribed, dismissed, or not supported
   if (subscribed || dismissed || typeof window === 'undefined' || !('Notification' in window) || !('serviceWorker' in navigator)) {
     return null;
   }
 
-  // Denied or already granted (but SW issue)
   if (permission === 'denied') {
     return null;
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 animate-slide-down">
-      <div className="glass rounded-2xl p-4 flex items-center justify-between gap-3">
+    <div className="mx-auto max-w-3xl px-4">
+      <div className="card rounded-xl p-3.5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">🔔</span>
-          <p className="text-sm font-medium text-gray-700">
+          <Bell className="h-5 w-5 text-dusty-rose flex-shrink-0" />
+          <p className="text-sm text-gray-600">
             알림을 켜면 맞춤 육아 정보를 받을 수 있어요
           </p>
         </div>
@@ -122,16 +118,16 @@ export default function PushSubscription() {
           <button
             onClick={subscribe}
             disabled={loading}
-            className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-bold text-white hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transition-all duration-300"
+            className="rounded-lg bg-dusty-rose px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-dusty-rose-dark disabled:opacity-50 transition-colors"
           >
             {loading ? '처리중...' : '알림 허용'}
           </button>
           <button
             onClick={() => setDismissed(true)}
-            className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="rounded-lg p-1.5 text-gray-300 hover:text-gray-500 hover:bg-gray-50 transition-colors"
             aria-label="닫기"
           >
-            ✕
+            <X className="h-4 w-4" />
           </button>
         </div>
       </div>

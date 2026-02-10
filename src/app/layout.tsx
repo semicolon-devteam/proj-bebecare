@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  themeColor: '#3b82f6',
+  themeColor: '#C2728A',
   viewport: {
     width: 'device-width',
     initialScale: 1,

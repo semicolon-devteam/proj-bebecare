@@ -7,15 +7,16 @@ import TimelineCard from './TimelineCard';
 import { supabase } from '@/lib/supabase';
 import { getChildren } from '@/lib/children';
 import type { Child } from '@/lib/children';
+import { ChevronDown, ChevronUp, LayoutList } from 'lucide-react';
 
 const CATEGORIES = [
-  { key: 'all', label: '전체', emoji: '📌' },
-  { key: 'pregnancy_planning', label: '임신계획', emoji: '📋' },
-  { key: 'pregnancy', label: '임신', emoji: '🤰' },
-  { key: 'postpartum', label: '산후', emoji: '🤱' },
-  { key: 'parenting', label: '육아', emoji: '👶' },
-  { key: 'work', label: '직장', emoji: '💼' },
-  { key: 'government_support', label: '정부지원', emoji: '🏛️' },
+  { key: 'all', label: '전체' },
+  { key: 'pregnancy_planning', label: '임신계획' },
+  { key: 'pregnancy', label: '임신' },
+  { key: 'postpartum', label: '산후' },
+  { key: 'parenting', label: '육아' },
+  { key: 'work', label: '직장' },
+  { key: 'government_support', label: '정부지원' },
 ];
 
 interface ProfileContext {
@@ -69,7 +70,6 @@ export default function TimelineFeed({ userId }: { userId: string }) {
   const [showPast, setShowPast] = useState(false);
   const hasTriedGenerate = useRef(false);
 
-  // 프로필 + 아이 정보 로드
   useEffect(() => {
     async function loadProfile() {
       const [profileRes, childrenData] = await Promise.all([
@@ -80,10 +80,9 @@ export default function TimelineFeed({ userId }: { userId: string }) {
       const profile = profileRes.data;
       const ctx: ProfileContext = { stage: profile?.stage || 'planning', children: childrenData };
 
-      // 선택된 아이 기준으로 D-Day 컨텍스트 설정
       const targetChild = selectedChildId !== 'all'
         ? childrenData.find(c => c.id === selectedChildId)
-        : childrenData[0]; // 기본: 첫 번째 아이
+        : childrenData[0];
 
       if (targetChild) {
         if (targetChild.status === 'expecting' && targetChild.pregnancy_start_date) {
@@ -97,7 +96,6 @@ export default function TimelineFeed({ userId }: { userId: string }) {
           ctx.childBirthDate = birth;
         }
       } else if (profile) {
-        // Fallback to profile data
         if (profile.stage === 'pregnant' && profile.due_date) {
           const dueDate = new Date(profile.due_date);
           const start = profile.pregnancy_start_date
@@ -176,43 +174,43 @@ export default function TimelineFeed({ userId }: { userId: string }) {
   const childrenForTabs = profileCtx.children;
 
   return (
-    <div className="flex flex-col h-full">
-      {/* 아이별 탭 (아이가 2명 이상일 때만 표시) */}
+    <div className="flex flex-col h-full bg-surface">
+      {/* Child tabs */}
       {childrenForTabs.length > 1 && (
-        <div className="px-4 pt-2 pb-1 overflow-x-auto">
+        <div className="px-4 pt-3 pb-1 overflow-x-auto bg-white border-b border-border">
           <div className="flex gap-2 min-w-max">
             <button
               onClick={() => setSelectedChildId('all')}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold transition-all duration-200 whitespace-nowrap ${
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap ${
                 selectedChildId === 'all'
-                  ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
-                  : 'glass text-gray-600 hover:text-gray-800'
+                  ? 'bg-dusty-rose text-white'
+                  : 'bg-gray-100 text-gray-500 hover:text-gray-700'
               }`}
             >
-              👨‍👩‍👧‍👦 전체
+              전체
             </button>
             {childrenForTabs.map((child) => (
               <button
                 key={child.id}
                 onClick={() => setSelectedChildId(child.id)}
-                className={`rounded-full px-3 py-1.5 text-xs font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap ${
                   selectedChildId === child.id
-                    ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md'
-                    : 'glass text-gray-600 hover:text-gray-800'
+                    ? 'bg-dusty-rose text-white'
+                    : 'bg-gray-100 text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {child.status === 'expecting' ? '🤰' : '👶'} {child.nickname || child.name || '아이'}
+                {child.nickname || child.name || '아이'}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* D-Day 배너 */}
+      {/* D-Day banner */}
       {profileCtx.currentWeek && (
-        <div className="mx-4 mt-2 mb-1 rounded-xl bg-gradient-to-r from-pink-500/10 to-purple-500/10 px-4 py-2 text-center">
-          <span className="text-sm font-bold text-pink-600">
-            🤰 임신 {profileCtx.currentWeek}주차
+        <div className="mx-4 mt-3 mb-1 rounded-xl border border-pink-100 bg-pink-50 px-4 py-2.5 text-center">
+          <span className="text-sm font-semibold text-dusty-rose">
+            임신 {profileCtx.currentWeek}주차
             {profileCtx.children.find(c => c.id === selectedChildId || selectedChildId === 'all')?.due_date &&
               ` · 예정일까지 D-${Math.max(0, Math.round(((new Date(profileCtx.children.find(c => c.id === selectedChildId || selectedChildId === 'all')?.due_date || '').getTime()) - Date.now()) / (24 * 60 * 60 * 1000)))}`
             }
@@ -220,9 +218,9 @@ export default function TimelineFeed({ userId }: { userId: string }) {
         </div>
       )}
       {profileCtx.ageMonths !== undefined && profileCtx.ageMonths >= 0 && (
-        <div className="mx-4 mt-2 mb-1 rounded-xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 px-4 py-2 text-center">
-          <span className="text-sm font-bold text-blue-600">
-            👶 생후 {profileCtx.ageMonths}개월
+        <div className="mx-4 mt-3 mb-1 rounded-xl border border-blue-100 bg-blue-50 px-4 py-2.5 text-center">
+          <span className="text-sm font-semibold text-blue-600">
+            생후 {profileCtx.ageMonths}개월
           </span>
         </div>
       )}
@@ -232,11 +230,11 @@ export default function TimelineFeed({ userId }: { userId: string }) {
         <div className="flex gap-2 min-w-max">
           {CATEGORIES.map((cat) => (
             <button key={cat.key} onClick={() => setSelectedCategory(cat.key)}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold transition-all duration-200 whitespace-nowrap ${
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap ${
                 selectedCategory === cat.key
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md'
-                  : 'glass text-gray-600 hover:text-gray-800'
-              }`}>{cat.emoji} {cat.label}</button>
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-white border border-border text-gray-500 hover:text-gray-700'
+              }`}>{cat.label}</button>
           ))}
         </div>
       </div>
@@ -244,26 +242,38 @@ export default function TimelineFeed({ userId }: { userId: string }) {
       {pastCount > 0 && (
         <div className="px-4 pb-2">
           <button onClick={() => setShowPast(!showPast)}
-            className="text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors">
-            {showPast ? '📂 지난 항목 숨기기' : `📁 지난 항목 보기 (${pastCount})`}
+            className="flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors">
+            {showPast ? (
+              <>
+                <ChevronUp className="h-3.5 w-3.5" />
+                지난 항목 숨기기
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-3.5 w-3.5" />
+                지난 항목 보기 ({pastCount})
+              </>
+            )}
           </button>
         </div>
       )}
 
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         {loading || generating ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-purple-200 border-t-blue-600" />
-            {generating && <p className="text-sm text-gray-500 animate-pulse">맞춤 콘텐츠를 준비하고 있어요...</p>}
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
+            {generating && <p className="text-sm text-gray-400">맞춤 콘텐츠를 준비하고 있어요...</p>}
           </div>
         ) : sortedEvents.length === 0 ? (
-          <div className="text-center py-20 space-y-4 animate-fade-in">
-            <span className="text-6xl">📭</span>
-            <p className="text-lg font-bold text-gray-600">아직 타임라인이 없어요</p>
-            <p className="text-sm text-gray-500">프로필 정보를 기반으로 맞춤 콘텐츠가 곧 제공됩니다</p>
+          <div className="text-center py-20 space-y-3">
+            <div className="mx-auto h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
+              <LayoutList className="h-6 w-6 text-gray-300" />
+            </div>
+            <p className="text-base font-semibold text-gray-600">아직 타임라인이 없어요</p>
+            <p className="text-sm text-gray-400">프로필 정보를 기반으로 맞춤 콘텐츠가 곧 제공됩니다</p>
           </div>
         ) : (
-          <div className="space-y-3 animate-fade-in">
+          <div className="space-y-3">
             {sortedEvents.map((event) => (
               <TimelineCard key={event.id} event={event} onUpdate={loadEvents} profile={profileCtx} />
             ))}
