@@ -352,7 +352,7 @@ export default function Home() {
               </div>
 
               {/* Chat Input */}
-              <div className="sticky bottom-0 z-20 border-t border-border bg-white px-4 py-3 pb-[env(safe-area-inset-bottom,12px)]">
+              <div className="sticky bottom-0 z-20 border-t border-border bg-white px-4 pt-3 pb-[max(env(safe-area-inset-bottom),1rem)]">
                 <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
                   <div className="flex items-center gap-2 rounded-xl border border-border bg-surface p-1.5">
                     <input
