@@ -191,7 +191,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       {user ? (
-        <div className="flex h-screen flex-col">
+        <div className="flex h-[100dvh] flex-col">
           {/* Header */}
           <header className="border-b border-border bg-white px-4 py-3">
             <div className="mx-auto flex max-w-4xl items-center justify-between">
@@ -352,7 +352,7 @@ export default function Home() {
               </div>
 
               {/* Chat Input */}
-              <div className="border-t border-border bg-white px-4 py-3">
+              <div className="sticky bottom-0 z-20 border-t border-border bg-white px-4 py-3 pb-[env(safe-area-inset-bottom,12px)]">
                 <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
                   <div className="flex items-center gap-2 rounded-xl border border-border bg-surface p-1.5">
                     <input
