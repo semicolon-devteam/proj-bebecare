@@ -193,7 +193,7 @@ export default function Home() {
       {user ? (
         <div className="flex h-[100dvh] flex-col">
           {/* Header */}
-          <header className="border-b border-border bg-white px-4 py-3">
+          <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur-sm px-4 py-3">
             <div className="mx-auto flex max-w-4xl items-center justify-between">
               <h1 className="text-xl font-semibold text-dusty-rose tracking-tight">
                 BebeCare
@@ -238,7 +238,7 @@ export default function Home() {
           </div>
 
           {/* Tab Bar */}
-          <div className="border-b border-border bg-white px-4">
+          <div className="sticky top-[53px] z-20 border-b border-border bg-white/95 backdrop-blur-sm px-4">
             <div className="mx-auto max-w-4xl flex">
               <button
                 onClick={() => setActiveTab('timeline')}
