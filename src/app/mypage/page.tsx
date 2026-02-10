@@ -7,7 +7,7 @@ import { getProfile, createOrUpdateProfile } from '@/lib/profile';
 import { getChildren, addChild, updateChild, deleteChild, deriveStageFromChildren } from '@/lib/children';
 import type { Child, ChildInput } from '@/lib/children';
 import { REGION_DATA } from '@/lib/regions';
-import { ChevronLeft, Baby, Briefcase, MapPin, Settings, LogOut, Plus, Pencil, Trash2, Heart, FileText, Save, Check } from 'lucide-react';
+import { ChevronLeft, Baby, Briefcase, MapPin, Settings, LogOut, Plus, Pencil, Trash2, Heart, FileText, Save, Check, Bell, BellOff } from 'lucide-react';
 
 export default function MyPage() {
   const router = useRouter();
@@ -15,6 +15,8 @@ export default function MyPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
+  const [pushLoading, setPushLoading] = useState(false);
 
   const [children, setChildren] = useState<Child[]>([]);
   const [showAddChild, setShowAddChild] = useState(false);
@@ -59,6 +61,67 @@ export default function MyPage() {
       }
     })();
   }, [router]);
+
+  // Check push notification status
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      setPushEnabled(false);
+      return;
+    }
+    setPushEnabled(Notification.permission === 'granted');
+  }, []);
+
+  const handleTogglePush = async () => {
+    if (!userId) return;
+    setPushLoading(true);
+    try {
+      if (pushEnabled) {
+        // Unsubscribe
+        const reg = await navigator.serviceWorker?.ready;
+        const sub = await reg?.pushManager?.getSubscription();
+        if (sub) {
+          await sub.unsubscribe();
+          // Remove from DB
+          const { supabase } = await import('@/lib/supabase');
+          await supabase.from('push_subscriptions').delete().eq('user_id', userId).eq('endpoint', sub.endpoint);
+        }
+        setPushEnabled(false);
+      } else {
+        // Request permission & subscribe
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          alert('알림 권한이 거부되었습니다. 브라우저 설정에서 허용해주세요.');
+          setPushLoading(false);
+          return;
+        }
+        const reg = await navigator.serviceWorker?.ready;
+        if (!reg) {
+          alert('서비스 워커를 사용할 수 없습니다.');
+          setPushLoading(false);
+          return;
+        }
+        const sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+        });
+        // Save to server
+        const res = await fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscription: sub.toJSON(), userId }),
+        });
+        if (res.ok) {
+          setPushEnabled(true);
+        } else {
+          alert('푸시 알림 등록에 실패했습니다.');
+        }
+      }
+    } catch (e) {
+      console.error('Push toggle error:', e);
+      alert('오류가 발생했습니다.');
+    }
+    setPushLoading(false);
+  };
 
   const resetChildForm = () => {
     setChildStatus('expecting');
@@ -412,6 +475,33 @@ export default function MyPage() {
             <><Save className="h-4 w-4" /> 저장하기</>
           )}
         </button>
+
+        {/* Push Notification */}
+        <div className="card rounded-xl p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <Bell className="h-4 w-4 text-gray-400" />
+            <h3 className="font-bold text-gray-900 text-sm">푸시 알림</h3>
+          </div>
+          <p className="text-xs text-gray-500">맞춤정보 D-Day 알림을 푸시로 받을 수 있어요.</p>
+          <button
+            onClick={handleTogglePush}
+            disabled={pushLoading || pushEnabled === null}
+            className={`w-full flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
+              pushEnabled
+                ? 'bg-gray-100 text-gray-600 border border-border hover:bg-gray-200'
+                : 'bg-dusty-rose text-white hover:bg-dusty-rose-dark'
+            } disabled:opacity-50`}
+          >
+            {pushLoading ? '처리 중...' : pushEnabled ? (
+              <><BellOff className="h-4 w-4" /> 알림 끄기</>
+            ) : (
+              <><Bell className="h-4 w-4" /> 알림 켜기</>
+            )}
+          </button>
+          {pushEnabled === false && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'denied' && (
+            <p className="text-xs text-red-500">⚠️ 브라우저에서 알림이 차단되어 있습니다. 브라우저 설정에서 허용해주세요.</p>
+          )}
+        </div>
 
         {/* Account */}
         <div className="card rounded-xl p-5 space-y-3">
