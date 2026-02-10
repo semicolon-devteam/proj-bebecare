@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import type { TimelineEvent } from '@/lib/timeline';
 import { markEventRead, toggleBookmark, dismissEvent } from '@/lib/timeline';
-import { X, Star } from 'lucide-react';
+import { X, Star, ChevronDown, ChevronUp } from 'lucide-react';
 
 const categoryLabel: Record<string, string> = {
   pregnancy_planning: '임신 계획',
@@ -99,7 +99,13 @@ export default function TimelineCard({
   const barColor = categoryBarColor[category] || 'bg-gray-400';
   const dotColor = categoryDotColor[category] || 'bg-gray-400';
 
-  const dday = profile ? computeDday(event, profile) : null;
+  // D-Day: compute or fallback to week_start/month_start label
+  let dday = profile ? computeDday(event, profile) : null;
+  if (!dday && event.content) {
+    const c = event.content;
+    if (c.week_start != null) dday = `${c.week_start}주`;
+    else if (c.month_start != null) dday = `${c.month_start}개월`;
+  }
 
   const handleExpand = async () => {
     setExpanded(!expanded);
@@ -123,8 +129,7 @@ export default function TimelineCard({
 
   return (
     <div
-      onClick={handleExpand}
-      className={`card card-hover overflow-hidden cursor-pointer ${
+      className={`card overflow-hidden ${
         !event.is_read ? 'border-l-2 border-l-dusty-rose' : ''
       }`}
     >
@@ -132,8 +137,8 @@ export default function TimelineCard({
       <div className={`h-1 ${barColor}`} />
 
       {/* Header */}
-      <div className="p-4 pb-2">
-        <div className="flex items-start justify-between gap-2">
+      <div className="p-4">
+        <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 flex-1 min-w-0">
             <div className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${dotColor}`} />
             <span className="text-xs font-semibold text-gray-500">
@@ -170,21 +175,33 @@ export default function TimelineCard({
           </div>
         </div>
 
-        <h3 className="mt-2 text-sm font-bold text-gray-900 leading-snug">
-          {event.content?.title}
-        </h3>
-
-        {event.content?.summary && !expanded && (
-          <p className="mt-1 text-sm text-gray-500 line-clamp-2">
-            {event.content.summary}
-          </p>
-        )}
+        {/* Title + Collapse toggle */}
+        <div className="flex items-center justify-between mt-1.5">
+          <h3 className="text-sm font-bold text-gray-900 leading-snug flex-1">
+            {event.content?.title}
+          </h3>
+          <button
+            onClick={handleExpand}
+            className="p-1 ml-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
+          >
+            {expanded ? (
+              <ChevronUp className="h-4 w-4 text-gray-400" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-gray-400" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Expanded Body */}
       {expanded && (
         <div className="px-4 pb-4">
-          <div className="mt-2 text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+          {event.content?.summary && (
+            <p className="text-sm text-gray-500 mb-2">
+              {event.content.summary}
+            </p>
+          )}
+          <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
             {event.content?.body}
           </div>
           {event.content?.tags && event.content.tags.length > 0 && (
