@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ChevronLeft, Building2, CreditCard, Banknote, FileText, Target, MapPin, Globe, Map } from 'lucide-react';
-import { REGION_DATA } from '@/lib/regions';
 
 interface Benefit {
   id: string;
@@ -19,104 +18,121 @@ interface Benefit {
 
 type RegionMode = 'my' | 'national' | 'select';
 
+interface ProfileSummary {
+  stage: string;
+  is_working: boolean;
+  region: string | null;
+  children_count: number;
+}
+
+interface BenefitsResponse {
+  benefits: Benefit[];
+  availableSubcategories: string[];
+  profile_summary: ProfileSummary;
+}
+
 const subcategoryIcon: Record<string, typeof Building2> = {
   건강관리: Building2,
   바우처: CreditCard,
   현금지원: Banknote,
   세금: FileText,
+  주거: Building2,
+  의료비: Building2,
+  산후조리: Building2,
+  다자녀: Building2,
+  급여: Banknote,
+  출산장려금: Banknote,
 };
 
-const SUBCATEGORIES = ['건강관리', '바우처', '현금지원', '세금'] as const;
-const PROVINCES = Object.keys(REGION_DATA);
+// 한국 시/도 목록
+const KOREA_PROVINCES = [
+  '서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종',
+  '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'
+];
 
 export default function BenefitsPage() {
   const router = useRouter();
   const [benefits, setBenefits] = useState<Benefit[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  
+  // 필터링 상태
   const [regionMode, setRegionMode] = useState<RegionMode>('my');
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
-  const [userRegion, setUserRegion] = useState<string | null>(null);
   const [availableSubcategories, setAvailableSubcategories] = useState<string[]>([]);
-  const [profileSummary, setProfileSummary] = useState<ProfileSummary | null>(null);
+  const [userRegion, setUserRegion] = useState<string | null>(null);
 
-  const fetchBenefits = useCallback(async (regionParam?: string) => {
+  // Benefits 로드 함수
+  const loadBenefits = useCallback(async (mode: RegionMode = regionMode, province?: string, subcategory?: string) => {
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { router.push('/login'); return; }
+      if (!session) { 
+        router.push('/login'); 
+        return; 
+      }
 
-      const params = regionParam ? `?region=${encodeURIComponent(regionParam)}` : '';
-      const response = await fetch(`/api/benefits${params}`, {
+      const params = new URLSearchParams();
+      
+      if (mode === 'national') {
+        params.set('regionFilter', 'national');
+      } else if (mode === 'my') {
+        params.set('regionFilter', 'my');
+      } else if (mode === 'select' && province) {
+        params.set('regionFilter', 'selected');
+        params.set('selectedRegion', province);
+      }
+
+      if (subcategory && subcategory !== '전체') {
+        params.set('subcategory', subcategory);
+      }
+
+      const res = await fetch(`/api/benefits?${params}`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (res.ok) {
+        const data: BenefitsResponse = await res.json();
         setBenefits(data.benefits || []);
-        if (data.profile_summary?.region && !userRegion) {
+        setAvailableSubcategories(data.availableSubcategories || []);
+        if (!userRegion && data.profile_summary?.region) {
           setUserRegion(data.profile_summary.region);
         }
-        return data.profile_summary?.region as string | null;
       }
     } catch (error) {
       console.error('Error loading benefits:', error);
     } finally {
       setLoading(false);
     }
-    return null;
-  }, [router, userRegion]);
+  }, [regionMode, userRegion, router]);
 
-  // Initial load
+  // 초기 로드
   useEffect(() => {
-    (async () => {
-      setLoading(true);
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { router.push('/login'); return; }
+    loadBenefits();
+  }, [loadBenefits]);
 
-        // Load benefits with new API structure
-        const params = new URLSearchParams({ regionFilter: 'my' });
-        const res = await fetch(`/api/benefits?${params}`, {
-          headers: { Authorization: `Bearer ${session.access_token}` },
-        });
-        
-        if (res.ok) {
-          const data: BenefitsResponse = await res.json();
-          setBenefits(data.benefits || []);
-          setAvailableSubcategories(data.availableSubcategories || []);
-          setProfileSummary(data.profile_summary);
-          setUserRegion(data.profile_summary?.region || null);
-        }
-      } catch (error) {
-        console.error('Error loading benefits:', error);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [router]);
-
+  // 지역 모드 변경 핸들러
   const handleRegionModeChange = (mode: RegionMode) => {
     setRegionMode(mode);
     setSelectedProvince(null);
-    if (mode === 'my') {
-      if (userRegion) fetchBenefits(userRegion);
-      else fetchBenefits();
-    } else if (mode === 'national') {
-      fetchBenefits('__national__');
+    if (mode !== 'select') {
+      loadBenefits(mode, undefined, selectedSubcategory || undefined);
     }
-    // 'select' mode: wait for province selection
   };
 
+  // 지역 선택 핸들러
   const handleProvinceSelect = (province: string) => {
     setSelectedProvince(province);
-    fetchBenefits(province);
+    loadBenefits('select', province, selectedSubcategory || undefined);
   };
 
-  const filteredBenefits = selectedSubcategory
-    ? benefits.filter(b => b.subcategory === selectedSubcategory)
-    : benefits;
+  // 서브카테고리 선택 핸들러
+  const handleSubcategorySelect = (subcategory: string | null) => {
+    setSelectedSubcategory(subcategory);
+    const currentProvince = regionMode === 'select' ? selectedProvince : undefined;
+    loadBenefits(regionMode, currentProvince || undefined, subcategory || undefined);
+  };
 
   const segmentedItems: { key: RegionMode; label: string; icon: typeof MapPin }[] = [
     { key: 'my', label: '내 지역', icon: MapPin },
@@ -175,7 +191,7 @@ export default function BenefitsPage() {
         {regionMode === 'select' && (
           <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
             <div className="flex gap-2 pb-1">
-              {PROVINCES.map((province) => (
+              {KOREA_PROVINCES.map((province) => (
                 <button
                   key={province}
                   onClick={() => handleProvinceSelect(province)}
@@ -196,7 +212,7 @@ export default function BenefitsPage() {
         <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
           <div className="flex gap-2 pb-1">
             <button
-              onClick={() => setSelectedSubcategory(null)}
+              onClick={() => handleSubcategorySelect(null)}
               className={`flex-shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium border transition-all ${
                 !selectedSubcategory
                   ? 'bg-dusty-rose text-white border-dusty-rose'
@@ -205,12 +221,12 @@ export default function BenefitsPage() {
             >
               전체
             </button>
-            {SUBCATEGORIES.map((sub) => {
+            {availableSubcategories.map((sub) => {
               const Icon = subcategoryIcon[sub] || Building2;
               return (
                 <button
                   key={sub}
-                  onClick={() => setSelectedSubcategory(selectedSubcategory === sub ? null : sub)}
+                  onClick={() => handleSubcategorySelect(selectedSubcategory === sub ? null : sub)}
                   className={`flex-shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium border transition-all ${
                     selectedSubcategory === sub
                       ? 'bg-dusty-rose text-white border-dusty-rose'
@@ -237,20 +253,16 @@ export default function BenefitsPage() {
           <div className="flex items-center justify-center py-20">
             <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
           </div>
-        ) : filteredBenefits.length === 0 ? (
+        ) : benefits.length === 0 ? (
           <div className="text-center py-20 space-y-3">
             <div className="mx-auto h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
               <Building2 className="h-6 w-6 text-gray-300" />
             </div>
-            <p className="text-base font-semibold text-gray-600">
-              {regionMode === 'select' && !selectedProvince
-                ? '지역을 선택해주세요'
-                : '해당 조건의 혜택이 없습니다'}
-            </p>
+            <p className="text-base font-semibold text-gray-600">혜택 정보를 불러올 수 없습니다</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {filteredBenefits.map((benefit, index) => {
+            {benefits.map((benefit, index) => {
               const IconComp = subcategoryIcon[benefit.subcategory || ''] || Building2;
               return (
                 <div
