@@ -65,6 +65,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedAudience, setSelectedAudience] = useState<'all' | 'baby' | 'parent'>('all');
   const [profileCtx, setProfileCtx] = useState<ProfileContext>({ stage: 'planning', children: [] });
   const [selectedChildId, setSelectedChildId] = useState<string>('all');
   const [showPast, setShowPast] = useState(false);
@@ -157,9 +158,17 @@ export default function TimelineFeed({ userId }: { userId: string }) {
     const past = withDday.filter(d => d.ddayValue !== null && d.ddayValue < 0);
     const base = showPast ? [...futureOrNoDate, ...past] : futureOrNoDate;
 
+    // Filter by audience
+    const audienceFiltered = selectedAudience === 'all'
+      ? base
+      : base.filter(({ event }) => {
+          const ta = event.content?.target_audience;
+          return !ta || ta === 'all' || ta === selectedAudience;
+        });
+
     if (selectedCategory === 'all') {
       let govCount = 0;
-      const filtered = base.filter(({ event }) => {
+      const filtered = audienceFiltered.filter(({ event }) => {
         if (event.content?.category === 'government_support') {
           govCount++;
           return govCount <= 5;
@@ -168,7 +177,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
       });
       return { visibleEvents: filtered.map(s => s.event), pastCount: past.length };
     }
-    return { visibleEvents: base.map(s => s.event), pastCount: past.length };
+    return { visibleEvents: audienceFiltered.map(s => s.event), pastCount: past.length };
   })();
 
   const childrenForTabs = profileCtx.children;
@@ -238,6 +247,31 @@ export default function TimelineFeed({ userId }: { userId: string }) {
           ))}
         </div>
       </div>
+
+      {/* Audience Filter (아기/엄마아빠) */}
+      {selectedCategory === 'government_support' && (
+        <div className="px-4 pb-2">
+          <div className="flex gap-2">
+            {([
+              { key: 'all', label: '전체' },
+              { key: 'baby', label: '👶 아기' },
+              { key: 'parent', label: '👨‍👩‍👧 엄마아빠' },
+            ] as const).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setSelectedAudience(tab.key)}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap ${
+                  selectedAudience === tab.key
+                    ? 'bg-violet-600 text-white'
+                    : 'bg-violet-50 text-violet-600 hover:bg-violet-100'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {pastCount > 0 && (
         <div className="px-4 pb-2">
