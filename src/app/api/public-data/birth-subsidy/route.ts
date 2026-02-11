@@ -34,29 +34,29 @@ export async function GET(request: NextRequest) {
     if (district) {
       const normalizedDistrict = district.replace(/구$|군$/, '');
       const { data: cached } = await admin
-        .from('public_data_cache')
-        .select('data')
+        .from('raw_sources')
+        .select('raw_data')
         .eq('data_type', 'birth_subsidy')
         .like('data_key', `busan_%${normalizedDistrict}%`)
+        .neq('status', 'error')
         .limit(1)
         .single();
 
-      if (cached?.data) {
-        return NextResponse.json({ ...cached.data, source: 'cache' });
+      if (cached?.raw_data) {
+        return NextResponse.json({ ...(cached.raw_data as object), source: 'cache' });
       }
     }
 
     // 전체 데이터 캐시 조회
     const { data: cached } = await admin
-      .from('public_data_cache')
-      .select('data, fetched_at')
+      .from('raw_sources')
+      .select('raw_data, fetched_at')
       .eq('data_type', 'birth_subsidy')
       .eq('data_key', 'busan_all')
       .single();
 
-    if (cached?.data) {
-      const result = cached.data as { data?: unknown[] };
-      // 구군 필터 적용
+    if (cached?.raw_data) {
+      const result = cached.raw_data as { data?: unknown[] };
       if (district && result.data) {
         const normalizedDistrict = district.replace(/구$|군$/, '');
         result.data = (result.data as { district: string }[]).filter(

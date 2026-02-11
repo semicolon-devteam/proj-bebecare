@@ -2,13 +2,71 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createHash } from 'crypto';
 
 function getSupabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
+}
+
+function computeChecksum(data: unknown): string {
+  return createHash('sha256').update(JSON.stringify(data)).digest('hex');
+}
+
+async function upsertRawSource(
+  admin: SupabaseClient,
+  params: {
+    sourceType: 'crawl' | 'api' | 'manual';
+    dataType: string;
+    dataKey: string;
+    rawData: unknown;
+    sourceUrl?: string;
+    expiresAt?: string;
+  }
+) {
+  const checksum = computeChecksum(params.rawData);
+
+  // Check if data changed
+  const { data: existing } = await admin
+    .from('raw_sources')
+    .select('id, checksum')
+    .eq('data_type', params.dataType)
+    .eq('data_key', params.dataKey)
+    .single();
+
+  if (existing?.checksum === checksum) {
+    // Data unchanged, just update fetched_at
+    await admin
+      .from('raw_sources')
+      .update({ fetched_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .eq('id', existing.id);
+    return { id: existing.id, changed: false };
+  }
+
+  // Upsert new/changed data
+  const { data, error } = await admin
+    .from('raw_sources')
+    .upsert({
+      source_type: params.sourceType,
+      data_type: params.dataType,
+      data_key: params.dataKey,
+      raw_data: params.rawData,
+      checksum,
+      source_url: params.sourceUrl,
+      status: 'processed',
+      fetched_at: new Date().toISOString(),
+      processed_at: new Date().toISOString(),
+      expires_at: params.expiresAt,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'data_type,data_key' })
+    .select('id')
+    .single();
+
+  if (error) throw error;
+  return { id: data!.id, changed: true };
 }
 
 // 예방접종 코드 매핑
@@ -27,29 +85,25 @@ const VACCINATION_CODES: Record<string, { code: string; ageMonths: number[]; lab
   Rotavirus: { code: '14', ageMonths: [2, 4, 6], label: '로타바이러스' },
 };
 
-async function syncVaccinations(admin: ReturnType<typeof getSupabaseAdmin>, serviceKey: string) {
-  const results: { synced: number; errors: number } = { synced: 0, errors: 0 };
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7일 후 만료
+async function syncVaccinations(admin: SupabaseClient, serviceKey: string) {
+  const results = { synced: 0, unchanged: 0, errors: 0 };
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  // 전체 스케줄 저장
+  // 전체 스케줄
   const scheduleData = Object.entries(VACCINATION_CODES).map(([name, v]) => ({
-    name,
-    label: v.label,
-    code: v.code,
-    recommendedMonths: v.ageMonths,
+    name, label: v.label, code: v.code, recommendedMonths: v.ageMonths,
   }));
 
-  await admin.from('public_data_cache').upsert({
-    data_type: 'vaccination',
-    data_key: 'schedule',
-    data: scheduleData,
-    source: 'data.go.kr - 질병관리청 예방접종 정보',
-    fetched_at: new Date().toISOString(),
-    expires_at: expiresAt,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: 'data_type,data_key' });
+  await upsertRawSource(admin, {
+    sourceType: 'api',
+    dataType: 'vaccination',
+    dataKey: 'schedule',
+    rawData: scheduleData,
+    sourceUrl: 'data.go.kr - 질병관리청 예방접종 정보',
+    expiresAt,
+  });
 
-  // 각 접종별 상세 정보
+  // 각 접종별 상세
   for (const [name, vac] of Object.entries(VACCINATION_CODES)) {
     try {
       const url = `https://apis.data.go.kr/1790387/vcninfo/getVcnInfo?serviceKey=${serviceKey}&vcnCd=${vac.code}`;
@@ -59,28 +113,37 @@ async function syncVaccinations(admin: ReturnType<typeof getSupabaseAdmin>, serv
       const titleMatch = text.match(/<title>([^<]+)<\/title>/);
       const messageMatch = text.match(/<message><!\[CDATA\[([\s\S]*?)\]\]><\/message>/);
 
-      const detail = {
-        name,
-        label: vac.label,
-        code: vac.code,
+      const rawDetail = {
+        name, label: vac.label, code: vac.code,
         recommendedMonths: vac.ageMonths,
         title: titleMatch?.[1] || vac.label,
         description: messageMatch?.[1]?.substring(0, 2000) || '',
+        rawXml: text.substring(0, 5000), // 원본 XML 보존
       };
 
-      await admin.from('public_data_cache').upsert({
-        data_type: 'vaccination',
-        data_key: `detail_${vac.code}`,
-        data: detail,
-        source: 'data.go.kr - 질병관리청 예방접종 정보',
-        fetched_at: new Date().toISOString(),
-        expires_at: expiresAt,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'data_type,data_key' });
+      const result = await upsertRawSource(admin, {
+        sourceType: 'api',
+        dataType: 'vaccination',
+        dataKey: `detail_${vac.code}`,
+        rawData: rawDetail,
+        sourceUrl: url,
+        expiresAt,
+      });
 
-      results.synced++;
+      result.changed ? results.synced++ : results.unchanged++;
     } catch (e) {
       console.error(`Vaccination sync error for ${name}:`, e);
+      // Mark as error
+      await admin.from('raw_sources').upsert({
+        source_type: 'api',
+        data_type: 'vaccination',
+        data_key: `detail_${vac.code}`,
+        raw_data: { error: String(e) },
+        status: 'error',
+        error_message: String(e),
+        fetched_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'data_type,data_key' });
       results.errors++;
     }
   }
@@ -88,68 +151,72 @@ async function syncVaccinations(admin: ReturnType<typeof getSupabaseAdmin>, serv
   return results;
 }
 
-async function syncBirthSubsidy(admin: ReturnType<typeof getSupabaseAdmin>, serviceKey: string) {
-  const results: { synced: number; errors: number } = { synced: 0, errors: 0 };
-  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30일 후 만료 (월 1회 갱신이면 충분)
+async function syncBirthSubsidy(admin: SupabaseClient, serviceKey: string) {
+  const results = { synced: 0, unchanged: 0, errors: 0 };
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
   try {
-    // 부산 출산지원금
     const url = `https://apis.data.go.kr/6260000/BusanChildBirthService/getTblChildBirth?serviceKey=${serviceKey}&numOfRows=200&pageNo=1&resultType=json`;
     const response = await fetch(url);
     const data = await response.json();
-
     const items = data?.response?.body?.items?.item || [];
 
-    if (items.length > 0) {
-      // 최신 연도
-      const latestYear = Math.max(...items.map((i: { pay_year: string }) => parseInt(i.pay_year)));
-      const filtered = items.filter((i: { pay_year: string }) => parseInt(i.pay_year) === latestYear);
+    if (items.length === 0) return results;
 
-      // 구군별 그룹핑
-      const grouped: Record<string, { district: string; year: number; subsidies: { type: string; division: string; amount: number; department: string }[] }> = {};
+    // 원본 전체를 raw_sources에 저장
+    await upsertRawSource(admin, {
+      sourceType: 'api',
+      dataType: 'birth_subsidy',
+      dataKey: 'busan_raw',
+      rawData: data, // API 응답 전체 보존
+      sourceUrl: url,
+      expiresAt,
+    });
 
-      for (const item of filtered) {
-        if (!grouped[item.gugun]) {
-          grouped[item.gugun] = { district: item.gugun, year: parseInt(item.pay_year), subsidies: [] };
-        }
-        grouped[item.gugun].subsidies.push({
-          type: item.subsidy_type,
-          division: item.division,
-          amount: parseInt(item.subsidy),
-          department: item.department_name,
-        });
+    const latestYear = Math.max(...items.map((i: { pay_year: string }) => parseInt(i.pay_year)));
+    const filtered = items.filter((i: { pay_year: string }) => parseInt(i.pay_year) === latestYear);
+
+    // 구군별 그룹핑 (가공 데이터)
+    const grouped: Record<string, { district: string; year: number; subsidies: { type: string; division: string; amount: number; department: string }[] }> = {};
+
+    for (const item of filtered) {
+      if (!grouped[item.gugun]) {
+        grouped[item.gugun] = { district: item.gugun, year: parseInt(item.pay_year), subsidies: [] };
       }
+      grouped[item.gugun].subsidies.push({
+        type: item.subsidy_type, division: item.division,
+        amount: parseInt(item.subsidy), department: item.department_name,
+      });
+    }
 
-      // 전체 데이터 캐시
-      await admin.from('public_data_cache').upsert({
-        data_type: 'birth_subsidy',
-        data_key: 'busan_all',
-        data: {
-          region: '부산광역시',
-          year: latestYear,
-          totalDistricts: Object.keys(grouped).length,
-          data: Object.values(grouped),
-          source: 'data.go.kr - 부산광역시_출산지원금 현황',
-        },
-        source: 'data.go.kr - 부산광역시 출산지원금',
-        fetched_at: new Date().toISOString(),
-        expires_at: expiresAt,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'data_type,data_key' });
+    // 가공된 전체 데이터
+    const processedAll = {
+      region: '부산광역시', year: latestYear,
+      totalDistricts: Object.keys(grouped).length,
+      data: Object.values(grouped),
+    };
 
-      // 구군별 개별 캐시
-      for (const [district, info] of Object.entries(grouped)) {
-        await admin.from('public_data_cache').upsert({
-          data_type: 'birth_subsidy',
-          data_key: `busan_${district}`,
-          data: info,
-          source: 'data.go.kr - 부산광역시 출산지원금',
-          fetched_at: new Date().toISOString(),
-          expires_at: expiresAt,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'data_type,data_key' });
-        results.synced++;
-      }
+    const allResult = await upsertRawSource(admin, {
+      sourceType: 'api',
+      dataType: 'birth_subsidy',
+      dataKey: 'busan_all',
+      rawData: processedAll,
+      sourceUrl: 'data.go.kr - 부산광역시 출산지원금',
+      expiresAt,
+    });
+    allResult.changed ? results.synced++ : results.unchanged++;
+
+    // 구군별 개별
+    for (const [district, info] of Object.entries(grouped)) {
+      const r = await upsertRawSource(admin, {
+        sourceType: 'api',
+        dataType: 'birth_subsidy',
+        dataKey: `busan_${district}`,
+        rawData: info,
+        sourceUrl: 'data.go.kr - 부산광역시 출산지원금',
+        expiresAt,
+      });
+      r.changed ? results.synced++ : results.unchanged++;
     }
   } catch (e) {
     console.error('Birth subsidy sync error:', e);
@@ -161,7 +228,6 @@ async function syncBirthSubsidy(admin: ReturnType<typeof getSupabaseAdmin>, serv
 
 export async function GET(request: NextRequest) {
   try {
-    // Vercel Cron 인증
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

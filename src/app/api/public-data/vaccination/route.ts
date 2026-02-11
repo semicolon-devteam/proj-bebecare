@@ -42,14 +42,16 @@ export async function GET(request: NextRequest) {
     // 단일 접종 상세 조회
     if (vcnCd) {
       const { data: cached } = await admin
-        .from('public_data_cache')
-        .select('data')
+        .from('raw_sources')
+        .select('raw_data')
         .eq('data_type', 'vaccination')
         .eq('data_key', `detail_${vcnCd}`)
+        .neq('status', 'error')
         .single();
 
-      if (cached?.data) {
-        return NextResponse.json({ ...cached.data, source: 'cache' });
+      if (cached?.raw_data) {
+        const { rawXml, ...displayData } = cached.raw_data as Record<string, unknown>;
+        return NextResponse.json({ ...displayData, source: 'cache' });
       }
 
       // 캐시 없으면 직접 API 호출 (폴백)
@@ -84,13 +86,18 @@ export async function GET(request: NextRequest) {
       const results = await Promise.all(
         relevant.map(async (vac) => {
           const { data: cached } = await admin
-            .from('public_data_cache')
-            .select('data')
+            .from('raw_sources')
+            .select('raw_data')
             .eq('data_type', 'vaccination')
             .eq('data_key', `detail_${vac.code}`)
+            .neq('status', 'error')
             .single();
 
-          return cached?.data || {
+          if (cached?.raw_data) {
+            const { rawXml, ...displayData } = cached.raw_data as Record<string, unknown>;
+            return displayData;
+          }
+          return {
             name: vac.name,
             label: vac.label,
             code: vac.code,
@@ -113,14 +120,14 @@ export async function GET(request: NextRequest) {
 
     // 전체 스케줄
     const { data: cached } = await admin
-      .from('public_data_cache')
-      .select('data')
+      .from('raw_sources')
+      .select('raw_data')
       .eq('data_type', 'vaccination')
       .eq('data_key', 'schedule')
       .single();
 
-    if (cached?.data) {
-      return NextResponse.json({ schedule: cached.data, source: 'cache' });
+    if (cached?.raw_data) {
+      return NextResponse.json({ schedule: cached.raw_data, source: 'cache' });
     }
 
     // 폴백: 정적 데이터
