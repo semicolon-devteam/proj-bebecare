@@ -40,10 +40,9 @@ export default function SignUpPage() {
       }
 
       if (user) {
-        setSuccess(true);
-        setTimeout(() => {
-          router.push('/login');
-        }, 3000);
+        // 이메일 인증 없이 바로 가입+로그인 완료 → 온보딩으로 이동
+        router.push('/onboarding');
+        return;
       }
     } catch (err) {
       console.error('Signup error:', err);

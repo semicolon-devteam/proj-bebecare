@@ -8,20 +8,29 @@ export interface AuthResponse {
 
 /**
  * 이메일/비밀번호로 회원가입
+ * API route를 통해 auto-confirm으로 가입 처리
  */
 export async function signUp(
   email: string,
   password: string
 ): Promise<AuthResponse> {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
+  const res = await fetch('/api/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
   });
+  const result = await res.json();
+  
+  if (!res.ok || result.error) {
+    return {
+      user: null,
+      error: { message: result.error || '회원가입 중 오류가 발생했습니다.', name: 'AuthError', status: res.status } as AuthError,
+    };
+  }
 
-  return {
-    user: data.user,
-    error,
-  };
+  // 가입 성공 후 자동 로그인
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  return { user: data.user, error };
 }
 
 /**
