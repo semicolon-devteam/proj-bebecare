@@ -12,7 +12,7 @@ function getSupabaseAdmin() {
 
 /**
  * 유저 프로필 기반 정부지원 혜택 매칭
- * GET /api/benefits?user_id=xxx
+ * GET /api/benefits?regionFilter=my|national|selected&selectedRegion=서울&subcategory=현금지원
  */
 export async function GET(request: NextRequest) {
   try {
@@ -50,12 +50,38 @@ export async function GET(request: NextRequest) {
       .select('*')
       .eq('user_id', user.id);
 
-    // 정부지원 콘텐츠 가져오기
-    const { data: govContents } = await supabase
+    // URL 파라미터 가져오기
+    const { searchParams } = new URL(request.url);
+    const regionFilter = searchParams.get('regionFilter') || 'my'; // 'my' | 'national' | 'selected'
+    const selectedRegion = searchParams.get('selectedRegion');
+    const subcategoryFilter = searchParams.get('subcategory');
+
+    // 정부지원 콘텐츠 기본 쿼리
+    let query = supabase
       .from('contents')
       .select('*')
-      .eq('category', 'government_support')
-      .order('priority', { ascending: true });
+      .eq('category', 'government_support');
+
+    // 지역 필터링
+    if (regionFilter === 'my' && profile?.region_province) {
+      // 내 지역: 사용자 지역 + 전국 공통
+      query = query.or(`region_filter.eq.${profile.region_province},region_filter.is.null,region_filter.eq.전국`);
+    } else if (regionFilter === 'national') {
+      // 전국: 전국 공통만
+      query = query.or('region_filter.is.null,region_filter.eq.전국');
+    } else if (regionFilter === 'selected' && selectedRegion) {
+      // 지역 선택: 선택된 지역 + 전국 공통
+      query = query.or(`region_filter.eq.${selectedRegion},region_filter.is.null,region_filter.eq.전국`);
+    }
+
+    // 서브카테고리 필터링
+    if (subcategoryFilter && subcategoryFilter !== '전체') {
+      query = query.eq('subcategory', subcategoryFilter);
+    }
+
+    query = query.order('priority', { ascending: true });
+
+    const { data: govContents } = await query;
 
     // 프로필 기반 필터링 + 관련도 점수
     const benefits = (govContents || []).map((content) => {
@@ -131,8 +157,18 @@ export async function GET(request: NextRequest) {
     // 관련도 순 정렬
     benefits.sort((a, b) => b.relevanceScore - a.relevanceScore);
 
+    // 사용 가능한 서브카테고리 목록 가져오기 (전체 정부지원 콘텐츠에서)
+    const { data: allGovContents } = await supabase
+      .from('contents')
+      .select('subcategory')
+      .eq('category', 'government_support')
+      .not('subcategory', 'is', null);
+
+    const availableSubcategories = [...new Set(allGovContents?.map(c => c.subcategory).filter(Boolean))];
+
     return NextResponse.json({
       benefits,
+      availableSubcategories,
       profile_summary: {
         stage: profile.stage,
         is_working: profile.is_working,
