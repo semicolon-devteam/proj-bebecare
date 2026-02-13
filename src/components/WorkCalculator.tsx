@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
-import { Calculator, Calendar, Baby, Briefcase, Clock, Heart } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Calculator, Calendar, Baby, Briefcase, Clock, Heart, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Props {
   dueDate?: string | null;
@@ -122,16 +122,27 @@ export default function WorkCalculator({ dueDate, childBirthDate }: Props) {
 
   if (periods.length === 0) return null;
 
+  const [collapsed, setCollapsed] = useState(false);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   return (
     <div className="mx-4 mb-3 rounded-xl border border-teal-100 bg-gradient-to-br from-teal-50 to-white p-4">
-      <div className="flex items-center gap-2 mb-3">
-        <Calculator className="h-4 w-4 text-teal-600" />
-        <h3 className="text-sm font-bold text-teal-800">출산 기간 자동 계산</h3>
-      </div>
-      <div className="space-y-2">
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="w-full flex items-center justify-between"
+      >
+        <div className="flex items-center gap-2">
+          <Calculator className="h-4 w-4 text-teal-600" />
+          <h3 className="text-sm font-bold text-teal-800">출산 기간 자동 계산</h3>
+        </div>
+        {collapsed ? (
+          <ChevronDown className="h-4 w-4 text-teal-400" />
+        ) : (
+          <ChevronUp className="h-4 w-4 text-teal-400" />
+        )}
+      </button>
+      {!collapsed && <div className="space-y-2 mt-3">
         {periods.map((p, i) => {
           const isActive = today >= p.start && today <= p.end;
           const isPast = today > p.end;
@@ -169,7 +180,7 @@ export default function WorkCalculator({ dueDate, childBirthDate }: Props) {
             </div>
           );
         })}
-      </div>
+      </div>}
     </div>
   );
 }
