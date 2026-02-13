@@ -54,6 +54,7 @@ export default function BabyLogPage() {
   const [logs, setLogs] = useState<BabyLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [defaultLogType, setDefaultLogType] = useState<LogType>('formula');
   const [summary, setSummary] = useState<DailySummary | null>(null);
 
   useEffect(() => {
@@ -110,7 +111,7 @@ export default function BabyLogPage() {
           {(Object.entries(LOG_TYPE_CONFIG) as [LogType, typeof LOG_TYPE_CONFIG[LogType]][]).map(([type, config]) => (
             <button
               key={type}
-              onClick={() => setShowAddModal(true)}
+              onClick={() => { setDefaultLogType(type); setShowAddModal(true); }}
               className={`flex flex-col items-center gap-1 min-w-[56px] rounded-xl p-2 ${config.bgColor} hover:opacity-80 transition-opacity`}
             >
               <span className="text-xl">{config.emoji}</span>
@@ -214,6 +215,7 @@ export default function BabyLogPage() {
         <AddLogModal
           userId={userId}
           childId={selectedChildId}
+          defaultType={defaultLogType}
           onClose={() => setShowAddModal(false)}
           onAdded={() => { setShowAddModal(false); loadLogs(); }}
         />
@@ -225,15 +227,17 @@ export default function BabyLogPage() {
 function AddLogModal({
   userId,
   childId,
+  defaultType,
   onClose,
   onAdded,
 }: {
   userId: string;
   childId: string | null;
+  defaultType: LogType;
   onClose: () => void;
   onAdded: () => void;
 }) {
-  const [logType, setLogType] = useState<LogType>('formula');
+  const [logType, setLogType] = useState<LogType>(defaultType);
   const [amountMl, setAmountMl] = useState('');
   const [diaperType, setDiaperType] = useState<DiaperType>('wet');
   const [startTime, setStartTime] = useState(() => {
