@@ -14,6 +14,7 @@ import PushSubscription from '@/components/PushSubscription';
 import TimelineFeed from '@/components/TimelineFeed';
 import { supabase } from '@/lib/supabase';
 import { Bell, User as UserIcon, Syringe, Building2, MessageCircle, LayoutList, Baby, ClipboardList } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   id: string;
@@ -338,9 +339,15 @@ export default function Home() {
                                 : 'bg-gray-100 text-gray-800'
                             }`}
                           >
-                            <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                              {message.content}
-                            </p>
+                            {message.role === 'assistant' ? (
+                              <div className="text-sm leading-relaxed prose prose-sm prose-gray max-w-none [&>h1]:text-base [&>h1]:font-bold [&>h1]:mt-3 [&>h1]:mb-1 [&>h2]:text-sm [&>h2]:font-bold [&>h2]:mt-2.5 [&>h2]:mb-1 [&>h3]:text-sm [&>h3]:font-semibold [&>h3]:mt-2 [&>h3]:mb-0.5 [&>p]:my-1 [&>ul]:my-1 [&>ul]:pl-4 [&>ol]:my-1 [&>ol]:pl-4 [&>li]:my-0.5">
+                                <ReactMarkdown>{message.content}</ReactMarkdown>
+                              </div>
+                            ) : (
+                              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                                {message.content}
+                              </p>
+                            )}
                           </div>
                         </div>
                       ))}
