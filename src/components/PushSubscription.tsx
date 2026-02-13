@@ -19,14 +19,19 @@ export default function PushSubscription() {
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [checking, setChecking] = useState(true); // 초기 확인 중
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'Notification' in window) {
       const perm = Notification.permission;
       setPermission(perm);
       if (perm === 'granted') {
-        checkExistingSubscription();
+        checkExistingSubscription().finally(() => setChecking(false));
+      } else {
+        setChecking(false);
       }
+    } else {
+      setChecking(false);
     }
   }, []);
 
@@ -97,7 +102,7 @@ export default function PushSubscription() {
     }
   };
 
-  if (subscribed || dismissed || typeof window === 'undefined' || !('Notification' in window) || !('serviceWorker' in navigator)) {
+  if (checking || subscribed || dismissed || typeof window === 'undefined' || !('Notification' in window) || !('serviceWorker' in navigator)) {
     return null;
   }
 
