@@ -9,7 +9,7 @@ import { getChildren } from '@/lib/children';
 import type { Child } from '@/lib/children';
 import { ChevronDown, ChevronUp, LayoutList } from 'lucide-react';
 
-const CATEGORIES = [
+const ALL_CATEGORIES = [
   { key: 'all', label: '전체' },
   { key: 'pregnancy_planning', label: '임신계획' },
   { key: 'pregnancy', label: '임신' },
@@ -18,6 +18,19 @@ const CATEGORIES = [
   { key: 'work', label: '직장' },
   { key: 'government_support', label: '정부지원' },
 ];
+
+// stage별로 관련 있는 카테고리만 노출
+const STAGE_CATEGORIES: Record<string, string[]> = {
+  planning: ['all', 'pregnancy_planning', 'work', 'government_support'],
+  pregnant: ['all', 'pregnancy_planning', 'pregnancy', 'work', 'government_support'],
+  postpartum: ['all', 'postpartum', 'parenting', 'work', 'government_support'],
+  parenting: ['all', 'parenting', 'work', 'government_support'],
+};
+
+function getCategoriesForStage(stage: string) {
+  const allowed = STAGE_CATEGORIES[stage] || ALL_CATEGORIES.map(c => c.key);
+  return ALL_CATEGORIES.filter(c => allowed.includes(c.key));
+}
 
 interface ProfileContext {
   stage: string;
@@ -109,6 +122,10 @@ export default function TimelineFeed({ userId }: { userId: string }) {
       }
 
       setProfileCtx(ctx);
+
+      // 현재 선택된 카테고리가 새 stage에서 유효하지 않으면 '전체'로 리셋
+      const allowed = STAGE_CATEGORIES[ctx.stage] || ALL_CATEGORIES.map(c => c.key);
+      setSelectedCategory(prev => allowed.includes(prev) ? prev : 'all');
     }
     loadProfile();
   }, [userId, selectedChildId]);
@@ -237,7 +254,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
       {/* Category Filter */}
       <div className="px-4 py-3 overflow-x-auto">
         <div className="flex gap-2 min-w-max">
-          {CATEGORIES.map((cat) => (
+          {getCategoriesForStage(profileCtx.stage).map((cat) => (
             <button key={cat.key} onClick={() => setSelectedCategory(cat.key)}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap ${
                 selectedCategory === cat.key
