@@ -24,6 +24,8 @@ export interface TimelineEvent {
     month_end: number | null;
     structured_data: Record<string, string> | null;
     target_audience: string | null;
+    region_filter: string | null;
+    region_city: string | null;
   };
 }
 
@@ -43,7 +45,7 @@ export async function getTimelineEvents(
     .from('timeline_events')
     .select(`
       id, content_id, display_date, is_read, is_dismissed, is_bookmarked, created_at,
-      content:contents(id, category, subcategory, stage, title, body, summary, tags, priority, week_start, week_end, month_start, month_end, structured_data, target_audience)
+      content:contents(id, category, subcategory, stage, title, body, summary, tags, priority, week_start, week_end, month_start, month_end, structured_data, target_audience, region_filter, region_city)
     `)
     .eq('user_id', userId)
     .eq('is_dismissed', false)

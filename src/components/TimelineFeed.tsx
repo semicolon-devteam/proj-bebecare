@@ -7,7 +7,7 @@ import TimelineCard from './TimelineCard';
 import { supabase } from '@/lib/supabase';
 import { getChildren } from '@/lib/children';
 import type { Child } from '@/lib/children';
-import { ChevronDown, ChevronUp, LayoutList } from 'lucide-react';
+import { ChevronDown, ChevronUp, LayoutList, MapPin } from 'lucide-react';
 
 const ALL_CATEGORIES = [
   { key: 'all', label: '전체' },
@@ -82,12 +82,15 @@ export default function TimelineFeed({ userId }: { userId: string }) {
   const [profileCtx, setProfileCtx] = useState<ProfileContext>({ stage: 'planning', children: [] });
   const [selectedChildId, setSelectedChildId] = useState<string>('all');
   const [showPast, setShowPast] = useState(false);
+  const [showOtherRegions, setShowOtherRegions] = useState(false);
+  const [userRegionCity, setUserRegionCity] = useState<string | null>(null);
+  const [userRegionProvince, setUserRegionProvince] = useState<string | null>(null);
   const hasTriedGenerate = useRef(false);
 
   useEffect(() => {
     async function loadProfile() {
       const [profileRes, childrenData] = await Promise.all([
-        supabase.from('profiles').select('stage, due_date, pregnancy_start_date').eq('user_id', userId).single(),
+        supabase.from('profiles').select('stage, due_date, pregnancy_start_date, region_province, region_city').eq('user_id', userId).single(),
         getChildren(userId),
       ]);
 
@@ -122,6 +125,8 @@ export default function TimelineFeed({ userId }: { userId: string }) {
       }
 
       setProfileCtx(ctx);
+      setUserRegionProvince(profile?.region_province || null);
+      setUserRegionCity(profile?.region_city || null);
 
       // 현재 선택된 카테고리가 새 stage에서 유효하지 않으면 '전체'로 리셋
       const allowed = STAGE_CATEGORIES[ctx.stage] || ALL_CATEGORIES.map(c => c.key);
@@ -163,7 +168,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
     loadEvents().then(generateIfEmpty);
   }, [loadEvents, generateIfEmpty]);
 
-  const { visibleEvents: sortedEvents, pastCount } = (() => {
+  const { visibleEvents: sortedEvents, pastCount, otherRegionCount = 0 } = (() => {
     const withDday = events.map(e => ({
       event: e,
       ddayValue: computeDdayValue(e, profileCtx),
@@ -183,9 +188,27 @@ export default function TimelineFeed({ userId }: { userId: string }) {
           return !ta || ta === 'all' || ta === selectedAudience;
         });
 
+    // 정부지원 지역 필터링: 내 지역 우선, 다른 지역은 토글로
+    const regionFiltered = audienceFiltered.filter(({ event }) => {
+      if (event.content?.category !== 'government_support') return true;
+      if (showOtherRegions) return true;
+
+      const c = event.content;
+      // 전국 공통 (region_filter 없음) → 항상 표시
+      if (!c.region_filter) return true;
+      // 내 시/군/구 매칭 (region_city 비교, "시/구/군" 접미사 제거 후 비교)
+      if (userRegionCity && c.region_city) {
+        const normalizedProfile = userRegionCity.replace(/(특례시|광역시|특별시|특별자치시|시|군|구)$/, '');
+        return c.region_city === normalizedProfile;
+      }
+      // region_city가 없으면 도 단위만 매칭 (구 시스템 호환)
+      if (!c.region_city && c.region_filter === userRegionProvince) return true;
+      return false;
+    });
+
     if (selectedCategory === 'all') {
       let govCount = 0;
-      const filtered = audienceFiltered.filter(({ event }) => {
+      const filtered = regionFiltered.filter(({ event }) => {
         if (event.content?.category === 'government_support') {
           govCount++;
           return govCount <= 5;
@@ -194,7 +217,10 @@ export default function TimelineFeed({ userId }: { userId: string }) {
       });
       return { visibleEvents: filtered.map(s => s.event), pastCount: past.length };
     }
-    return { visibleEvents: audienceFiltered.map(s => s.event), pastCount: past.length };
+    // 다른 지역 콘텐츠 수 계산 (정부지원 탭에서만)
+    const otherRegionCount = selectedCategory === 'government_support' && !showOtherRegions
+      ? audienceFiltered.length - regionFiltered.length : 0;
+    return { visibleEvents: regionFiltered.map(s => s.event), pastCount: past.length, otherRegionCount };
   })();
 
   const childrenForTabs = profileCtx.children;
@@ -286,6 +312,29 @@ export default function TimelineFeed({ userId }: { userId: string }) {
                 {tab.label}
               </button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* 지역 필터 (정부지원 탭) */}
+      {selectedCategory === 'government_support' && userRegionCity && (
+        <div className="px-4 pb-2">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600">
+              <MapPin className="h-3 w-3" />
+              {userRegionCity}
+            </span>
+            {otherRegionCount > 0 && (
+              <button
+                onClick={() => setShowOtherRegions(!showOtherRegions)}
+                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {showOtherRegions
+                  ? `${userRegionCity}만 보기`
+                  : `다른 ${userRegionProvince || ''} 지역 보기 (${otherRegionCount})`
+                }
+              </button>
+            )}
           </div>
         </div>
       )}
