@@ -13,7 +13,7 @@ import type { User } from '@supabase/supabase-js';
 import PushSubscription from '@/components/PushSubscription';
 import TimelineFeed from '@/components/TimelineFeed';
 import { supabase } from '@/lib/supabase';
-import { Bell, User as UserIcon, Syringe, Building2, MessageCircle, LayoutList, Baby } from 'lucide-react';
+import { Bell, User as UserIcon, Syringe, Building2, MessageCircle, LayoutList, Baby, ClipboardList } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -199,6 +199,13 @@ export default function Home() {
                 BebeCare
               </h1>
               <div className="flex items-center gap-1">
+                <button
+                  onClick={() => router.push('/baby-log')}
+                  className="rounded-lg p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
+                  title="육아 기록"
+                >
+                  <ClipboardList className="h-5 w-5" />
+                </button>
                 <button
                   onClick={() => router.push('/pregnancy-weeks')}
                   className="rounded-lg p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
