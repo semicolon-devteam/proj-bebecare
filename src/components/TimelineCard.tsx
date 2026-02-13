@@ -94,10 +94,12 @@ function getDdayStyle(dday: string): string {
   if (dday.startsWith('D-')) {
     const num = parseInt(dday.slice(2));
     if (num <= 7) return 'bg-orange-50 text-orange-600 border border-orange-200';
-    if (num <= 30) return 'bg-amber-50 text-amber-600 border border-amber-200';
+    if (num <= 14) return 'bg-amber-50 text-amber-600 border border-amber-200';
     return 'bg-gray-50 text-gray-500 border border-gray-200';
   }
-  return 'bg-blue-50 text-blue-500 border border-blue-200';
+  if (dday.startsWith('D+')) return 'bg-blue-50 text-blue-500 border border-blue-200';
+  // 주차/개월 표시
+  return 'bg-gray-50 text-gray-400 border border-gray-100';
 }
 
 // Key-value label icons for structured data
@@ -161,8 +163,28 @@ export default function TimelineCard({
   const isGovernmentSupport = category === 'government_support';
   const hasStructuredData = isGovernmentSupport && event.content?.structured_data;
 
-  // D-Day: compute or fallback to week_start/month_start label
-  let dday = profile ? computeDday(event, profile) : null;
+  // D-Day: D-14 이내만 D-Day 뱃지, 그 외는 주차/개월 표시
+  let dday: string | null = null;
+  if (profile) {
+    const rawDday = computeDday(event, profile);
+    if (rawDday) {
+      // D-Day 숫자 파싱
+      const match = rawDday.match(/^D-(\d+)$/);
+      if (match) {
+        const days = parseInt(match[1]);
+        if (days <= 14) {
+          dday = rawDday; // D-14 이내: D-Day 뱃지
+        } else {
+          // 먼 콘텐츠: 주차/개월로 표시
+          const c = event.content;
+          if (c?.week_start != null) dday = `${c.week_start}주`;
+          else if (c?.month_start != null) dday = `${c.month_start}개월`;
+        }
+      } else {
+        dday = rawDday; // D-Day, D+N 등은 그대로
+      }
+    }
+  }
   if (!dday && event.content) {
     const c = event.content;
     if (c.week_start != null) dday = `${c.week_start}주`;
