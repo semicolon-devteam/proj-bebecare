@@ -26,6 +26,7 @@ export interface TimelineEvent {
     target_audience: string | null;
     region_filter: string | null;
     region_city: string | null;
+    employment_filter: boolean | null;
   };
 }
 
@@ -45,7 +46,7 @@ export async function getTimelineEvents(
     .from('timeline_events')
     .select(`
       id, content_id, display_date, is_read, is_dismissed, is_bookmarked, created_at,
-      content:contents(id, category, subcategory, stage, title, body, summary, tags, priority, week_start, week_end, month_start, month_end, structured_data, target_audience, region_filter, region_city)
+      content:contents(id, category, subcategory, stage, title, body, summary, tags, priority, week_start, week_end, month_start, month_end, structured_data, target_audience, region_filter, region_city, employment_filter)
     `)
     .eq('user_id', userId)
     .eq('is_dismissed', false)

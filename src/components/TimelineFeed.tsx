@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import type { TimelineEvent } from '@/lib/timeline';
 import { getTimelineEvents } from '@/lib/timeline';
 import TimelineCard from './TimelineCard';
@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { getChildren } from '@/lib/children';
 import type { Child } from '@/lib/children';
 import { ChevronDown, ChevronUp, LayoutList, MapPin } from 'lucide-react';
+import WorkCalculator from './WorkCalculator';
 
 const ALL_CATEGORIES = [
   { key: 'all', label: '전체' },
@@ -73,6 +74,90 @@ function computeSortScore(event: TimelineEvent, profile: ProfileContext): number
   return 10000 + Math.abs(ddayValue);
 }
 
+// 직장 탭 서브카테고리 그룹핑
+const WORK_GROUPS: { key: string; label: string; subcategories: string[] }[] = [
+  { key: 'protection', label: '🛡️ 모성보호 법적내용', subcategories: ['모성보호', '권리'] },
+  { key: 'leave', label: '🏖️ 휴가·휴직 제도', subcategories: ['출산휴가', '육아휴직', '배우자', '배우자휴가'] },
+  { key: 'worktime', label: '⏰ 근로시간 제도', subcategories: ['근로시간', '유연근무'] },
+  { key: 'benefits', label: '💰 급여·지원', subcategories: ['급여'] },
+  { key: 'life', label: '💼 직장생활', subcategories: ['직장생활', '인수인계', '시간관리', '모유수유', '복직', '자영업', '돌봄'] },
+];
+
+function WorkGroupedEvents({
+  events,
+  onUpdate,
+  profile,
+}: {
+  events: TimelineEvent[];
+  onUpdate: () => void;
+  profile: ProfileContext;
+}) {
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['protection', 'leave']));
+
+  const grouped = useMemo(() => {
+    const result: { key: string; label: string; events: TimelineEvent[] }[] = [];
+    const used = new Set<string>();
+
+    for (const group of WORK_GROUPS) {
+      const matched = events.filter(e => {
+        const sub = e.content?.subcategory;
+        return sub && group.subcategories.includes(sub) && !used.has(e.id);
+      });
+      matched.forEach(e => used.add(e.id));
+      if (matched.length > 0) {
+        result.push({ key: group.key, label: group.label, events: matched });
+      }
+    }
+
+    // 미분류
+    const remaining = events.filter(e => !used.has(e.id));
+    if (remaining.length > 0) {
+      result.push({ key: 'other', label: '📋 기타', events: remaining });
+    }
+
+    return result;
+  }, [events]);
+
+  const toggleGroup = (key: string) => {
+    setExpandedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  return (
+    <div className="space-y-3">
+      {grouped.map(({ key, label, events: groupEvents }) => (
+        <div key={key} className="rounded-xl border border-gray-100 overflow-hidden">
+          <button
+            onClick={() => toggleGroup(key)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+          >
+            <span className="text-sm font-semibold text-gray-700">
+              {label}
+              <span className="ml-2 text-xs text-gray-400">({groupEvents.length})</span>
+            </span>
+            {expandedGroups.has(key) ? (
+              <ChevronUp className="h-4 w-4 text-gray-400" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-gray-400" />
+            )}
+          </button>
+          {expandedGroups.has(key) && (
+            <div className="p-3 space-y-2">
+              {groupEvents.map(event => (
+                <TimelineCard key={event.id} event={event} onUpdate={onUpdate} profile={profile} />
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function TimelineFeed({ userId }: { userId: string }) {
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -85,6 +170,8 @@ export default function TimelineFeed({ userId }: { userId: string }) {
   const [showOtherRegions, setShowOtherRegions] = useState(false);
   const [userRegionCity, setUserRegionCity] = useState<string | null>(null);
   const [userRegionProvince, setUserRegionProvince] = useState<string | null>(null);
+  const [userDueDate, setUserDueDate] = useState<string | null>(null);
+  const [userChildBirthDate, setUserChildBirthDate] = useState<string | null>(null);
   const hasTriedGenerate = useRef(false);
 
   useEffect(() => {
@@ -127,6 +214,8 @@ export default function TimelineFeed({ userId }: { userId: string }) {
       setProfileCtx(ctx);
       setUserRegionProvince(profile?.region_province || null);
       setUserRegionCity(profile?.region_city || null);
+      setUserDueDate(profile?.due_date || targetChild?.due_date || null);
+      setUserChildBirthDate(targetChild?.birth_date || null);
 
       // 현재 선택된 카테고리가 새 stage에서 유효하지 않으면 '전체'로 리셋
       const allowed = STAGE_CATEGORIES[ctx.stage] || ALL_CATEGORIES.map(c => c.key);
@@ -358,6 +447,11 @@ export default function TimelineFeed({ userId }: { userId: string }) {
         </div>
       )}
 
+      {/* 직장 탭: 출산 기간 계산기 */}
+      {selectedCategory === 'work' && (
+        <WorkCalculator dueDate={userDueDate} childBirthDate={userChildBirthDate} />
+      )}
+
       <div className="flex-1 overflow-y-auto px-4 pb-4">
         {loading || generating ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
@@ -372,6 +466,8 @@ export default function TimelineFeed({ userId }: { userId: string }) {
             <p className="text-base font-semibold text-gray-600">아직 타임라인이 없어요</p>
             <p className="text-sm text-gray-400">프로필 정보를 기반으로 맞춤 콘텐츠가 곧 제공됩니다</p>
           </div>
+        ) : selectedCategory === 'work' ? (
+          <WorkGroupedEvents events={sortedEvents} onUpdate={loadEvents} profile={profileCtx} />
         ) : (
           <div className="space-y-3">
             {sortedEvents.map((event) => (
