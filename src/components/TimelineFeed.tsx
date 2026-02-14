@@ -447,12 +447,14 @@ export default function TimelineFeed({ userId }: { userId: string }) {
         </div>
       )}
 
-      {/* 직장 탭: 출산 기간 계산기 */}
-      {selectedCategory === 'work' && (
-        <WorkCalculator dueDate={userDueDate} childBirthDate={userChildBirthDate} />
-      )}
-
       <div className="flex-1 overflow-y-auto px-4 pb-4">
+        {/* 직장 탭: 출산 기간 계산기 (스크롤 영역 내부) */}
+        {selectedCategory === 'work' && (
+          <div className="mb-3 -mx-4">
+            <WorkCalculator dueDate={userDueDate} childBirthDate={userChildBirthDate} />
+          </div>
+        )}
+
         {loading || generating ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3">
             <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />

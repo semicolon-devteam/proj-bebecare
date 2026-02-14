@@ -120,9 +120,10 @@ export default function WorkCalculator({ dueDate, childBirthDate }: Props) {
     return results;
   }, [dueDate, childBirthDate]);
 
+  const [collapsed, setCollapsed] = useState(false);
+
   if (periods.length === 0) return null;
 
-  const [collapsed, setCollapsed] = useState(false);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
