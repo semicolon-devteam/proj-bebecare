@@ -12,6 +12,7 @@ import {
 } from '@/lib/baby-logs';
 import { useTimer } from '@/components/Timer';
 import QuickLogModal from '@/components/QuickLogModal';
+import VoiceInput from '@/components/VoiceInput';
 import {
   Plus, Trash2, ChevronLeft, ChevronRight, X, BarChart3, ClipboardList,
 } from 'lucide-react';
@@ -259,7 +260,10 @@ export default function LogPage() {
             )}
           </div>
 
-          {/* FAB */}
+          {/* Voice Input FAB (left) */}
+          <VoiceInput userId={userId} childId={selectedChildId} onLogSaved={loadLogs} />
+
+          {/* Manual Add FAB (right) */}
           <button
             onClick={() => setShowAddModal(true)}
             className="fixed bottom-24 right-6 h-14 w-14 rounded-full bg-dusty-rose text-white shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity z-20"
