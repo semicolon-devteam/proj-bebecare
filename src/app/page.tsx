@@ -13,7 +13,10 @@ import type { User } from '@supabase/supabase-js';
 import PushSubscription from '@/components/PushSubscription';
 import TimelineFeed from '@/components/TimelineFeed';
 import { supabase } from '@/lib/supabase';
-import { Bell, User as UserIcon, Syringe, Building2, MessageCircle, LayoutList, Baby, ClipboardList } from 'lucide-react';
+import { addBabyLog, LOG_TYPE_CONFIG, type LogType, type DiaperType } from '@/lib/baby-logs';
+import { getChildren } from '@/lib/children';
+import { useTimer } from '@/components/Timer';
+import { Bell, User as UserIcon, Syringe, Building2, MessageCircle, LayoutList, Baby, ClipboardList, Plus, X } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
@@ -35,6 +38,10 @@ export default function Home() {
   const [isTyping, setIsTyping] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showFab, setShowFab] = useState(false);
+  const [quickLogType, setQuickLogType] = useState<LogType | null>(null);
+  const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
+  const { startTimer } = useTimer();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,6 +71,10 @@ export default function Home() {
         }
       }
       setUser(currentUser);
+      if (currentUser) {
+        const kids = await getChildren(currentUser.id);
+        if (kids.length > 0) setSelectedChildId(kids[0].id);
+      }
       setLoading(false);
     } catch (error) {
       console.error('Error checking user:', error);
@@ -281,8 +292,43 @@ export default function Home() {
 
           {/* Content Area */}
           {activeTab === 'timeline' ? (
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden relative">
               <TimelineFeed userId={user.id} />
+
+              {/* FAB */}
+              <div className="fixed bottom-6 right-6 z-30 flex flex-col items-end gap-2">
+                {showFab && (
+                  <div className="flex flex-col gap-2 mb-2 animate-in fade-in slide-in-from-bottom-2">
+                    {([['formula', '🍼', '분유'], ['sleep', '😴', '수면'], ['diaper', '🧷', '기저귀']] as [LogType, string, string][]).map(([type, emoji, label]) => (
+                      <button
+                        key={type}
+                        onClick={() => { setQuickLogType(type); setShowFab(false); }}
+                        className="flex items-center gap-2 rounded-full bg-white shadow-lg border border-gray-100 pl-4 pr-5 py-2.5 hover:bg-gray-50 transition-colors"
+                      >
+                        <span className="text-lg">{emoji}</span>
+                        <span className="text-sm font-semibold text-gray-700">{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <button
+                  onClick={() => setShowFab(!showFab)}
+                  className={`h-14 w-14 rounded-full bg-dusty-rose text-white shadow-lg flex items-center justify-center hover:opacity-90 transition-all ${showFab ? 'rotate-45' : ''}`}
+                >
+                  <Plus className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Quick Log Modal */}
+              {quickLogType && (
+                <QuickLogModal
+                  userId={user.id}
+                  childId={selectedChildId}
+                  logType={quickLogType}
+                  onClose={() => setQuickLogType(null)}
+                  onStartTimer={(type) => { startTimer(type, user.id, selectedChildId); setQuickLogType(null); }}
+                />
+              )}
             </div>
           ) : (
             <>
@@ -446,6 +492,146 @@ export default function Home() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* Quick Log Modal for home page FAB */
+function QuickLogModal({
+  userId,
+  childId,
+  logType,
+  onClose,
+  onStartTimer,
+}: {
+  userId: string;
+  childId: string | null;
+  logType: LogType;
+  onClose: () => void;
+  onStartTimer: (type: LogType) => void;
+}) {
+  const [amountMl, setAmountMl] = useState('');
+  const [diaperType, setDiaperType] = useState<DiaperType>('wet');
+  const [startTime, setStartTime] = useState(() => {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  });
+  const [endTime, setEndTime] = useState('');
+  const [memo, setMemo] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [mode, setMode] = useState<'manual' | 'timer'>('manual');
+
+  const needsAmount = logType === 'formula';
+  const needsDuration = logType === 'sleep';
+  const needsDiaperType = logType === 'diaper';
+  const canTimer = ['sleep', 'breast'].includes(logType);
+  const config = LOG_TYPE_CONFIG[logType];
+
+  const handleSave = async () => {
+    setSaving(true);
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const started_at = `${dateStr}T${startTime}:00+09:00`;
+    const ended_at = endTime ? `${dateStr}T${endTime}:00+09:00` : null;
+
+    await addBabyLog({
+      user_id: userId,
+      child_id: childId,
+      log_type: logType,
+      started_at,
+      ended_at,
+      amount_ml: needsAmount && amountMl ? parseInt(amountMl) : null,
+      diaper_type: needsDiaperType ? diaperType : null,
+      memo: memo || null,
+    });
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+      <div className="w-full max-w-lg bg-white rounded-t-2xl p-5 animate-slide-up" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">{config.emoji}</span>
+            <h2 className="text-lg font-bold text-gray-900">{config.label} 기록</h2>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100">
+            <X className="h-5 w-5 text-gray-400" />
+          </button>
+        </div>
+
+        {/* Timer vs Manual toggle for sleep */}
+        {canTimer && (
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setMode('manual')}
+              className={`flex-1 rounded-xl py-2 text-sm font-semibold border-2 transition-all ${mode === 'manual' ? 'bg-dusty-rose/10 border-dusty-rose text-dusty-rose' : 'bg-gray-50 border-transparent text-gray-400'}`}
+            >
+              수동 입력
+            </button>
+            <button
+              onClick={() => setMode('timer')}
+              className={`flex-1 rounded-xl py-2 text-sm font-semibold border-2 transition-all ${mode === 'timer' ? 'bg-dusty-rose/10 border-dusty-rose text-dusty-rose' : 'bg-gray-50 border-transparent text-gray-400'}`}
+            >
+              ⏱ 타이머
+            </button>
+          </div>
+        )}
+
+        {mode === 'timer' && canTimer ? (
+          <button
+            onClick={() => onStartTimer(logType)}
+            className="w-full rounded-xl bg-dusty-rose text-white py-3 font-semibold text-sm hover:opacity-90 transition-opacity"
+          >
+            ⏱ 타이머 시작
+          </button>
+        ) : (
+          <>
+            {/* Time */}
+            <div className="flex gap-3 mb-3">
+              <div className="flex-1">
+                <label className="text-xs font-semibold text-gray-500 mb-1 block">시작 시간</label>
+                <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm" />
+              </div>
+              {needsDuration && (
+                <div className="flex-1">
+                  <label className="text-xs font-semibold text-gray-500 mb-1 block">종료 시간</label>
+                  <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm" />
+                </div>
+              )}
+            </div>
+
+            {needsAmount && (
+              <div className="mb-3">
+                <label className="text-xs font-semibold text-gray-500 mb-1 block">용량 (ml)</label>
+                <input type="number" placeholder="예: 120" value={amountMl} onChange={e => setAmountMl(e.target.value)} className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm" />
+              </div>
+            )}
+
+            {needsDiaperType && (
+              <div className="mb-3">
+                <label className="text-xs font-semibold text-gray-500 mb-1 block">종류</label>
+                <div className="flex gap-2">
+                  {([['wet', '💧 소변'], ['dirty', '💩 대변'], ['mixed', '🔄 혼합']] as [DiaperType, string][]).map(([type, label]) => (
+                    <button key={type} onClick={() => setDiaperType(type)} className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold border-2 transition-all ${diaperType === type ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-gray-50 border-transparent text-gray-400'}`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="text-xs font-semibold text-gray-500 mb-1 block">메모</label>
+              <input type="text" placeholder="선택사항" value={memo} onChange={e => setMemo(e.target.value)} className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm" />
+            </div>
+
+            <button onClick={handleSave} disabled={saving} className="w-full rounded-xl bg-dusty-rose text-white py-3 font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
+              {saving ? '저장 중...' : '저장'}
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }

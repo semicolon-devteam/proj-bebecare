@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import TimerBar from '@/components/Timer';
 
 export const metadata: Metadata = {
   title: 'BebeCare - 임신·출산·육아 슈퍼앱',
@@ -34,7 +35,10 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <TimerBar />
+        {children}
+      </body>
     </html>
   );
 }

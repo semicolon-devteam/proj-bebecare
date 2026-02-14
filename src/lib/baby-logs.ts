@@ -68,6 +68,25 @@ export async function deleteBabyLog(logId: string): Promise<boolean> {
   return !error;
 }
 
+export async function getBabyLogsRange(userId: string, startDate: string, endDate: string): Promise<BabyLog[]> {
+  const startOfDay = `${startDate}T00:00:00+09:00`;
+  const endOfDay = `${endDate}T23:59:59+09:00`;
+
+  const { data, error } = await supabase
+    .from('baby_logs')
+    .select('*')
+    .eq('user_id', userId)
+    .gte('started_at', startOfDay)
+    .lte('started_at', endOfDay)
+    .order('started_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching baby logs range:', error);
+    return [];
+  }
+  return data || [];
+}
+
 export interface DailySummary {
   totalFormulaMl: number;
   totalBabyFoodMl: number;
