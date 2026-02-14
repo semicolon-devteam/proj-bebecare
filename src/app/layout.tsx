@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import TimerBar from '@/components/Timer';
+import BottomTabBar from '@/components/BottomTabBar';
+import LayoutWrapper from '@/components/LayoutWrapper';
 
 export const metadata: Metadata = {
   title: 'BebeCare - 임신·출산·육아 슈퍼앱',
@@ -37,7 +39,9 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <TimerBar />
-        {children}
+        <LayoutWrapper>
+          {children}
+        </LayoutWrapper>
       </body>
     </html>
   );
