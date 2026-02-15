@@ -15,6 +15,8 @@ import { type LogType } from '@/lib/baby-logs';
 import { getChildren } from '@/lib/children';
 import { useTimer } from '@/components/Timer';
 import { Bell, User as UserIcon } from 'lucide-react';
+import ChecklistCard from '@/components/ChecklistCard';
+import OnboardingGuide from '@/components/OnboardingGuide';
 
 export default function Home() {
   const router = useRouter();
@@ -123,6 +125,9 @@ export default function Home() {
               {/* Today's Recommendations */}
               <TodayRecommendations userId={user.id} />
 
+              {/* Checklist */}
+              <ChecklistCard userId={user.id} />
+
               {/* Quick Log Bar */}
               <div className="space-y-3">
                 <h3 className="text-sm font-bold text-gray-900">퀵 기록</h3>
@@ -148,6 +153,9 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          {/* Onboarding Guide */}
+          <OnboardingGuide />
 
           {/* Quick Log Modal */}
           {quickLogType && (

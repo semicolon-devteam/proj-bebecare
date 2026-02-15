@@ -7,7 +7,8 @@ import { getProfile, createOrUpdateProfile } from '@/lib/profile';
 import { getChildren, addChild, updateChild, deleteChild, deriveStageFromChildren } from '@/lib/children';
 import type { Child, ChildInput } from '@/lib/children';
 import { REGION_DATA } from '@/lib/regions';
-import { ChevronLeft, Baby, Briefcase, MapPin, Settings, LogOut, Plus, Pencil, Trash2, Heart, FileText, Save, Check, Bell, BellOff } from 'lucide-react';
+import { ChevronLeft, Baby, Briefcase, MapPin, Settings, LogOut, Plus, Pencil, Trash2, Heart, FileText, Save, Check, Bell, BellOff, Users, Download } from 'lucide-react';
+import FamilyManager from '@/components/FamilyManager';
 
 export default function MyPage() {
   const router = useRouter();
@@ -502,6 +503,31 @@ export default function MyPage() {
             <p className="text-xs text-red-500">⚠️ 브라우저에서 알림이 차단되어 있습니다. 브라우저 설정에서 허용해주세요.</p>
           )}
         </div>
+
+        {/* Family */}
+        {userId && <FamilyManager userId={userId} />}
+
+        {/* Growth Report */}
+        {userId && (
+          <div className="card rounded-xl p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Download className="h-4 w-4 text-gray-400" />
+              <h3 className="font-bold text-gray-900 text-sm">성장 보고서</h3>
+            </div>
+            <p className="text-xs text-gray-500">기록 데이터를 보고서로 내보내세요. (인쇄/PDF 저장 가능)</p>
+            <div className="flex gap-2">
+              {[7, 30, 90].map(p => (
+                <button
+                  key={p}
+                  onClick={() => window.open(`/api/report?userId=${userId}&period=${p}`, '_blank')}
+                  className="flex-1 rounded-lg border border-border py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+                >
+                  최근 {p}일
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Account */}
         <div className="card rounded-xl p-5 space-y-3">
