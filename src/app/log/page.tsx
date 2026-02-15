@@ -13,8 +13,9 @@ import {
 import { useTimer } from '@/components/Timer';
 import QuickLogModal from '@/components/QuickLogModal';
 import VoiceInput from '@/components/VoiceInput';
+import PeerComparison from '@/components/PeerComparison';
 import {
-  Plus, Trash2, ChevronLeft, ChevronRight, X, BarChart3, ClipboardList,
+  Plus, Trash2, ChevronLeft, ChevronRight, X, BarChart3, ClipboardList, Users,
 } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -55,7 +56,7 @@ function formatDateLabel(ds: string): string {
   return label;
 }
 
-type SubTab = 'logs' | 'stats';
+type SubTab = 'logs' | 'stats' | 'peers';
 
 export default function LogPage() {
   const router = useRouter();
@@ -157,6 +158,15 @@ export default function LogPage() {
           >
             <BarChart3 className="h-4 w-4" />
             통계
+          </button>
+          <button
+            onClick={() => setSubTab('peers')}
+            className={`flex items-center gap-1.5 flex-1 py-3 justify-center text-sm font-semibold transition-colors border-b-2 ${
+              subTab === 'peers' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400 hover:text-gray-600'
+            }`}
+          >
+            <Users className="h-4 w-4" />
+            또래비교
           </button>
         </div>
       </div>
@@ -282,9 +292,16 @@ export default function LogPage() {
             />
           )}
         </>
-      ) : (
+      ) : subTab === 'stats' ? (
         /* Stats Tab */
         userId && <StatsTab userId={userId} />
+      ) : (
+        /* Peers Tab */
+        userId && (
+          <div className="px-4 py-4 pb-24">
+            <PeerComparison userId={userId} />
+          </div>
+        )
       )}
     </div>
   );
