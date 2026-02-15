@@ -184,3 +184,12 @@ export function getAgeMonths(birthDate: string): number {
   const now = new Date();
   return (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
 }
+
+/**
+ * Calculate pregnancy weeks from pregnancy start date
+ */
+export function getAgeWeeks(pregnancyStartDate: string): number {
+  const start = new Date(pregnancyStartDate);
+  const now = new Date();
+  return Math.floor((now.getTime() - start.getTime()) / (7 * 24 * 60 * 60 * 1000));
+}
