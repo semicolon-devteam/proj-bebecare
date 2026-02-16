@@ -1,58 +1,95 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { X, ChevronRight, Mic, BarChart3, Users, MessageCircle, ClipboardList } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { ChevronRight, ChevronLeft, X } from 'lucide-react';
 
-interface GuideStep {
+interface TourStep {
+  target: string;
   title: string;
-  description: string;
-  icon: React.ReactNode;
-  highlight?: string; // CSS selector or area hint
+  content: string;
+  placement?: 'top' | 'bottom';
 }
 
-const GUIDE_STEPS: GuideStep[] = [
+const STEPS: TourStep[] = [
   {
+    target: '[data-tour="baby-profile"]',
+    title: '👶 아이 프로필',
+    content: '우리 아이 프로필이에요. 임신 주수나 월령이 자동으로 계산돼요.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="today-summary"]',
+    title: '📊 오늘의 요약',
+    content: '오늘 기록한 수유·수면·기저귀를 한눈에 확인할 수 있어요.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="quick-log"]',
     title: '🍼 퀵 기록',
-    description: '홈 화면에서 바로 분유, 수면, 기저귀 등을 기록하세요. 탭 한 번으로 간편하게!',
-    icon: <ClipboardList className="h-8 w-8 text-dusty-rose" />,
+    content: '탭 한 번으로 분유, 수면, 기저귀 등을 바로 기록하세요!',
+    placement: 'top',
   },
   {
-    title: '🎙 음성 기록',
-    description: '"분유 170ml 먹었어" 처럼 말하면 AI가 자동으로 기록해요. 아기 안고도 한 손으로 기록!',
-    icon: <Mic className="h-8 w-8 text-sage" />,
+    target: '[data-tour="tab-log"]',
+    title: '📝 기록 탭',
+    content: '상세 기록, 또래 비교, 음성 입력을 사용할 수 있어요.',
+    placement: 'top',
   },
   {
-    title: '📊 또래 비교',
-    description: '기록 탭의 "또래비교"에서 우리 아이가 또래 대비 잘먹고, 잘자고, 잘싸는지 확인하세요.',
-    icon: <BarChart3 className="h-8 w-8 text-indigo-500" />,
-  },
-  {
+    target: '[data-tour="tab-chat"]',
     title: '💬 AI 상담',
-    description: '궁금한 건 뭐든 물어보세요. 아이 기록 데이터를 참고해서 맞춤 조언을 드려요.',
-    icon: <MessageCircle className="h-8 w-8 text-blue-500" />,
+    content: '궁금한 건 AI에게 물어보세요. 아이 기록을 참고해서 맞춤 조언을 드려요.',
+    placement: 'top',
   },
   {
-    title: '👨‍👩‍👧 가족 동기화',
-    description: '마이페이지에서 가족을 만들고 초대 코드를 공유하면 함께 기록을 볼 수 있어요.',
-    icon: <Users className="h-8 w-8 text-amber-500" />,
+    target: '[data-tour="tab-explore"]',
+    title: '📖 정보 탭',
+    content: '정부지원, 예방접종, 임신주수 정보를 한곳에서 확인하세요.',
+    placement: 'top',
   },
 ];
 
-const GUIDE_KEY = 'bebecare_guide_shown';
+const GUIDE_KEY = 'bebecare_guide_shown_v2';
 
 export default function OnboardingGuide() {
   const [show, setShow] = useState(false);
   const [step, setStep] = useState(0);
+  const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  const updateSpotlight = useCallback(() => {
+    const current = STEPS[step];
+    if (!current) return;
+    const el = document.querySelector(current.target);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Small delay after scroll for accurate rect
+      requestAnimationFrame(() => {
+        setSpotlightRect(el.getBoundingClientRect());
+      });
+    }
+  }, [step]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const shown = localStorage.getItem(GUIDE_KEY);
     if (!shown) {
-      // Show after a small delay
-      const t = setTimeout(() => setShow(true), 1000);
+      const t = setTimeout(() => setShow(true), 1500);
       return () => clearTimeout(t);
     }
   }, []);
+
+  useEffect(() => {
+    if (!show) return;
+    updateSpotlight();
+    const handleResize = () => updateSpotlight();
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleResize, true);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleResize, true);
+    };
+  }, [show, step, updateSpotlight]);
 
   const close = () => {
     setShow(false);
@@ -60,69 +97,131 @@ export default function OnboardingGuide() {
   };
 
   const next = () => {
-    if (step < GUIDE_STEPS.length - 1) {
-      setStep(step + 1);
-    } else {
-      close();
-    }
+    if (step < STEPS.length - 1) setStep(step + 1);
+    else close();
   };
 
-  if (!show) return null;
+  const prev = () => {
+    if (step > 0) setStep(step - 1);
+  };
 
-  const current = GUIDE_STEPS[step];
-  const isLast = step === GUIDE_STEPS.length - 1;
+  if (!show || !spotlightRect) return null;
+
+  const current = STEPS[step];
+  const isLast = step === STEPS.length - 1;
+  const pad = 8;
+
+  // Tooltip position
+  const placement = current.placement || 'bottom';
+  const tooltipStyle: React.CSSProperties = {
+    position: 'fixed',
+    left: Math.max(16, Math.min(spotlightRect.left + spotlightRect.width / 2 - 160, window.innerWidth - 336)),
+    zIndex: 10002,
+    width: 320,
+  };
+
+  if (placement === 'bottom') {
+    tooltipStyle.top = spotlightRect.bottom + pad + 12;
+  } else {
+    tooltipStyle.bottom = window.innerHeight - spotlightRect.top + pad + 12;
+  }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-6">
-      <div className="w-full max-w-sm bg-white rounded-2xl overflow-hidden shadow-2xl animate-slide-up">
-        {/* Close */}
-        <div className="flex justify-end p-3 pb-0">
-          <button onClick={close} className="p-1.5 rounded-lg hover:bg-gray-100">
-            <X className="h-4 w-4 text-gray-400" />
-          </button>
-        </div>
+    <>
+      {/* Overlay with spotlight cutout using CSS clip-path */}
+      <div
+        className="fixed inset-0 z-[10000] transition-all duration-300"
+        style={{
+          backgroundColor: 'rgba(0,0,0,0.55)',
+          clipPath: `polygon(
+            0% 0%, 0% 100%, 
+            ${spotlightRect.left - pad}px 100%, 
+            ${spotlightRect.left - pad}px ${spotlightRect.top - pad}px, 
+            ${spotlightRect.right + pad}px ${spotlightRect.top - pad}px, 
+            ${spotlightRect.right + pad}px ${spotlightRect.bottom + pad}px, 
+            ${spotlightRect.left - pad}px ${spotlightRect.bottom + pad}px, 
+            ${spotlightRect.left - pad}px 100%, 
+            100% 100%, 100% 0%
+          )`,
+        }}
+        onClick={close}
+      />
+
+      {/* Spotlight border glow */}
+      <div
+        className="fixed z-[10001] rounded-2xl pointer-events-none transition-all duration-300"
+        style={{
+          top: spotlightRect.top - pad,
+          left: spotlightRect.left - pad,
+          width: spotlightRect.width + pad * 2,
+          height: spotlightRect.height + pad * 2,
+          boxShadow: '0 0 0 3px rgba(194,114,138,0.6), 0 0 20px rgba(194,114,138,0.3)',
+        }}
+      />
+
+      {/* Tooltip */}
+      <div
+        ref={tooltipRef}
+        style={tooltipStyle}
+        className="bg-white rounded-2xl shadow-2xl p-5 animate-slide-up"
+      >
+        {/* Arrow */}
+        <div
+          className="absolute w-3 h-3 bg-white rotate-45"
+          style={{
+            left: Math.min(
+              Math.max(24, spotlightRect.left + spotlightRect.width / 2 - (tooltipStyle.left as number)),
+              296
+            ),
+            ...(placement === 'bottom' ? { top: -6 } : { bottom: -6 }),
+          }}
+        />
+
+        {/* Skip button */}
+        <button
+          onClick={close}
+          className="absolute top-3 right-3 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+        >
+          <X className="h-4 w-4 text-gray-400" />
+        </button>
 
         {/* Content */}
-        <div className="px-6 pb-2 text-center">
-          <div className="mx-auto h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center mb-4">
-            {current.icon}
+        <h3 className="text-base font-bold text-gray-900 mb-1.5 pr-6">{current.title}</h3>
+        <p className="text-sm text-gray-500 leading-relaxed mb-4">{current.content}</p>
+
+        {/* Progress + Navigation */}
+        <div className="flex items-center justify-between">
+          <div className="flex gap-1.5">
+            {STEPS.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === step ? 'w-5 bg-dusty-rose' : 'w-1.5 bg-gray-200'
+                }`}
+              />
+            ))}
           </div>
-          <h2 className="text-lg font-bold text-gray-900 mb-2">{current.title}</h2>
-          <p className="text-sm text-gray-500 leading-relaxed">{current.description}</p>
-        </div>
-
-        {/* Progress dots */}
-        <div className="flex justify-center gap-1.5 py-4">
-          {GUIDE_STEPS.map((_, i) => (
-            <div
-              key={i}
-              className={`h-1.5 rounded-full transition-all ${
-                i === step ? 'w-6 bg-dusty-rose' : 'w-1.5 bg-gray-200'
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-3 px-6 pb-6">
-          {step > 0 && (
-            <button
-              onClick={() => setStep(step - 1)}
-              className="flex-1 rounded-xl border-2 border-gray-200 py-3 text-sm font-semibold text-gray-400"
-            >
-              이전
-            </button>
-          )}
-          <button
-            onClick={next}
-            className="flex-1 rounded-xl bg-dusty-rose py-3 text-sm font-semibold text-white flex items-center justify-center gap-1 hover:opacity-90"
-          >
-            {isLast ? '시작하기! 🎉' : (
-              <>다음 <ChevronRight className="h-4 w-4" /></>
+          <div className="flex items-center gap-2">
+            {step > 0 && (
+              <button
+                onClick={prev}
+                className="flex items-center gap-0.5 px-3 py-1.5 text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                이전
+              </button>
             )}
-          </button>
+            <button
+              onClick={next}
+              className="flex items-center gap-0.5 px-4 py-2 bg-dusty-rose text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              {isLast ? '시작하기! 🎉' : (
+                <>다음 <ChevronRight className="h-4 w-4" /></>
+              )}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

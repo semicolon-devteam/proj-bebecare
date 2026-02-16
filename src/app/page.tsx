@@ -117,19 +117,27 @@ export default function Home() {
           <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 bg-surface">
             <div className="mx-auto max-w-4xl space-y-6">
               {/* Baby Profile Card */}
-              <BabyProfileCard userId={user.id} />
+              <div data-tour="baby-profile">
+                <BabyProfileCard userId={user.id} />
+              </div>
 
               {/* Today's Summary */}
-              <TodaySummary userId={user.id} />
+              <div data-tour="today-summary">
+                <TodaySummary userId={user.id} />
+              </div>
 
               {/* Today's Recommendations */}
-              <TodayRecommendations userId={user.id} />
+              <div data-tour="recommendations">
+                <TodayRecommendations userId={user.id} />
+              </div>
 
               {/* Checklist */}
-              <ChecklistCard userId={user.id} />
+              <div data-tour="checklist">
+                <ChecklistCard userId={user.id} />
+              </div>
 
               {/* Quick Log Bar */}
-              <div className="space-y-3">
+              <div className="space-y-3" data-tour="quick-log">
                 <h3 className="text-sm font-bold text-gray-900">퀵 기록</h3>
                 <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
                   {([

@@ -29,6 +29,7 @@ export default function BottomTabBar({ isVisible }: BottomTabBarProps) {
           return (
             <button
               key={id}
+              data-tour={`tab-${id}`}
               onClick={() => router.push(path)}
               className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 transition-colors ${
                 isActive 
