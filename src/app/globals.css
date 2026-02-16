@@ -7,8 +7,9 @@
   --color-sage: #7C9A82;
   --color-sage-light: #A3BDA8;
 
-  --color-surface: #F9FAFB;
-  --color-border: #E5E7EB;
+  --color-surface: #FEF7F2;
+  --color-surface-warm: #FFF9F5;
+  --color-border: #F0E6E0;
 
   --color-gray-50: #F9FAFB;
   --color-gray-100: #F3F4F6;
@@ -63,16 +64,22 @@
 
 body {
   overflow-x: hidden;
-  background-color: #FFFFFF;
+  background-color: #FFF9F5;
   color: #111827;
 }
 
 @layer components {
   .card {
     background-color: #FFFFFF;
-    border: 1px solid #E5E7EB;
-    border-radius: 1rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    border: 1px solid #F0E6E0;
+    border-radius: 1.25rem;
+    box-shadow: 0 2px 8px 0 rgba(194, 114, 138, 0.06);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 16px rgba(194, 114, 138, 0.1);
+    transform: scale(1.005);
   }
 
   .card-hover {
@@ -80,8 +87,8 @@ body {
   }
 
   .card-hover:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(194, 114, 138, 0.12);
+    transform: translateY(-2px);
   }
 
   .scrollbar-hide {

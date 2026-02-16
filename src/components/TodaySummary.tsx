@@ -46,13 +46,13 @@ export default function TodaySummary({ userId, refreshKey }: TodaySummaryProps) 
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-bold text-gray-900">오늘의 요약</h3>
+      <h3 className="text-sm font-bold text-gray-700">오늘의 요약</h3>
       <div className="grid grid-cols-3 gap-3">
         {/* 수유 */}
         <div className="card p-4 text-center">
           <div className="flex items-center justify-center mb-2">
-            <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center">
-              <Milk className="h-4 w-4 text-orange-500" />
+            <div className="h-9 w-9 rounded-full bg-orange-50 flex items-center justify-center">
+              <Milk className="h-4 w-4 text-orange-400" />
             </div>
           </div>
           <div className="space-y-1">
@@ -67,8 +67,8 @@ export default function TodaySummary({ userId, refreshKey }: TodaySummaryProps) 
         {/* 수면 */}
         <div className="card p-4 text-center">
           <div className="flex items-center justify-center mb-2">
-            <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
-              <Moon className="h-4 w-4 text-indigo-500" />
+            <div className="h-9 w-9 rounded-full bg-indigo-50 flex items-center justify-center">
+              <Moon className="h-4 w-4 text-indigo-400" />
             </div>
           </div>
           <div className="space-y-1">
@@ -82,8 +82,8 @@ export default function TodaySummary({ userId, refreshKey }: TodaySummaryProps) 
         {/* 기저귀 */}
         <div className="card p-4 text-center">
           <div className="flex items-center justify-center mb-2">
-            <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center">
-              <Baby className="h-4 w-4 text-amber-600" />
+            <div className="h-9 w-9 rounded-full bg-amber-50 flex items-center justify-center">
+              <Baby className="h-4 w-4 text-amber-400" />
             </div>
           </div>
           <div className="space-y-1">

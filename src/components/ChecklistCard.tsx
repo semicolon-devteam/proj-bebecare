@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getChecklistForAge, type ChecklistItem } from '@/lib/checklist';
 import { getChildren } from '@/lib/children';
 import { getAgeMonths } from '@/lib/peer-comparison';
-import { CheckSquare, Square, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckSquare, Square, ChevronDown, ChevronUp, ClipboardCheck } from 'lucide-react';
 
 interface ChecklistCardProps {
   userId: string;
@@ -65,8 +65,9 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-          ✅ 체크리스트
+        <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
+          <ClipboardCheck className="h-4 w-4 text-sage" />
+          체크리스트
         </h3>
         <span className="text-xs text-gray-400">{doneItems.length}/{items.length} 완료 ({progress}%)</span>
       </div>
@@ -98,7 +99,7 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm">{item.emoji}</span>
+                  <span className="text-xs">{item.emoji}</span>
                   <span className={`text-sm font-semibold ${isDone ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
                     {item.title}
                   </span>

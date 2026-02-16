@@ -22,8 +22,8 @@ export default function BottomTabBar({ isVisible }: BottomTabBarProps) {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-border safe-area-inset-bottom">
-      <div className="flex h-16 px-2">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border safe-area-inset-bottom" style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(12px)' }}>
+      <div className="flex h-16 px-3">
         {tabs.map(({ id, path, label, icon: Icon }) => {
           const isActive = pathname === path;
           return (
@@ -31,14 +31,18 @@ export default function BottomTabBar({ isVisible }: BottomTabBarProps) {
               key={id}
               data-tour={`tab-${id}`}
               onClick={() => router.push(path)}
-              className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 transition-colors ${
+              className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 transition-all ${
                 isActive 
                   ? 'text-dusty-rose' 
-                  : 'text-gray-400 hover:text-gray-600'
+                  : 'text-gray-400 hover:text-gray-500'
               }`}
             >
-              <Icon className="h-5 w-5" />
-              <span className={`text-xs font-medium ${
+              <span className={`flex items-center justify-center h-7 w-7 rounded-full transition-all ${
+                isActive ? 'bg-dusty-rose/10' : ''
+              }`}>
+                <Icon className={`${isActive ? 'h-[18px] w-[18px]' : 'h-5 w-5'}`} />
+              </span>
+              <span className={`text-[10px] font-semibold ${
                 isActive ? 'text-dusty-rose' : 'text-gray-400'
               }`}>
                 {label}

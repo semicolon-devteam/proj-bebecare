@@ -125,15 +125,17 @@ export default function TodayRecommendations({ userId }: TodayRecommendationsPro
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-bold text-gray-900">오늘의 추천</h3>
+      <h3 className="text-sm font-bold text-gray-700">오늘의 추천</h3>
       <div className="space-y-2">
         {recommendations.map((event) => {
           const ddayValue = (event as TimelineEvent & { ddayValue?: number | null }).ddayValue ?? null;
           const content = event.content;
           
           return (
-            <div key={event.id} className="card p-3 hover:bg-gray-50 transition-colors cursor-pointer">
-              <div className="flex items-start justify-between gap-2">
+            <div key={event.id} className="card p-0 overflow-hidden hover:bg-gray-50/50 transition-colors cursor-pointer">
+              <div className="flex">
+                <div className={`w-1 flex-shrink-0 rounded-l-xl ${ddayValue !== null && ddayValue <= 3 ? 'bg-red-300' : ddayValue !== null && ddayValue <= 7 ? 'bg-amber-300' : 'bg-dusty-rose-light'}`} />
+                <div className="flex items-start justify-between gap-2 flex-1 p-3">
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-gray-900 line-clamp-1 mb-1">
                     {content?.title || '제목 없음'}
@@ -150,6 +152,7 @@ export default function TodayRecommendations({ userId }: TodayRecommendationsPro
                     </span>
                   </div>
                 )}
+              </div>
               </div>
             </div>
           );

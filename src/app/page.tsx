@@ -14,7 +14,7 @@ import { supabase } from '@/lib/supabase';
 import { type LogType } from '@/lib/baby-logs';
 import { getChildren } from '@/lib/children';
 import { useTimer } from '@/components/Timer';
-import { Bell, User as UserIcon } from 'lucide-react';
+import { Bell, User as UserIcon, Baby, Droplets, Moon, Shirt, Bath, Pill } from 'lucide-react';
 import ChecklistCard from '@/components/ChecklistCard';
 import OnboardingGuide from '@/components/OnboardingGuide';
 
@@ -68,40 +68,49 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
+      <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#FFF9F5' }}>
         <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
-          <p className="text-sm text-gray-500">로딩 중...</p>
+          <div className="h-10 w-10 animate-spin rounded-full border-3 border-dusty-rose/20 border-t-dusty-rose" />
+          <p className="text-sm text-gray-400">로딩 중...</p>
         </div>
       </div>
     );
   }
 
+  const quickLogItems: [LogType, React.ComponentType<{ className?: string }>, string, string][] = [
+    ['formula', Baby, '분유', 'bg-orange-50 text-orange-400'],
+    ['breast', Droplets, '모유', 'bg-pink-50 text-pink-400'],
+    ['sleep', Moon, '수면', 'bg-indigo-50 text-indigo-400'],
+    ['diaper', Shirt, '기저귀', 'bg-amber-50 text-amber-400'],
+    ['bath', Bath, '목욕', 'bg-cyan-50 text-cyan-400'],
+    ['medicine', Pill, '투약', 'bg-emerald-50 text-emerald-400'],
+  ];
+
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col" style={{ backgroundColor: '#FFF9F5' }}>
       {user ? (
         <div className="flex h-[100dvh] flex-col">
-          {/* Minimal Header */}
-          <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur-sm px-4 py-3">
+          {/* Header */}
+          <header className="sticky top-0 z-30 border-b border-border backdrop-blur-sm px-4 py-3" style={{ backgroundColor: 'rgba(255, 249, 245, 0.95)' }}>
             <div className="mx-auto flex max-w-4xl items-center justify-between">
-              <h1 className="text-xl font-semibold text-dusty-rose tracking-tight">
+              <h1 className="text-xl font-bold text-dusty-rose" style={{ letterSpacing: '0.05em', fontWeight: 700 }}>
                 BebeCare
               </h1>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => router.push('/notifications')}
-                  className="relative rounded-lg p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="relative rounded-full p-2 text-gray-400 hover:text-dusty-rose hover:bg-dusty-rose/5 transition-colors"
                 >
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-dusty-rose text-[9px] font-bold text-white">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
                 </button>
                 <button
                   onClick={() => router.push('/mypage')}
-                  className="rounded-lg p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
+                  className="rounded-full p-2 text-gray-400 hover:text-dusty-rose hover:bg-dusty-rose/5 transition-colors"
                 >
                   <UserIcon className="h-5 w-5" />
                 </button>
@@ -115,7 +124,7 @@ export default function Home() {
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 bg-surface">
+          <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6" style={{ backgroundColor: '#FEF7F2' }}>
             <div className="mx-auto max-w-4xl space-y-6">
               {/* Baby Profile Card */}
               <div data-tour="baby-profile">
@@ -139,23 +148,18 @@ export default function Home() {
 
               {/* Quick Log Bar */}
               <div className="space-y-3" data-tour="quick-log">
-                <h3 className="text-sm font-bold text-gray-900">퀵 기록</h3>
+                <h3 className="text-sm font-bold text-gray-700">퀵 기록</h3>
                 <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-                  {([
-                    ['formula', '🍼', '분유'],
-                    ['breast', '🤱', '모유'],
-                    ['sleep', '😴', '수면'],
-                    ['diaper', '🧷', '기저귀'],
-                    ['bath', '🛁', '목욕'],
-                    ['medicine', '💊', '투약']
-                  ] as [LogType, string, string][]).map(([type, emoji, label]) => (
+                  {quickLogItems.map(([type, Icon, label, colorClass]) => (
                     <button
                       key={type}
                       onClick={() => setQuickLogType(type)}
-                      className="flex items-center gap-2 flex-shrink-0 rounded-xl bg-white border border-gray-200 pl-3 pr-4 py-2.5 hover:bg-gray-50 transition-colors shadow-sm"
+                      className="flex items-center gap-2 flex-shrink-0 rounded-full bg-white border border-border pl-2.5 pr-4 py-2 hover:shadow-md transition-all"
                     >
-                      <span className="text-lg">{emoji}</span>
-                      <span className="text-sm font-semibold text-gray-700">{label}</span>
+                      <span className={`h-8 w-8 rounded-full flex items-center justify-center ${colorClass}`}>
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <span className="text-sm font-semibold text-gray-600">{label}</span>
                     </button>
                   ))}
                 </div>
@@ -180,18 +184,33 @@ export default function Home() {
         </div>
       ) : (
         /* Landing Page */
-        <div className="flex min-h-screen items-center justify-center px-5 py-8">
+        <div className="flex min-h-screen items-center justify-center px-5 py-8" style={{ background: 'linear-gradient(180deg, #FFF9F5 0%, #FEF0E8 100%)' }}>
           <div className="w-full max-w-lg space-y-8">
-            {/* Hero */}
-            <div className="text-center space-y-4">
-              <div className="card rounded-2xl px-6 py-8">
-                <h1 className="text-4xl md:text-5xl font-bold text-dusty-rose">
+            {/* Hero with SVG illustration */}
+            <div className="text-center space-y-6">
+              <div className="card rounded-3xl px-6 py-10" style={{ background: 'linear-gradient(135deg, #FFFFFF 0%, #FFF5F0 100%)' }}>
+                {/* Simple baby SVG illustration */}
+                <div className="flex justify-center mb-6">
+                  <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="60" cy="60" r="55" fill="#FEF0E8" stroke="#D4A0B0" strokeWidth="2"/>
+                    <circle cx="60" cy="52" r="22" fill="#FFDDD2" stroke="#C2728A" strokeWidth="2"/>
+                    <circle cx="52" cy="49" r="2.5" fill="#6B5B5B"/>
+                    <circle cx="68" cy="49" r="2.5" fill="#6B5B5B"/>
+                    <path d="M55 56 Q60 60 65 56" stroke="#C2728A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                    <ellipse cx="60" cy="85" rx="18" ry="14" fill="#FFDDD2" stroke="#C2728A" strokeWidth="2"/>
+                    <circle cx="42" cy="38" r="5" fill="#FEF0E8" stroke="#D4A0B0" strokeWidth="1.5"/>
+                    <circle cx="78" cy="38" r="5" fill="#FEF0E8" stroke="#D4A0B0" strokeWidth="1.5"/>
+                    <path d="M38 75 Q32 82 36 88" stroke="#C2728A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                    <path d="M82 75 Q88 82 84 88" stroke="#C2728A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                  </svg>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold text-dusty-rose" style={{ letterSpacing: '0.05em' }}>
                   BebeCare
                 </h1>
-                <p className="mt-2 text-lg font-semibold text-gray-800">
+                <p className="mt-3 text-lg font-semibold text-gray-700">
                   임신·출산·육아 슈퍼앱
                 </p>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-400">
                   AI 기반 맞춤 정보 제공 서비스
                 </p>
               </div>
@@ -199,8 +218,8 @@ export default function Home() {
 
             {/* CTA */}
             <div className="space-y-4">
-              <div className="card rounded-2xl p-6 text-center">
-                <p className="text-lg font-semibold text-gray-800 leading-relaxed">
+              <div className="card rounded-3xl p-6 text-center">
+                <p className="text-lg font-semibold text-gray-700 leading-relaxed">
                   BebeCare와 함께
                   <br />
                   <span className="text-xl font-bold text-dusty-rose">
@@ -213,13 +232,14 @@ export default function Home() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => router.push('/login')}
-                  className="rounded-xl bg-dusty-rose px-6 py-4 font-semibold text-white shadow-sm hover:bg-dusty-rose-dark transition-colors"
+                  className="rounded-2xl px-6 py-4 font-semibold text-white shadow-md hover:shadow-lg transition-all"
+                  style={{ background: 'linear-gradient(135deg, #C2728A 0%, #D4A0B0 100%)' }}
                 >
                   로그인
                 </button>
                 <button
                   onClick={() => router.push('/signup')}
-                  className="card rounded-xl px-6 py-4 font-semibold text-dusty-rose card-hover"
+                  className="card rounded-2xl px-6 py-4 font-semibold text-dusty-rose card-hover"
                 >
                   회원가입
                 </button>

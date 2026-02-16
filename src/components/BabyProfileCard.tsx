@@ -72,14 +72,16 @@ export default function BabyProfileCard({ userId }: BabyProfileCardProps) {
   };
 
   return (
-    <div className="card p-4 bg-gradient-to-r from-dusty-rose/5 to-sage/5">
-      <div className="flex items-center gap-3">
-        <div className="h-12 w-12 rounded-full bg-dusty-rose/20 flex items-center justify-center">
-          <Baby className="h-6 w-6 text-dusty-rose" />
+    <div className="card p-5" style={{ background: 'linear-gradient(135deg, #FFF0F3 0%, #F0F7F1 100%)' }}>
+      <div className="flex items-center gap-4">
+        <div className="h-14 w-14 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F8D0DA 0%, #D4A0B0 100%)' }}>
+          <Baby className="h-7 w-7 text-white" />
         </div>
         <div className="flex-1">
-          <h2 className="font-bold text-lg text-gray-900">{child.nickname || '아기'}</h2>
-          <p className="text-sm text-gray-500">{calculateAge()}</p>
+          <h2 className="font-bold text-lg text-gray-800">{child.nickname || '아기'}</h2>
+          <span className="inline-block mt-1 text-xs font-semibold text-dusty-rose bg-dusty-rose/10 rounded-full px-3 py-0.5">
+            {calculateAge()}
+          </span>
         </div>
       </div>
     </div>
