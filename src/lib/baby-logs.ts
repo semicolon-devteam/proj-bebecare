@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 
-export type LogType = 'formula' | 'baby_food' | 'breast' | 'diaper' | 'sleep' | 'bath' | 'medicine';
+export type LogType = 'formula' | 'baby_food' | 'breast' | 'diaper' | 'sleep' | 'bath' | 'medicine' | 'vaccination';
 export type DiaperType = 'wet' | 'dirty' | 'mixed';
 
 export interface BabyLog {
@@ -24,6 +24,7 @@ export const LOG_TYPE_CONFIG: Record<LogType, { emoji: string; label: string; co
   sleep: { emoji: '😴', label: '수면', color: 'text-indigo-500', bgColor: 'bg-indigo-100' },
   bath: { emoji: '🛁', label: '목욕', color: 'text-cyan-500', bgColor: 'bg-cyan-100' },
   medicine: { emoji: '💊', label: '투약', color: 'text-red-500', bgColor: 'bg-red-100' },
+  vaccination: { emoji: '💉', label: '예방접종', color: 'text-teal-500', bgColor: 'bg-teal-100' },
 };
 
 export async function getBabyLogs(userId: string, date: string): Promise<BabyLog[]> {

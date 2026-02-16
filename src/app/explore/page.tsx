@@ -8,6 +8,7 @@ import type { User } from '@supabase/supabase-js';
 import { BookOpen, Heart, Building2, Syringe, Baby } from 'lucide-react';
 import TimelineFeed from '@/components/TimelineFeed';
 import BenefitsTab from '@/components/BenefitsTab';
+import VaccinationTab from '@/components/VaccinationTab';
 
 type ExploreTab = 'custom' | 'benefits' | 'vaccination' | 'pregnancy';
 
@@ -146,22 +147,9 @@ function ExploreContent() {
           </div>
         )}
 
-        {activeTab === 'vaccination' && (
-          <div className="p-4">
-            <div className="text-center py-16">
-              <Syringe className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-              <h2 className="text-lg font-semibold text-gray-600 mb-2">예방접종 정보</h2>
-              <p className="text-sm text-gray-400">
-                현재 개발 중입니다.<br />
-                곧 만나보실 수 있어요!
-              </p>
-              <button
-                onClick={() => router.push('/vaccination')}
-                className="mt-4 px-4 py-2 bg-dusty-rose text-white rounded-lg text-sm font-semibold"
-              >
-                기존 페이지 보기
-              </button>
-            </div>
+        {activeTab === 'vaccination' && user && (
+          <div className="h-full">
+            <VaccinationTab userId={user.id} />
           </div>
         )}
 
