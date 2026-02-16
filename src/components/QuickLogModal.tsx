@@ -116,17 +116,17 @@ export default function QuickLogModal({
         ) : (
           <>
             {/* Time */}
-            <div className="flex gap-3 mb-3">
-              <div className="flex-1">
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="min-w-0">
                 <label className="text-xs font-semibold text-gray-500 mb-1 block">시작 시간</label>
-                <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm" />
+                <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm box-border" />
               </div>
-              {needsDuration && (
-                <div className="flex-1">
+              {needsDuration ? (
+                <div className="min-w-0">
                   <label className="text-xs font-semibold text-gray-500 mb-1 block">종료 시간</label>
-                  <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm" />
+                  <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm box-border" />
                 </div>
-              )}
+              ) : <div />}
             </div>
 
             {needsAmount && (
