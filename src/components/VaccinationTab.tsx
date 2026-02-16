@@ -343,7 +343,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
                   {/* Month marker */}
                   <div className="flex items-center gap-3 mb-2">
                     <div
-                      className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 text-xs font-bold ${
+                      className={`relative z-10 flex h-10 min-w-10 px-2 items-center justify-center rounded-full border-2 text-xs font-bold whitespace-nowrap ${
                         isCurrent
                           ? 'border-dusty-rose bg-dusty-rose text-white'
                           : isPast
