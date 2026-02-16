@@ -175,7 +175,7 @@ export default function ChatPage() {
       </header>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 bg-surface">
+      <div className="flex-1 overflow-y-auto px-4 py-6 pb-32 bg-surface">
         <div className="mx-auto max-w-3xl space-y-4">
           {messages.length === 0 ? (
             <div className="space-y-6">
@@ -259,8 +259,8 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* Chat Input */}
-      <div className="sticky bottom-0 z-20 border-t border-border bg-white px-4 pt-3 pb-6">
+      {/* Chat Input - above BottomTabBar */}
+      <div className="fixed bottom-16 left-0 right-0 z-30 border-t border-border bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
         <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
           <div className="flex items-center gap-2 rounded-xl border border-border bg-surface p-1.5">
             <input
