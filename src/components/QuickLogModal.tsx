@@ -10,6 +10,7 @@ interface QuickLogModalProps {
   logType: LogType;
   onClose: () => void;
   onStartTimer: (type: LogType) => void;
+  onSaved?: () => void;
 }
 
 export default function QuickLogModal({
@@ -18,6 +19,7 @@ export default function QuickLogModal({
   logType,
   onClose,
   onStartTimer,
+  onSaved,
 }: QuickLogModalProps) {
   const [amountMl, setAmountMl] = useState('');
   const [diaperType, setDiaperType] = useState<DiaperType>('wet');
@@ -36,28 +38,45 @@ export default function QuickLogModal({
   const canTimer = ['sleep', 'breast'].includes(logType);
   const config = LOG_TYPE_CONFIG[logType];
 
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
   const handleSave = async () => {
     setSaving(true);
-    const today = new Date();
-    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    const started_at = `${dateStr}T${startTime}:00+09:00`;
-    const ended_at = endTime ? `${dateStr}T${endTime}:00+09:00` : null;
+    try {
+      const today = new Date();
+      const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      const started_at = `${dateStr}T${startTime}:00+09:00`;
+      const ended_at = endTime ? `${dateStr}T${endTime}:00+09:00` : null;
 
-    await addBabyLog({
-      user_id: userId,
-      child_id: childId,
-      log_type: logType,
-      started_at,
-      ended_at,
-      amount_ml: needsAmount && amountMl ? parseInt(amountMl) : null,
-      diaper_type: needsDiaperType ? diaperType : null,
-      memo: memo || null,
-    });
-    onClose();
+      await addBabyLog({
+        user_id: userId,
+        child_id: childId,
+        log_type: logType,
+        started_at,
+        ended_at,
+        amount_ml: needsAmount && amountMl ? parseInt(amountMl) : null,
+        diaper_type: needsDiaperType ? diaperType : null,
+        memo: memo || null,
+      });
+      setToast({ type: 'success', message: `${config.emoji} ${config.label} 기록 완료!` });
+      onSaved?.();
+      setTimeout(() => onClose(), 1200);
+    } catch {
+      setToast({ type: 'error', message: '저장에 실패했어요. 다시 시도해주세요.' });
+      setSaving(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-16 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-xl shadow-lg text-sm font-semibold animate-slide-up ${
+          toast.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`}>
+          {toast.message}
+        </div>
+      )}
       <div className="w-full max-w-lg bg-white rounded-t-2xl p-5 animate-slide-up" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">

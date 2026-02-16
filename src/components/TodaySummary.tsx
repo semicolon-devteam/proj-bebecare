@@ -6,9 +6,10 @@ import { Milk, Moon, Baby } from 'lucide-react';
 
 interface TodaySummaryProps {
   userId: string;
+  refreshKey?: number;
 }
 
-export default function TodaySummary({ userId }: TodaySummaryProps) {
+export default function TodaySummary({ userId, refreshKey }: TodaySummaryProps) {
   const [summary, setSummary] = useState<DailySummary | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -27,7 +28,7 @@ export default function TodaySummary({ userId }: TodaySummaryProps) {
       }
     };
     loadTodaySummary();
-  }, [userId]);
+  }, [userId, refreshKey]);
 
   if (loading || !summary) return null;
 

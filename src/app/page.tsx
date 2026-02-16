@@ -25,6 +25,7 @@ export default function Home() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [quickLogType, setQuickLogType] = useState<LogType | null>(null);
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const { startTimer } = useTimer();
 
   useEffect(() => {
@@ -123,7 +124,7 @@ export default function Home() {
 
               {/* Today's Summary */}
               <div data-tour="today-summary">
-                <TodaySummary userId={user.id} />
+                <TodaySummary userId={user.id} refreshKey={refreshKey} />
               </div>
 
               {/* Today's Recommendations */}
@@ -173,6 +174,7 @@ export default function Home() {
               logType={quickLogType}
               onClose={() => setQuickLogType(null)}
               onStartTimer={(type) => { startTimer(type, user.id, selectedChildId); setQuickLogType(null); }}
+              onSaved={() => setRefreshKey(k => k + 1)}
             />
           )}
         </div>
