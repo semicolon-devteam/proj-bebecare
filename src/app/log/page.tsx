@@ -381,6 +381,18 @@ function StatsTab({ userId }: { userId: string }) {
     );
   }
 
+  if (allLogs.length === 0) {
+    return (
+      <div className="text-center py-16 px-4">
+        <div className="mx-auto h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+          <BarChart3 className="h-8 w-8 text-gray-300" />
+        </div>
+        <p className="text-sm font-semibold text-gray-600">기록을 시작하면 통계를 볼 수 있어요</p>
+        <p className="text-xs text-gray-400 mt-1">수유, 수면, 기저귀 등의 기록을 추가해보세요</p>
+      </div>
+    );
+  }
+
   return (
     <div className="px-4 py-4 space-y-5 pb-24">
       {/* Period selector */}

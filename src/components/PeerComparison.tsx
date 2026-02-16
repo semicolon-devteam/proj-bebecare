@@ -313,9 +313,9 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
 
         {bornResults.length === 0 ? (
           <div className="rounded-xl bg-gray-50 border border-gray-100 p-6 text-center">
-            <AlertCircle className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-            <p className="text-sm text-gray-500 font-semibold">오늘 기록이 없어요</p>
-            <p className="text-xs text-gray-400 mt-1">기록을 추가하면 또래와 비교해드릴게요</p>
+            <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+            <p className="text-sm text-gray-500 font-semibold">또래 비교 데이터가 준비 중이에요</p>
+            <p className="text-xs text-gray-400 mt-1">오늘 수유·수면·기저귀 기록을 추가하면 또래와 비교해드릴게요</p>
           </div>
         ) : (
           <div className="space-y-3">

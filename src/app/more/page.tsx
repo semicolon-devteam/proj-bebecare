@@ -219,7 +219,7 @@ export default function MorePage() {
           {/* App Info */}
           <div className="text-center py-4">
             <p className="text-xs text-gray-400">BebeCare v1.0.0</p>
-            <p className="text-xs text-gray-300 mt-1">© 2024 Semicolon Team</p>
+            <p className="text-xs text-gray-300 mt-1">© 2026 Semicolon Team</p>
           </div>
         </div>
       </div>

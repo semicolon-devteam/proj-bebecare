@@ -67,11 +67,29 @@ function computeDdayValue(event: TimelineEvent, profile: ProfileContext): number
   return null;
 }
 
+// stage와 관련 없는 카테고리인지 판별
+const STAGE_RELEVANT_CATEGORIES: Record<string, string[]> = {
+  planning: ['pregnancy_planning', 'work', 'government_support'],
+  pregnant: ['pregnancy_planning', 'pregnancy', 'work', 'government_support'],
+  postpartum: ['postpartum', 'parenting', 'work', 'government_support'],
+  parenting: ['parenting', 'work', 'government_support'],
+};
+
+function isRelevantForStage(category: string, stage: string): boolean {
+  const relevant = STAGE_RELEVANT_CATEGORIES[stage];
+  if (!relevant) return true;
+  return relevant.includes(category);
+}
+
 function computeSortScore(event: TimelineEvent, profile: ProfileContext): number {
   const ddayValue = computeDdayValue(event, profile);
-  if (ddayValue === null) return 5000;
-  if (ddayValue >= 0) return ddayValue;
-  return 10000 + Math.abs(ddayValue);
+  const base = ddayValue === null ? 5000 : ddayValue >= 0 ? ddayValue : 10000 + Math.abs(ddayValue);
+  // stage에 맞지 않는 콘텐츠는 큰 페널티 부여 → 하단으로 밀림
+  const category = event.content?.category;
+  if (category && !isRelevantForStage(category, profile.stage)) {
+    return base + 50000;
+  }
+  return base;
 }
 
 // 직장 탭 서브카테고리 그룹핑
