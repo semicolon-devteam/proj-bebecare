@@ -7,6 +7,7 @@ import { getChildren, deriveStageFromChildren } from '@/lib/children';
 import type { User } from '@supabase/supabase-js';
 import { BookOpen, Heart, Building2, Syringe, Baby } from 'lucide-react';
 import TimelineFeed from '@/components/TimelineFeed';
+import BenefitsTab from '@/components/BenefitsTab';
 
 type ExploreTab = 'custom' | 'benefits' | 'vaccination' | 'pregnancy';
 
@@ -139,22 +140,9 @@ function ExploreContent() {
           </div>
         )}
         
-        {activeTab === 'benefits' && (
-          <div className="p-4">
-            <div className="text-center py-16">
-              <Building2 className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-              <h2 className="text-lg font-semibold text-gray-600 mb-2">정부지원 정보</h2>
-              <p className="text-sm text-gray-400">
-                현재 개발 중입니다.<br />
-                곧 만나보실 수 있어요!
-              </p>
-              <button
-                onClick={() => router.push('/benefits')}
-                className="mt-4 px-4 py-2 bg-dusty-rose text-white rounded-lg text-sm font-semibold"
-              >
-                기존 페이지 보기
-              </button>
-            </div>
+        {activeTab === 'benefits' && user && (
+          <div className="h-full">
+            <BenefitsTab userId={user.id} />
           </div>
         )}
 

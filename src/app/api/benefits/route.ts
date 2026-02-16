@@ -149,6 +149,8 @@ export async function GET(request: NextRequest) {
         body: content.body,
         subcategory: content.subcategory,
         tags: content.tags,
+        structured_data: content.structured_data || null,
+        region_filter: content.region_filter || null,
         relevanceScore,
         reasons: [...new Set(reasons)],
       };
