@@ -113,3 +113,39 @@ body {
     transform: translateY(0);
   }
 }
+
+@keyframes celebration-particle {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(var(--tx, 20px), var(--ty, -30px)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx2, 30px), var(--ty2, -60px)) scale(0.3);
+  }
+}
+
+.animate-celebration-particle {
+  animation: celebration-particle 0.8s ease-out forwards;
+  --tx: calc(-20px + 40px * var(--random, 0.5));
+  --ty: calc(-40px - 20px * var(--random, 0.5));
+  --tx2: calc(-30px + 60px * var(--random, 0.5));
+  --ty2: calc(-60px - 30px * var(--random, 0.5));
+}
+
+.animate-celebration-particle:nth-child(odd) {
+  --tx: 25px; --ty: -35px; --tx2: 40px; --ty2: -65px;
+}
+.animate-celebration-particle:nth-child(even) {
+  --tx: -20px; --ty: -40px; --tx2: -35px; --ty2: -70px;
+}
+.animate-celebration-particle:nth-child(3n) {
+  --tx: 0px; --ty: -45px; --tx2: 10px; --ty2: -80px;
+}
+.animate-celebration-particle:nth-child(4n) {
+  --tx: -30px; --ty: -25px; --tx2: -45px; --ty2: -55px;
+}

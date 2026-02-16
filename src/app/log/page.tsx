@@ -17,6 +17,8 @@ import PeerComparison from '@/components/PeerComparison';
 import {
   Plus, Trash2, ChevronLeft, ChevronRight, X, BarChart3, ClipboardList, Users,
 } from 'lucide-react';
+import EmptyStateIllustration from '@/components/illustrations/EmptyStateIllustration';
+import { FadeInUp, StaggerContainer, StaggerItem, CuteLoader } from '@/components/animations/MotionWrappers';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
@@ -118,10 +120,7 @@ export default function LogPage() {
   if (!userId) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
-          <p className="text-sm text-gray-500">로딩 중...</p>
-        </div>
+        <CuteLoader />
       </div>
     );
   }
@@ -225,17 +224,22 @@ export default function LogPage() {
                 <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
               </div>
             ) : logs.length === 0 ? (
-              <div className="text-center py-16">
-                <p className="text-4xl mb-3">📝</p>
-                <p className="text-sm font-semibold text-gray-600">아직 기록이 없어요</p>
-                <p className="text-xs text-gray-400 mt-1">위의 버튼을 눌러 기록을 시작하세요</p>
-              </div>
+              <FadeInUp>
+                <div className="text-center py-12">
+                  <div className="flex justify-center mb-3">
+                    <EmptyStateIllustration type="no-records" />
+                  </div>
+                  <p className="text-sm font-semibold text-gray-600">아직 기록이 없어요</p>
+                  <p className="text-xs text-gray-400 mt-1">위의 버튼을 눌러 기록을 시작하세요</p>
+                </div>
+              </FadeInUp>
             ) : (
-              <div className="space-y-2">
+              <StaggerContainer className="space-y-2">
                 {logs.map(log => {
                   const config = LOG_TYPE_CONFIG[log.log_type];
                   return (
-                    <div key={log.id} className="flex items-center gap-3 rounded-xl bg-white border border-gray-100 px-4 py-3">
+                    <StaggerItem key={log.id}>
+                    <div className="flex items-center gap-3 rounded-xl bg-white border border-gray-100 px-4 py-3">
                       <div className={`h-10 w-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 ${config.bgColor}`}>
                         {config.emoji}
                       </div>
@@ -264,9 +268,10 @@ export default function LogPage() {
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
+                    </StaggerItem>
                   );
                 })}
-              </div>
+              </StaggerContainer>
             )}
           </div>
 
@@ -383,13 +388,15 @@ function StatsTab({ userId }: { userId: string }) {
 
   if (allLogs.length === 0) {
     return (
-      <div className="text-center py-16 px-4">
-        <div className="mx-auto h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-          <BarChart3 className="h-8 w-8 text-gray-300" />
+      <FadeInUp>
+        <div className="text-center py-12 px-4">
+          <div className="flex justify-center mb-3">
+            <EmptyStateIllustration type="no-stats" />
+          </div>
+          <p className="text-sm font-semibold text-gray-600">기록을 시작하면 통계를 볼 수 있어요</p>
+          <p className="text-xs text-gray-400 mt-1">수유, 수면, 기저귀 등의 기록을 추가해보세요</p>
         </div>
-        <p className="text-sm font-semibold text-gray-600">기록을 시작하면 통계를 볼 수 있어요</p>
-        <p className="text-xs text-gray-400 mt-1">수유, 수면, 기저귀 등의 기록을 추가해보세요</p>
-      </div>
+      </FadeInUp>
     );
   }
 

@@ -14,6 +14,8 @@ import {
   Shield,
   Loader2,
 } from 'lucide-react';
+import CelebrationEffect from '@/components/animations/CelebrationEffect';
+import { CuteLoader } from '@/components/animations/MotionWrappers';
 
 // ── Static data ──────────────────────────────────────────
 interface VaccinationInfo {
@@ -125,6 +127,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [detailVaccine, setDetailVaccine] = useState<{ key: string; info: VaccinationInfo } | null>(null);
   const [apiDetails, setApiDetails] = useState<Record<string, Record<string, string>>>({});
+  const [celebrateKey, setCelebrateKey] = useState<string | null>(null);
 
   const timeline = buildTimeline();
 
@@ -181,6 +184,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
     if (existing) {
       await supabase.from('baby_logs').delete().eq('id', existing.id);
     } else {
+      setCelebrateKey(toggleKey);
       await supabase.from('baby_logs').insert({
         user_id: userId,
         child_id: selectedChild.id,
@@ -217,11 +221,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
   const completedCount = completedVaccinations.length;
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-dusty-rose" />
-      </div>
-    );
+    return <CuteLoader text="접종 현황을 불러오는 중..." />;
   }
 
   return (
@@ -370,7 +370,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
                       return (
                         <div
                           key={toggleKey}
-                          className={`flex items-center gap-2 rounded-xl border p-3 transition-colors ${
+                          className={`relative flex items-center gap-2 rounded-xl border p-3 transition-all duration-300 ${
                             done
                               ? 'border-sage-green/30 bg-sage-green/5'
                               : isCurrent
@@ -378,6 +378,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
                               : 'border-gray-100 bg-white'
                           }`}
                         >
+                          <CelebrationEffect trigger={celebrateKey === toggleKey} onComplete={() => setCelebrateKey(null)} />
                           {/* Check button */}
                           {selectedChild && (
                             <button

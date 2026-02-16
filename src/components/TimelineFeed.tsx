@@ -8,6 +8,8 @@ import { supabase } from '@/lib/supabase';
 import { getChildren } from '@/lib/children';
 import type { Child } from '@/lib/children';
 import { ChevronDown, ChevronUp, LayoutList, MapPin } from 'lucide-react';
+import EmptyStateIllustration from '@/components/illustrations/EmptyStateIllustration';
+import { CuteLoader, FadeInUp } from '@/components/animations/MotionWrappers';
 import WorkCalculator from './WorkCalculator';
 
 const ALL_CATEGORIES = [
@@ -474,18 +476,17 @@ export default function TimelineFeed({ userId }: { userId: string }) {
         )}
 
         {loading || generating ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
-            {generating && <p className="text-sm text-gray-400">맞춤 콘텐츠를 준비하고 있어요...</p>}
-          </div>
+          <CuteLoader text={generating ? '맞춤 콘텐츠를 준비하고 있어요...' : '로딩 중...'} />
         ) : sortedEvents.length === 0 ? (
-          <div className="text-center py-20 space-y-3">
-            <div className="mx-auto h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
-              <LayoutList className="h-6 w-6 text-gray-300" />
+          <FadeInUp>
+            <div className="text-center py-12 space-y-3">
+              <div className="flex justify-center mb-2">
+                <EmptyStateIllustration type="no-timeline" />
+              </div>
+              <p className="text-base font-semibold text-gray-600">아직 타임라인이 없어요</p>
+              <p className="text-sm text-gray-400">프로필 정보를 기반으로 맞춤 콘텐츠가 곧 제공됩니다</p>
             </div>
-            <p className="text-base font-semibold text-gray-600">아직 타임라인이 없어요</p>
-            <p className="text-sm text-gray-400">프로필 정보를 기반으로 맞춤 콘텐츠가 곧 제공됩니다</p>
-          </div>
+          </FadeInUp>
         ) : selectedCategory === 'work' ? (
           <WorkGroupedEvents events={sortedEvents} onUpdate={loadEvents} profile={profileCtx} />
         ) : (

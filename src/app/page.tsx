@@ -17,6 +17,9 @@ import { useTimer } from '@/components/Timer';
 import { Bell, User as UserIcon, Baby, Droplets, Moon, Shirt, Bath, Pill } from 'lucide-react';
 import ChecklistCard from '@/components/ChecklistCard';
 import OnboardingGuide from '@/components/OnboardingGuide';
+import LandingIllustration from '@/components/illustrations/LandingIllustration';
+import { SparkleGroup } from '@/components/illustrations/SectionDecorations';
+import { FadeInUp, CuteLoader } from '@/components/animations/MotionWrappers';
 
 export default function Home() {
   const router = useRouter();
@@ -69,10 +72,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#FFF9F5' }}>
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-3 border-dusty-rose/20 border-t-dusty-rose" />
-          <p className="text-sm text-gray-400">로딩 중...</p>
-        </div>
+        <CuteLoader />
       </div>
     );
   }
@@ -127,26 +127,35 @@ export default function Home() {
           <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6" style={{ backgroundColor: '#FEF7F2' }}>
             <div className="mx-auto max-w-4xl space-y-6">
               {/* Baby Profile Card */}
-              <div data-tour="baby-profile">
-                <BabyProfileCard userId={user.id} />
-              </div>
+              <FadeInUp delay={0}>
+                <div data-tour="baby-profile">
+                  <BabyProfileCard userId={user.id} />
+                </div>
+              </FadeInUp>
 
               {/* Today's Summary */}
-              <div data-tour="today-summary">
-                <TodaySummary userId={user.id} refreshKey={refreshKey} />
-              </div>
+              <FadeInUp delay={0.05}>
+                <div data-tour="today-summary">
+                  <TodaySummary userId={user.id} refreshKey={refreshKey} />
+                </div>
+              </FadeInUp>
 
               {/* Today's Recommendations */}
-              <div data-tour="recommendations">
-                <TodayRecommendations userId={user.id} />
-              </div>
+              <FadeInUp delay={0.1}>
+                <div data-tour="recommendations">
+                  <TodayRecommendations userId={user.id} />
+                </div>
+              </FadeInUp>
 
               {/* Checklist */}
-              <div data-tour="checklist">
-                <ChecklistCard userId={user.id} />
-              </div>
+              <FadeInUp delay={0.15}>
+                <div data-tour="checklist">
+                  <ChecklistCard userId={user.id} />
+                </div>
+              </FadeInUp>
 
               {/* Quick Log Bar */}
+              <FadeInUp delay={0.2}>
               <div className="space-y-3" data-tour="quick-log">
                 <h3 className="text-sm font-bold text-gray-700">퀵 기록</h3>
                 <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
@@ -164,6 +173,7 @@ export default function Home() {
                   ))}
                 </div>
               </div>
+              </FadeInUp>
             </div>
           </div>
 
@@ -189,20 +199,8 @@ export default function Home() {
             {/* Hero with SVG illustration */}
             <div className="text-center space-y-6">
               <div className="card rounded-3xl px-6 py-10" style={{ background: 'linear-gradient(135deg, #FFFFFF 0%, #FFF5F0 100%)' }}>
-                {/* Simple baby SVG illustration */}
                 <div className="flex justify-center mb-6">
-                  <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="60" cy="60" r="55" fill="#FEF0E8" stroke="#D4A0B0" strokeWidth="2"/>
-                    <circle cx="60" cy="52" r="22" fill="#FFDDD2" stroke="#C2728A" strokeWidth="2"/>
-                    <circle cx="52" cy="49" r="2.5" fill="#6B5B5B"/>
-                    <circle cx="68" cy="49" r="2.5" fill="#6B5B5B"/>
-                    <path d="M55 56 Q60 60 65 56" stroke="#C2728A" strokeWidth="2" strokeLinecap="round" fill="none"/>
-                    <ellipse cx="60" cy="85" rx="18" ry="14" fill="#FFDDD2" stroke="#C2728A" strokeWidth="2"/>
-                    <circle cx="42" cy="38" r="5" fill="#FEF0E8" stroke="#D4A0B0" strokeWidth="1.5"/>
-                    <circle cx="78" cy="38" r="5" fill="#FEF0E8" stroke="#D4A0B0" strokeWidth="1.5"/>
-                    <path d="M38 75 Q32 82 36 88" stroke="#C2728A" strokeWidth="2" strokeLinecap="round" fill="none"/>
-                    <path d="M82 75 Q88 82 84 88" stroke="#C2728A" strokeWidth="2" strokeLinecap="round" fill="none"/>
-                  </svg>
+                  <LandingIllustration />
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold text-dusty-rose" style={{ letterSpacing: '0.05em' }}>
                   BebeCare
@@ -218,7 +216,8 @@ export default function Home() {
 
             {/* CTA */}
             <div className="space-y-4">
-              <div className="card rounded-3xl p-6 text-center">
+              <div className="card rounded-3xl p-6 text-center relative overflow-hidden">
+                <SparkleGroup className="absolute top-2 right-4" />
                 <p className="text-lg font-semibold text-gray-700 leading-relaxed">
                   BebeCare와 함께
                   <br />

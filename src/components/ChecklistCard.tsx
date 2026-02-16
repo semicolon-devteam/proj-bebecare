@@ -5,6 +5,8 @@ import { getChecklistForAge, type ChecklistItem } from '@/lib/checklist';
 import { getChildren } from '@/lib/children';
 import { getAgeMonths } from '@/lib/peer-comparison';
 import { CheckSquare, Square, ChevronDown, ChevronUp, ClipboardCheck } from 'lucide-react';
+import CelebrationEffect from '@/components/animations/CelebrationEffect';
+import { LeafDecor } from '@/components/illustrations/SectionDecorations';
 
 interface ChecklistCardProps {
   userId: string;
@@ -28,6 +30,7 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
   const [done, setDone] = useState<Set<string>>(new Set());
   const [expanded, setExpanded] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [celebrateId, setCelebrateId] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -46,6 +49,7 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
   }, [userId]);
 
   const toggle = (id: string) => {
+    const wasUnchecked = !done.has(id);
     setDone(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -53,6 +57,9 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
       saveDoneItems(next);
       return next;
     });
+    if (wasUnchecked) {
+      setCelebrateId(id);
+    }
   };
 
   if (loading || items.length === 0) return null;
@@ -68,6 +75,7 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
         <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
           <ClipboardCheck className="h-4 w-4 text-sage" />
           체크리스트
+          <LeafDecor className="ml-0.5" />
         </h3>
         <span className="text-xs text-gray-400">{doneItems.length}/{items.length} 완료 ({progress}%)</span>
       </div>
@@ -85,10 +93,11 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
         {displayItems.map(item => {
           const isDone = done.has(item.id);
           return (
+            <div key={item.id} className="relative">
+              <CelebrationEffect trigger={celebrateId === item.id} onComplete={() => setCelebrateId(null)} />
             <button
-              key={item.id}
               onClick={() => toggle(item.id)}
-              className={`w-full flex items-start gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${
+              className={`w-full flex items-start gap-3 rounded-xl px-3 py-2.5 text-left transition-all duration-300 ${
                 isDone ? 'bg-green-50/50' : 'bg-white border border-gray-100'
               }`}
             >
@@ -113,6 +122,7 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
               </div>
               <span className="text-[10px] text-gray-300 flex-shrink-0 mt-1">{item.ageRange}</span>
             </button>
+            </div>
           );
         })}
       </div>

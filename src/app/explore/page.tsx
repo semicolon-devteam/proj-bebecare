@@ -6,6 +6,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { getChildren, deriveStageFromChildren } from '@/lib/children';
 import type { User } from '@supabase/supabase-js';
 import { BookOpen, Heart, Building2, Syringe, Baby } from 'lucide-react';
+import { CuteLoader } from '@/components/animations/MotionWrappers';
 import TimelineFeed from '@/components/TimelineFeed';
 import BenefitsTab from '@/components/BenefitsTab';
 import VaccinationTab from '@/components/VaccinationTab';
@@ -92,10 +93,7 @@ function ExploreContent() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
-          <p className="text-sm text-gray-500">로딩 중...</p>
-        </div>
+        <CuteLoader />
       </div>
     );
   }
@@ -168,10 +166,7 @@ export default function ExplorePage() {
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
-          <p className="text-sm text-gray-500">로딩 중...</p>
-        </div>
+        <CuteLoader />
       </div>
     }>
       <ExploreContent />

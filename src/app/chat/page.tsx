@@ -6,6 +6,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { createConversation, saveMessage, generateConversationTitle } from '@/lib/chat';
 import type { User } from '@supabase/supabase-js';
 import { MessageCircle } from 'lucide-react';
+import { CuteLoader, FadeInUp } from '@/components/animations/MotionWrappers';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
@@ -154,10 +155,7 @@ export default function ChatPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
-          <p className="text-sm text-gray-500">로딩 중...</p>
-        </div>
+        <CuteLoader />
       </div>
     );
   }
@@ -194,15 +192,16 @@ export default function ChatPage() {
                   '우리 지역 출산 혜택 알려줘',
                   '직장맘으로서 준비할 것들이 뭐야?',
                 ].map((example, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleSendMessage(example)}
-                    className="card card-hover p-4 text-left"
-                  >
-                    <p className="text-sm text-gray-700">
-                      {example}
-                    </p>
-                  </button>
+                  <FadeInUp key={index} delay={index * 0.05}>
+                    <button
+                      onClick={() => handleSendMessage(example)}
+                      className="card card-hover p-4 text-left w-full"
+                    >
+                      <p className="text-sm text-gray-700">
+                        {example}
+                      </p>
+                    </button>
+                  </FadeInUp>
                 ))}
               </div>
             </div>
