@@ -316,7 +316,7 @@ export default function VoiceInput({ userId, childId, onLogSaved }: VoiceInputPr
                     onClick={confirmAndSave}
                     className="flex-1 rounded-xl bg-dusty-rose py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
                   >
-                    ✓ 저장
+                    저장
                   </button>
                 </div>
               </div>
@@ -358,7 +358,7 @@ export default function VoiceInput({ userId, childId, onLogSaved }: VoiceInputPr
                     onClick={() => { reset(); setTimeout(startListening, 100); }}
                     className="flex-1 rounded-xl bg-sage py-3 text-sm font-semibold text-white"
                   >
-                    🎙 다시 시도
+                    다시 시도
                   </button>
                 </div>
               </div>

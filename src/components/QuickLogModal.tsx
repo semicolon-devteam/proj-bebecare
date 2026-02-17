@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Droplets, Circle, RefreshCw } from 'lucide-react';
+import { X, Droplets, Circle, RefreshCw, Timer } from 'lucide-react';
 import { addBabyLog, LOG_TYPE_CONFIG, type LogType, type DiaperType } from '@/lib/baby-logs';
 import { IconByName } from '@/lib/icon-map';
 
@@ -104,7 +104,7 @@ export default function QuickLogModal({
               onClick={() => setMode('timer')}
               className={`flex-1 rounded-xl py-2 text-sm font-semibold border-2 transition-all ${mode === 'timer' ? 'bg-dusty-rose/10 border-dusty-rose text-dusty-rose' : 'bg-gray-50 border-transparent text-gray-400'}`}
             >
-              ⏱ 타이머
+              <Timer className="h-3.5 w-3.5 inline-block mr-1" />타이머
             </button>
           </div>
         )}
@@ -112,9 +112,9 @@ export default function QuickLogModal({
         {mode === 'timer' && canTimer ? (
           <button
             onClick={() => onStartTimer(logType)}
-            className="w-full rounded-xl bg-dusty-rose text-white py-3 font-semibold text-sm hover:opacity-90 transition-opacity"
+            className="w-full rounded-xl bg-dusty-rose text-white py-3 font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
           >
-            ⏱ 타이머 시작
+            <Timer className="h-4 w-4" /> 타이머 시작
           </button>
         ) : (
           <>

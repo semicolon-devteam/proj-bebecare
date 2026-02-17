@@ -13,7 +13,7 @@ import {
   type FetalComparisonResult,
   type FetalGrowthStandard,
 } from '@/lib/fetal-measurements';
-import { Users, TrendingUp, TrendingDown, Minus, Baby, AlertCircle, Plus, X, Calendar, ChevronDown, ChevronUp, Microscope } from 'lucide-react';
+import { Users, TrendingUp, TrendingDown, Minus, Baby, AlertCircle, Plus, X, Calendar, ChevronDown, ChevronUp, Microscope, Heart } from 'lucide-react';
 import { IconByName } from '@/lib/icon-map';
 
 interface PeerComparisonProps {
@@ -414,7 +414,7 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
                     {m.fl_mm != null && <span>FL {m.fl_mm}</span>}
                     {m.hc_mm != null && <span>HC {m.hc_mm}</span>}
                     {m.ac_mm != null && <span>AC {m.ac_mm}</span>}
-                    {m.heart_rate_bpm != null && <span>♥ {m.heart_rate_bpm}</span>}
+                    {m.heart_rate_bpm != null && <span className="inline-flex items-center gap-0.5"><Heart className="h-3 w-3 text-pink-400" />{m.heart_rate_bpm}</span>}
                   </div>
                   {m.memo && <p className="text-[10px] text-gray-400 mt-1">{m.memo}</p>}
                 </div>

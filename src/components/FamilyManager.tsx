@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { getMyFamily, createFamily, joinFamily, leaveFamily, type Family, type FamilyMember } from '@/lib/family';
-import { Users, Copy, Check, LogOut, Plus, UserPlus } from 'lucide-react';
+import { Users, Copy, Check, LogOut, Plus, UserPlus, Crown, User } from 'lucide-react';
 
 interface FamilyManagerProps {
   userId: string;
@@ -102,9 +102,7 @@ export default function FamilyManager({ userId }: FamilyManagerProps) {
           {members.map(m => (
             <div key={m.id} className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2">
               <div className="h-8 w-8 rounded-full bg-dusty-rose/10 flex items-center justify-center">
-                <span className="text-xs font-bold text-dusty-rose">
-                  {m.role === 'owner' ? '👑' : '👤'}
-                </span>
+                {m.role === 'owner' ? <Crown className="h-4 w-4 text-dusty-rose" /> : <User className="h-4 w-4 text-dusty-rose" />}
               </div>
               <div className="flex-1">
                 <p className="text-sm font-semibold text-gray-700">

@@ -60,7 +60,7 @@ function calculatePregnancyWeek(child: Child): { weeks: number; days: number } |
 }
 
 /* ── Circular Progress ── */
-function CircularProgress({ week, totalWeeks = 42, emoji }: { week: number; totalWeeks?: number; emoji: string }) {
+function CircularProgress({ week, totalWeeks = 42, fruitName }: { week: number; totalWeeks?: number; fruitName?: string | null }) {
   const pct = Math.min(week / totalWeeks, 1);
   const r = 54;
   const circ = 2 * Math.PI * r;
@@ -78,7 +78,9 @@ function CircularProgress({ week, totalWeeks = 42, emoji }: { week: number; tota
         />
       </svg>
       <div className="absolute flex flex-col items-center">
-        <span className="text-3xl">{emoji}</span>
+        <div className="h-12 w-12 rounded-full bg-pink-100 flex items-center justify-center">
+          <Baby className="h-6 w-6 text-dusty-rose" />
+        </div>
       </div>
     </div>
   );
@@ -209,7 +211,7 @@ export default function PregnancyWeeksTab({ userId }: PregnancyWeeksTabProps) {
       <div className="flex flex-col items-center gap-2">
         <CircularProgress
           week={selectedWeek}
-          emoji={current?.fruit_emoji || '🍇'}
+          fruitName={current?.fruit_name}
         />
         {currentWeekInfo && selectedWeek === currentWeekInfo.weeks ? (
           <p className="text-lg font-bold text-gray-900">
