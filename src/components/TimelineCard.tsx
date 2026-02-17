@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import type { TimelineEvent } from '@/lib/timeline';
 import { markEventRead, toggleBookmark, dismissEvent } from '@/lib/timeline';
-import { X, Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Star, ChevronDown, ChevronUp, Coins, Landmark, CreditCard, Calendar, Lightbulb, Baby, Pin, Users } from 'lucide-react';
 
 const categoryLabel: Record<string, string> = {
   pregnancy_planning: '임신 계획',
@@ -14,22 +14,13 @@ const categoryLabel: Record<string, string> = {
   government_support: '정부 지원',
 };
 
-const categoryBarColor: Record<string, string> = {
-  pregnancy_planning: 'bg-amber-500',
-  pregnancy: 'bg-dusty-rose',
-  postpartum: 'bg-purple-600',
-  parenting: 'bg-cyan-600',
-  work: 'bg-teal-600',
-  government_support: 'bg-violet-600',
-};
-
-const categoryDotColor: Record<string, string> = {
-  pregnancy_planning: 'bg-amber-500',
-  pregnancy: 'bg-dusty-rose',
-  postpartum: 'bg-purple-600',
-  parenting: 'bg-cyan-600',
-  work: 'bg-teal-600',
-  government_support: 'bg-violet-600',
+const categoryIconBg: Record<string, string> = {
+  pregnancy_planning: 'bg-amber-100 text-amber-600',
+  pregnancy: 'bg-pink-100 text-pink-600',
+  postpartum: 'bg-purple-100 text-purple-600',
+  parenting: 'bg-cyan-100 text-cyan-600',
+  work: 'bg-teal-100 text-teal-600',
+  government_support: 'bg-violet-100 text-violet-600',
 };
 
 const categoryBgColor: Record<string, string> = {
@@ -48,6 +39,26 @@ const categoryTextColor: Record<string, string> = {
   parenting: 'text-cyan-600',
   work: 'text-teal-600',
   government_support: 'text-violet-600',
+};
+
+const categoryGradient: Record<string, string> = {
+  pregnancy_planning: 'from-amber-50 to-orange-50',
+  pregnancy: 'from-pink-50 to-rose-50',
+  postpartum: 'from-purple-50 to-fuchsia-50',
+  parenting: 'from-cyan-50 to-teal-50',
+  work: 'from-teal-50 to-emerald-50',
+  government_support: 'from-violet-50 to-purple-50',
+};
+
+import { Shield, Heart, BookOpen, ClipboardList } from 'lucide-react';
+
+const categoryIcon: Record<string, React.ComponentType<{ className?: string }>> = {
+  pregnancy_planning: Calendar,
+  pregnancy: Heart,
+  postpartum: Shield,
+  parenting: Baby,
+  work: ClipboardList,
+  government_support: Coins,
 };
 
 export interface ProfileContext {
@@ -74,18 +85,15 @@ function diffFromToday(targetDate: Date): number {
 function computeDday(event: TimelineEvent, profile: ProfileContext): string | null {
   const c = event.content;
   if (!c) return null;
-
   if (c.week_start != null && profile.pregnancyStartDate) {
     const contentDate = new Date(profile.pregnancyStartDate.getTime() + c.week_start * 7 * 24 * 60 * 60 * 1000);
     return formatDday(diffFromToday(contentDate));
   }
-
   if (c.month_start != null && profile.childBirthDate) {
     const contentDate = new Date(profile.childBirthDate);
     contentDate.setMonth(contentDate.getMonth() + c.month_start);
     return formatDday(diffFromToday(contentDate));
   }
-
   return null;
 }
 
@@ -98,47 +106,49 @@ function getDdayStyle(dday: string): string {
     return 'bg-gray-50 text-gray-500 border border-gray-200';
   }
   if (dday.startsWith('D+')) return 'bg-blue-50 text-blue-500 border border-blue-200';
-  // 주차/개월 표시
   return 'bg-gray-50 text-gray-400 border border-gray-100';
 }
 
 // Key-value label icons for structured data
-const structuredKeyIcon: Record<string, string> = {
-  '발급처': '🏛️',
-  '카드사': '💳',
-  '지원금액': '💰',
-  '사용처': '🛒',
-  '발급기간': '📅',
-  '특이사항': '💡',
-  '대상': '👶',
+const structuredKeyIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  '발급처': Landmark,
+  '카드사': CreditCard,
+  '지원금액': Coins,
+  '발급기간': Calendar,
+  '특이사항': Lightbulb,
+  '대상': Baby,
 };
+const defaultStructuredIcon = Pin;
 
 function StructuredDataCard({ data, category }: { data: Record<string, string>; category: string }) {
   const bgColor = categoryBgColor[category] || 'bg-gray-50';
   const textColor = categoryTextColor[category] || 'text-gray-600';
-
-  // Show 지원금액 prominently if available
   const amount = data['지원금액'];
   const otherEntries = Object.entries(data).filter(([k]) => k !== '지원금액');
 
   return (
     <div className="space-y-2">
       {amount && (
-        <div className={`${bgColor} rounded-xl px-4 py-3 text-center`}>
+        <div className={`${bgColor} rounded-[1.25rem] px-4 py-3 text-center`}>
           <p className="text-xs text-gray-500 mb-0.5">지원금액</p>
           <p className={`text-lg font-bold ${textColor}`}>{amount}</p>
         </div>
       )}
       <div className="grid gap-1.5">
-        {otherEntries.map(([key, value]) => (
-          <div key={key} className="flex items-start gap-2 rounded-lg bg-gray-50 px-3 py-2">
-            <span className="text-sm flex-shrink-0">{structuredKeyIcon[key] || '📌'}</span>
-            <div className="min-w-0">
-              <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">{key}</span>
-              <p className="text-sm text-gray-700 leading-snug">{value}</p>
+        {otherEntries.map(([key, value]) => {
+          const IconComp = structuredKeyIconMap[key] || defaultStructuredIcon;
+          return (
+            <div key={key} className="flex items-start gap-2 rounded-lg bg-gray-50 px-3 py-2">
+              <div className="h-5 w-5 rounded-full bg-white flex items-center justify-center flex-shrink-0 mt-0.5">
+                <IconComp className="h-3 w-3 text-gray-400" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">{key}</span>
+                <p className="text-sm text-gray-700 leading-snug">{value}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -148,40 +158,39 @@ export default function TimelineCard({
   event,
   onUpdate,
   profile,
+  isHero,
 }: {
   event: TimelineEvent;
   onUpdate: () => void;
   profile?: ProfileContext;
+  isHero?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [bookmarked, setBookmarked] = useState(event.is_bookmarked);
 
   const category = event.content?.category || 'pregnancy';
   const label = categoryLabel[category] || category;
-  const barColor = categoryBarColor[category] || 'bg-gray-400';
-  const dotColor = categoryDotColor[category] || 'bg-gray-400';
+  const iconBg = categoryIconBg[category] || 'bg-gray-100 text-gray-500';
   const isGovernmentSupport = category === 'government_support';
   const hasStructuredData = isGovernmentSupport && event.content?.structured_data;
+  const CategoryIconComp = categoryIcon[category] || ClipboardList;
 
-  // D-Day: D-14 이내만 D-Day 뱃지, 그 외는 주차/개월 표시
   let dday: string | null = null;
   if (profile) {
     const rawDday = computeDday(event, profile);
     if (rawDday) {
-      // D-Day 숫자 파싱
       const match = rawDday.match(/^D-(\d+)$/);
       if (match) {
         const days = parseInt(match[1]);
         if (days <= 14) {
-          dday = rawDday; // D-14 이내: D-Day 뱃지
+          dday = rawDday;
         } else {
-          // 먼 콘텐츠: 주차/개월로 표시
           const c = event.content;
           if (c?.week_start != null) dday = `${c.week_start}주`;
           else if (c?.month_start != null) dday = `${c.month_start}개월`;
         }
       } else {
-        dday = rawDday; // D-Day, D+N 등은 그대로
+        dday = rawDday;
       }
     }
   }
@@ -191,9 +200,7 @@ export default function TimelineCard({
     else if (c.month_start != null) dday = `${c.month_start}개월`;
   }
 
-  // Target audience badge
   const audience = event.content?.target_audience;
-  const audienceLabel = audience === 'baby' ? '👶 아기' : audience === 'parent' ? '👨‍👩‍👧 부모' : null;
 
   const handleExpand = async () => {
     setExpanded(!expanded);
@@ -215,114 +222,144 @@ export default function TimelineCard({
     onUpdate();
   };
 
-  return (
-    <div
-      className={`card overflow-hidden ${
-        !event.is_read ? 'border-l-2 border-l-dusty-rose' : ''
-      }`}
-    >
-      {/* Category color bar */}
-      <div className={`h-1 ${barColor}`} />
-
-      {/* Header */}
-      <div className="p-4">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${dotColor}`} />
-            <span className="text-xs font-semibold text-gray-500">
-              {label}
-            </span>
-            {audienceLabel && (
-              <span className="text-[10px] font-medium text-gray-400 bg-gray-100 rounded-full px-1.5 py-0.5">
-                {audienceLabel}
-              </span>
-            )}
-            {dday && (
-              <span
-                className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold flex-shrink-0 ${getDdayStyle(dday)}`}
-              >
-                {dday}
-              </span>
-            )}
-            {!event.is_read && (
-              <span className="h-1.5 w-1.5 rounded-full bg-dusty-rose flex-shrink-0" />
-            )}
+  // Hero card style for urgent items
+  if (isHero) {
+    const gradient = categoryGradient[category] || 'from-gray-50 to-gray-100';
+    return (
+      <div className={`rounded-[1.25rem] bg-gradient-to-br ${gradient} border border-white/60 shadow-[0_2px_16px_rgba(194,114,138,0.06)] overflow-hidden ${!event.is_read ? 'ring-2 ring-dusty-rose/20' : ''}`}>
+        <div className="p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <div className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${iconBg}`}>
+                <CategoryIconComp className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-semibold text-gray-500">{label}</span>
+                  {audience === 'baby' && <Baby className="h-3 w-3 text-gray-400" />}
+                  {audience === 'parent' && <Users className="h-3 w-3 text-gray-400" />}
+                  {dday && (
+                    <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-bold ${getDdayStyle(dday)}`}>
+                      {dday}
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-base font-bold text-gray-900 leading-snug">{event.content?.title}</h3>
+                {event.content?.summary && (
+                  <p className="text-sm text-gray-500 mt-1 leading-relaxed">{event.content.summary}</p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-0.5 flex-shrink-0">
+              <button onClick={handleBookmark} className="p-1.5 rounded-lg hover:bg-white/60 transition-colors">
+                {bookmarked ? <Star className="h-4 w-4 text-amber-500 fill-amber-500" /> : <Star className="h-4 w-4 text-gray-300" />}
+              </button>
+              <button onClick={handleDismiss} className="p-1.5 rounded-lg hover:bg-white/60 transition-colors">
+                <X className="h-4 w-4 text-gray-300 hover:text-gray-500" />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-0.5 flex-shrink-0">
-            <button
-              onClick={handleBookmark}
-              className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              {bookmarked ? (
-                <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-              ) : (
-                <Star className="h-4 w-4 text-gray-300" />
-              )}
-            </button>
-            <button
-              onClick={handleDismiss}
-              className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <X className="h-4 w-4 text-gray-300 hover:text-gray-500" />
-            </button>
-          </div>
-        </div>
 
-        {/* Title + Collapse toggle */}
-        <div className="flex items-center justify-between mt-1.5">
-          <h3 className="text-sm font-bold text-gray-900 leading-snug flex-1">
-            {event.content?.title}
-          </h3>
-          <button
-            onClick={handleExpand}
-            className="p-1 ml-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
-          >
-            {expanded ? (
-              <ChevronUp className="h-4 w-4 text-gray-400" />
-            ) : (
-              <ChevronDown className="h-4 w-4 text-gray-400" />
-            )}
+          {/* Amount highlight for government support */}
+          {hasStructuredData && event.content?.structured_data?.['지원금액'] && (
+            <div className="mt-3 rounded-xl bg-white/60 px-4 py-2.5 text-center">
+              <p className={`text-lg font-bold ${categoryTextColor[category] || 'text-gray-700'}`}>
+                {event.content.structured_data['지원금액']}
+              </p>
+            </div>
+          )}
+
+          <button onClick={handleExpand} className="mt-2 text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors">
+            {expanded ? '접기' : '자세히 보기'}
           </button>
         </div>
 
-        {/* Summary always visible for government_support */}
-        {hasStructuredData && event.content?.summary && (
-          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-            {event.content.summary}
-          </p>
+        {expanded && (
+          <div className="px-5 pb-5 pt-0">
+            {hasStructuredData ? (
+              <StructuredDataCard data={event.content!.structured_data!} category={category} />
+            ) : (
+              <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{event.content?.body}</div>
+            )}
+            {event.content?.tags && event.content.tags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {event.content.tags.map((tag) => (
+                  <span key={tag} className="rounded-md bg-white/80 border border-gray-200 px-2 py-0.5 text-xs text-gray-500">#{tag}</span>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
+    );
+  }
 
-      {/* Expanded Body */}
+  // Compact card (default)
+  return (
+    <div className={`rounded-[1.25rem] bg-white border border-gray-100 shadow-[0_2px_12px_rgba(194,114,138,0.06)] overflow-hidden ${!event.is_read ? 'ring-1 ring-dusty-rose/20' : ''}`}>
+      <div className="p-4 flex gap-3">
+        {/* Left icon circle */}
+        <div className={`h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0 ${iconBg}`}>
+          <CategoryIconComp className="h-4 w-4" />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <span className="text-xs font-semibold text-gray-500">{label}</span>
+              {audience === 'baby' && <Baby className="h-3 w-3 text-gray-400" />}
+              {audience === 'parent' && <Users className="h-3 w-3 text-gray-400" />}
+              {dday && (
+                <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold flex-shrink-0 ${getDdayStyle(dday)}`}>
+                  {dday}
+                </span>
+              )}
+              {!event.is_read && <span className="h-1.5 w-1.5 rounded-full bg-dusty-rose flex-shrink-0" />}
+            </div>
+            <div className="flex items-center gap-0.5 flex-shrink-0">
+              <button onClick={handleBookmark} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+                {bookmarked ? <Star className="h-4 w-4 text-amber-500 fill-amber-500" /> : <Star className="h-4 w-4 text-gray-300" />}
+              </button>
+              <button onClick={handleDismiss} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+                <X className="h-4 w-4 text-gray-300 hover:text-gray-500" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mt-1">
+            <h3 className="text-sm font-bold text-gray-900 leading-snug flex-1">{event.content?.title}</h3>
+            <button onClick={handleExpand} className="p-1 ml-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0">
+              {expanded ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+            </button>
+          </div>
+
+          {/* Amount highlight for government support */}
+          {isGovernmentSupport && event.content?.structured_data?.['지원금액'] && (
+            <p className={`text-sm font-bold mt-1 ${categoryTextColor[category]}`}>
+              {event.content.structured_data['지원금액']}
+            </p>
+          )}
+
+          {hasStructuredData && event.content?.summary && (
+            <p className="text-xs text-gray-500 mt-1 leading-relaxed">{event.content.summary}</p>
+          )}
+        </div>
+      </div>
+
       {expanded && (
-        <div className="px-4 pb-4">
-          {/* Structured data card for government_support */}
+        <div className="px-4 pb-4 ml-12">
           {hasStructuredData ? (
-            <StructuredDataCard
-              data={event.content!.structured_data!}
-              category={category}
-            />
+            <StructuredDataCard data={event.content!.structured_data!} category={category} />
           ) : (
             <>
-              {event.content?.summary && (
-                <p className="text-sm text-gray-500 mb-2">
-                  {event.content.summary}
-                </p>
-              )}
-              <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                {event.content?.body}
-              </div>
+              {event.content?.summary && <p className="text-sm text-gray-500 mb-2">{event.content.summary}</p>}
+              <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{event.content?.body}</div>
             </>
           )}
           {event.content?.tags && event.content.tags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1.5">
               {event.content.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-md bg-gray-50 border border-gray-200 px-2 py-0.5 text-xs text-gray-500"
-                >
-                  #{tag}
-                </span>
+                <span key={tag} className="rounded-md bg-gray-50 border border-gray-200 px-2 py-0.5 text-xs text-gray-500">#{tag}</span>
               ))}
             </div>
           )}

@@ -14,7 +14,7 @@ export interface PeerNorm {
 export interface ComparisonResult {
   metric: string;
   label: string;
-  emoji: string;
+  icon: string;
   value: number;
   unit: string;
   p50: number;
@@ -77,7 +77,7 @@ export function compareToPeers(logs: BabyLog[], norms: PeerNorm[]): ComparisonRe
     results.push({
       metric: 'daily_formula_ml',
       label: '분유 섭취량',
-      emoji: '🍼',
+      icon: 'Baby',
       value: formulaMl,
       unit: 'ml',
       p50: formulaNorm.p50,
@@ -97,7 +97,7 @@ export function compareToPeers(logs: BabyLog[], norms: PeerNorm[]): ComparisonRe
     results.push({
       metric: 'daily_breast_count',
       label: '모유수유 횟수',
-      emoji: '🤱',
+      icon: 'Heart',
       value: breastCount,
       unit: '회',
       p50: breastNorm.p50,
@@ -119,7 +119,7 @@ export function compareToPeers(logs: BabyLog[], norms: PeerNorm[]): ComparisonRe
     results.push({
       metric: 'daily_baby_food_ml',
       label: '이유식 섭취량',
-      emoji: '🥣',
+      icon: 'UtensilsCrossed',
       value: babyFoodMl,
       unit: 'ml',
       p50: babyFoodNorm.p50,
@@ -142,7 +142,7 @@ export function compareToPeers(logs: BabyLog[], norms: PeerNorm[]): ComparisonRe
     results.push({
       metric: 'daily_sleep_hours',
       label: '수면 시간',
-      emoji: '😴',
+      icon: 'Moon',
       value: sleepHours,
       unit: '시간',
       p50: sleepNorm.p50,
@@ -162,7 +162,7 @@ export function compareToPeers(logs: BabyLog[], norms: PeerNorm[]): ComparisonRe
     results.push({
       metric: 'daily_diaper_count',
       label: '기저귀 교체',
-      emoji: '🧷',
+      icon: 'Shirt',
       value: diaperCount,
       unit: '회',
       p50: diaperNorm.p50,

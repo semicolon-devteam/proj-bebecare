@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronRight, ChevronLeft, X } from 'lucide-react';
+import { ChevronRight, ChevronLeft, X, Baby, BarChart3, Milk, ClipboardList, MessageCircle, BookOpen } from 'lucide-react';
 
 interface TourStep {
   target: string;
   title: string;
+  icon: React.ComponentType<{ className?: string }>;
   content: string;
   placement?: 'top' | 'bottom';
 }
@@ -13,37 +14,43 @@ interface TourStep {
 const STEPS: TourStep[] = [
   {
     target: '[data-tour="baby-profile"]',
-    title: '👶 아이 프로필',
+    title: '아이 프로필',
+    icon: Baby,
     content: '우리 아이 프로필이에요. 임신 주수나 월령이 자동으로 계산돼요.',
     placement: 'bottom',
   },
   {
     target: '[data-tour="today-summary"]',
-    title: '📊 오늘의 요약',
+    title: '오늘의 요약',
+    icon: BarChart3,
     content: '오늘 기록한 수유·수면·기저귀를 한눈에 확인할 수 있어요.',
     placement: 'bottom',
   },
   {
     target: '[data-tour="quick-log"]',
-    title: '🍼 퀵 기록',
+    title: '퀵 기록',
+    icon: Milk,
     content: '탭 한 번으로 분유, 수면, 기저귀 등을 바로 기록하세요!',
     placement: 'top',
   },
   {
     target: '[data-tour="tab-log"]',
-    title: '📝 기록 탭',
+    title: '기록 탭',
+    icon: ClipboardList,
     content: '상세 기록, 또래 비교, 음성 입력을 사용할 수 있어요.',
     placement: 'top',
   },
   {
     target: '[data-tour="tab-chat"]',
-    title: '💬 AI 상담',
+    title: 'AI 상담',
+    icon: MessageCircle,
     content: '궁금한 건 AI에게 물어보세요. 아이 기록을 참고해서 맞춤 조언을 드려요.',
     placement: 'top',
   },
   {
     target: '[data-tour="tab-explore"]',
-    title: '📖 정보 탭',
+    title: '정보 탭',
+    icon: BookOpen,
     content: '정부지원, 예방접종, 임신주수 정보를 한곳에서 확인하세요.',
     placement: 'top',
   },
@@ -186,7 +193,12 @@ export default function OnboardingGuide() {
         </button>
 
         {/* Content */}
-        <h3 className="text-base font-bold text-gray-900 mb-1.5 pr-6">{current.title}</h3>
+        <h3 className="text-base font-bold text-gray-900 mb-1.5 pr-6 flex items-center gap-2">
+          <span className="h-6 w-6 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
+            <current.icon className="h-3.5 w-3.5 text-dusty-rose" />
+          </span>
+          {current.title}
+        </h3>
         <p className="text-sm text-gray-500 leading-relaxed mb-4">{current.content}</p>
 
         {/* Progress + Navigation */}
@@ -215,7 +227,7 @@ export default function OnboardingGuide() {
               onClick={next}
               className="flex items-center gap-0.5 px-4 py-2 bg-dusty-rose text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
             >
-              {isLast ? '시작하기! 🎉' : (
+              {isLast ? '시작하기!' : (
                 <>다음 <ChevronRight className="h-4 w-4" /></>
               )}
             </button>

@@ -7,7 +7,7 @@ import TimelineCard from './TimelineCard';
 import { supabase } from '@/lib/supabase';
 import { getChildren } from '@/lib/children';
 import type { Child } from '@/lib/children';
-import { ChevronDown, ChevronUp, LayoutList, MapPin } from 'lucide-react';
+import { ChevronDown, ChevronUp, LayoutList, MapPin, Shield, Palmtree, Clock, Coins, Briefcase, ClipboardList, Baby, Users } from 'lucide-react';
 import EmptyStateIllustration from '@/components/illustrations/EmptyStateIllustration';
 import { CuteLoader, FadeInUp } from '@/components/animations/MotionWrappers';
 import WorkCalculator from './WorkCalculator';
@@ -95,12 +95,21 @@ function computeSortScore(event: TimelineEvent, profile: ProfileContext): number
 }
 
 // 직장 탭 서브카테고리 그룹핑
+const WORK_GROUP_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  protection: Shield,
+  leave: Palmtree,
+  worktime: Clock,
+  benefits: Coins,
+  life: Briefcase,
+  other: ClipboardList,
+};
+
 const WORK_GROUPS: { key: string; label: string; subcategories: string[] }[] = [
-  { key: 'protection', label: '🛡️ 모성보호 법적내용', subcategories: ['모성보호', '권리'] },
-  { key: 'leave', label: '🏖️ 휴가·휴직 제도', subcategories: ['출산휴가', '육아휴직', '배우자', '배우자휴가'] },
-  { key: 'worktime', label: '⏰ 근로시간 제도', subcategories: ['근로시간', '유연근무'] },
-  { key: 'benefits', label: '💰 급여·지원', subcategories: ['급여'] },
-  { key: 'life', label: '💼 직장생활', subcategories: ['직장생활', '인수인계', '시간관리', '모유수유', '복직', '자영업', '돌봄'] },
+  { key: 'protection', label: '모성보호 법적내용', subcategories: ['모성보호', '권리'] },
+  { key: 'leave', label: '휴가·휴직 제도', subcategories: ['출산휴가', '육아휴직', '배우자', '배우자휴가'] },
+  { key: 'worktime', label: '근로시간 제도', subcategories: ['근로시간', '유연근무'] },
+  { key: 'benefits', label: '급여·지원', subcategories: ['급여'] },
+  { key: 'life', label: '직장생활', subcategories: ['직장생활', '인수인계', '시간관리', '모유수유', '복직', '자영업', '돌봄'] },
 ];
 
 function WorkGroupedEvents({
@@ -132,7 +141,7 @@ function WorkGroupedEvents({
     // 미분류
     const remaining = events.filter(e => !used.has(e.id));
     if (remaining.length > 0) {
-      result.push({ key: 'other', label: '📋 기타', events: remaining });
+      result.push({ key: 'other', label: '기타', events: remaining });
     }
 
     return result;
@@ -155,9 +164,10 @@ function WorkGroupedEvents({
             onClick={() => toggleGroup(key)}
             className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
           >
-            <span className="text-sm font-semibold text-gray-700">
+            <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+              {(() => { const IconComp = WORK_GROUP_ICONS[key] || ClipboardList; return <IconComp className="h-4 w-4 text-teal-500" />; })()}
               {label}
-              <span className="ml-2 text-xs text-gray-400">({groupEvents.length})</span>
+              <span className="text-xs text-gray-400">({groupEvents.length})</span>
             </span>
             {expandedGroups.has(key) ? (
               <ChevronUp className="h-4 w-4 text-gray-400" />
@@ -172,6 +182,59 @@ function WorkGroupedEvents({
               ))}
             </div>
           )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function getTimeSection(ddayValue: number | null): string {
+  if (ddayValue === null) return '기타';
+  if (ddayValue < 0) return '지난 항목';
+  if (ddayValue <= 7) return '이번 주 확인할 것';
+  if (ddayValue <= 30) return '이번 달';
+  if (ddayValue <= 60) return '다음 달';
+  return '그 이후';
+}
+
+const SECTION_ORDER = ['이번 주 확인할 것', '이번 달', '다음 달', '그 이후', '기타', '지난 항목'];
+
+function TimeGroupedEvents({
+  events,
+  onUpdate,
+  profile,
+}: {
+  events: TimelineEvent[];
+  onUpdate: () => void;
+  profile: ProfileContext;
+}) {
+  const sections = useMemo(() => {
+    const map = new Map<string, TimelineEvent[]>();
+    for (const event of events) {
+      const ddayValue = computeDdayValue(event, profile);
+      const section = getTimeSection(ddayValue);
+      if (!map.has(section)) map.set(section, []);
+      map.get(section)!.push(event);
+    }
+    return SECTION_ORDER
+      .filter(s => map.has(s))
+      .map(s => ({ label: s, events: map.get(s)! }));
+  }, [events, profile]);
+
+  return (
+    <div className="space-y-5">
+      {sections.map(({ label, events: sectionEvents }) => (
+        <div key={label}>
+          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">{label}</h3>
+          <div className="space-y-3">
+            {sectionEvents.map((event) => {
+              const ddayValue = computeDdayValue(event, profile);
+              const isHero = ddayValue !== null && ddayValue >= 0 && ddayValue <= 7;
+              return (
+                <TimelineCard key={event.id} event={event} onUpdate={onUpdate} profile={profile} isHero={isHero} />
+              );
+            })}
+          </div>
         </div>
       ))}
     </div>
@@ -405,9 +468,9 @@ export default function TimelineFeed({ userId }: { userId: string }) {
         <div className="px-4 pb-2">
           <div className="flex gap-2">
             {([
-              { key: 'all', label: '전체' },
-              { key: 'baby', label: '👶 아기' },
-              { key: 'parent', label: '👨‍👩‍👧 엄마아빠' },
+              { key: 'all', label: '전체', icon: null },
+              { key: 'baby', label: '아기', icon: Baby },
+              { key: 'parent', label: '엄마아빠', icon: Users },
             ] as const).map((tab) => (
               <button
                 key={tab.key}
@@ -418,7 +481,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
                     : 'bg-violet-50 text-violet-600 hover:bg-violet-100'
                 }`}
               >
-                {tab.label}
+                {tab.icon && <tab.icon className="h-3 w-3 inline-block mr-0.5" />}{tab.label}
               </button>
             ))}
           </div>
@@ -490,11 +553,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
         ) : selectedCategory === 'work' ? (
           <WorkGroupedEvents events={sortedEvents} onUpdate={loadEvents} profile={profileCtx} />
         ) : (
-          <div className="space-y-3">
-            {sortedEvents.map((event) => (
-              <TimelineCard key={event.id} event={event} onUpdate={loadEvents} profile={profileCtx} />
-            ))}
-          </div>
+          <TimeGroupedEvents events={sortedEvents} onUpdate={loadEvents} profile={profileCtx} />
         )}
       </div>
     </div>

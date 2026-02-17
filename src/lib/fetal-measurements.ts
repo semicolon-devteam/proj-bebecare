@@ -45,7 +45,7 @@ export interface FetalGrowthStandard {
 export interface FetalComparisonResult {
   metric: string;
   label: string;
-  emoji: string;
+  icon: string;
   value: number;
   unit: string;
   p50: number;
@@ -55,13 +55,13 @@ export interface FetalComparisonResult {
   norm: FetalGrowthStandard | null;
 }
 
-const METRIC_INFO: Record<string, { label: string; emoji: string; unit: string }> = {
-  bpd_mm: { label: '머리 직경 (BPD)', emoji: '🧠', unit: 'mm' },
-  fl_mm: { label: '대퇴골 길이 (FL)', emoji: '🦴', unit: 'mm' },
-  ac_mm: { label: '복부 둘레 (AC)', emoji: '⭕', unit: 'mm' },
-  hc_mm: { label: '머리 둘레 (HC)', emoji: '📏', unit: 'mm' },
-  efw_g: { label: '예측 체중 (EFW)', emoji: '⚖️', unit: 'g' },
-  heart_rate_bpm: { label: '심박수', emoji: '💓', unit: 'bpm' },
+const METRIC_INFO: Record<string, { label: string; icon: string; unit: string }> = {
+  bpd_mm: { label: '머리 직경 (BPD)', icon: 'Circle', unit: 'mm' },
+  fl_mm: { label: '대퇴골 길이 (FL)', icon: 'Bone', unit: 'mm' },
+  ac_mm: { label: '복부 둘레 (AC)', icon: 'Circle', unit: 'mm' },
+  hc_mm: { label: '머리 둘레 (HC)', icon: 'Ruler', unit: 'mm' },
+  efw_g: { label: '예측 체중 (EFW)', icon: 'Scale', unit: 'g' },
+  heart_rate_bpm: { label: '심박수', icon: 'Heart', unit: 'bpm' },
 };
 
 /**
@@ -205,7 +205,7 @@ export function compareFetalToPeers(
     results.push({
       metric,
       label: info.label,
-      emoji: info.emoji,
+      icon: info.icon,
       value: numValue,
       unit: info.unit,
       p50: std.p50,

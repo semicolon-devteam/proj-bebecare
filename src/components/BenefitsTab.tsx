@@ -46,14 +46,16 @@ const REGIONS = [
   '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주',
 ];
 
-const subcategoryIcons: Record<string, string> = {
-  '현금지원': '💰',
-  '건강관리': '🏥',
-  '교육': '📚',
-  '돌봄': '👶',
-  '주거': '🏠',
-  '세금·보험': '📋',
-  '일·가정양립': '⚖️',
+import { Coins as CoinsIcon, Hospital as HospitalIcon, BookOpen as BookOpenIcon, Baby as BabyIcon, Home as HomeIcon, ClipboardList as ClipboardIcon, Scale as ScaleIcon, Pin as PinIcon } from 'lucide-react';
+
+const subcategoryIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  '현금지원': CoinsIcon,
+  '건강관리': HospitalIcon,
+  '교육': BookOpenIcon,
+  '돌봄': BabyIcon,
+  '주거': HomeIcon,
+  '세금·보험': ClipboardIcon,
+  '일·가정양립': ScaleIcon,
 };
 
 export default function BenefitsTab({ userId }: { userId: string }) {
@@ -233,7 +235,7 @@ export default function BenefitsTab({ userId }: { userId: string }) {
                   : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
               }`}
             >
-              {subcategoryIcons[sub] || '📌'} {sub}
+              {(() => { const I = subcategoryIconMap[sub] || PinIcon; return <I className="h-3 w-3 inline-block" />; })()} {sub}
             </button>
           ))}
         </div>
@@ -315,7 +317,7 @@ function BenefitCard({
             )}
             {benefit.subcategory && (
               <span className="text-[10px] text-gray-400 font-medium">
-                {subcategoryIcons[benefit.subcategory] || '📌'} {benefit.subcategory}
+                {(() => { const I = subcategoryIconMap[benefit.subcategory] || PinIcon; return <I className="h-3 w-3 inline-block" />; })()} {benefit.subcategory}
               </span>
             )}
           </div>
@@ -387,7 +389,7 @@ function BenefitDetailSheet({
             <div className="flex items-center gap-2 mb-1">
               {benefit.subcategory && (
                 <span className="text-xs text-sage font-medium">
-                  {subcategoryIcons[benefit.subcategory] || '📌'} {benefit.subcategory}
+                  {(() => { const I = subcategoryIconMap[benefit.subcategory] || PinIcon; return <I className="h-3 w-3 inline-block" />; })()} {benefit.subcategory}
                 </span>
               )}
               {benefit.region_filter && (

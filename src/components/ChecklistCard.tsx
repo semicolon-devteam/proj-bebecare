@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getChecklistForAge, type ChecklistItem } from '@/lib/checklist';
+import { IconByName } from '@/lib/icon-map';
 import { getChildren } from '@/lib/children';
 import { getAgeMonths } from '@/lib/peer-comparison';
 import { CheckSquare, Square, ChevronDown, ChevronUp, ClipboardCheck } from 'lucide-react';
@@ -108,7 +109,9 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs">{item.emoji}</span>
+                  <span className="h-5 w-5 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <IconByName name={item.icon} className="h-3 w-3 text-gray-500" />
+                  </span>
                   <span className={`text-sm font-semibold ${isDone ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
                     {item.title}
                   </span>

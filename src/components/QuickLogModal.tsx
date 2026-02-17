@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Droplets, Circle, RefreshCw } from 'lucide-react';
 import { addBabyLog, LOG_TYPE_CONFIG, type LogType, type DiaperType } from '@/lib/baby-logs';
+import { IconByName } from '@/lib/icon-map';
 
 interface QuickLogModalProps {
   userId: string;
@@ -58,7 +59,7 @@ export default function QuickLogModal({
         diaper_type: needsDiaperType ? diaperType : null,
         memo: memo || null,
       });
-      setToast({ type: 'success', message: `${config.emoji} ${config.label} 기록 완료!` });
+      setToast({ type: 'success', message: `${config.label} 기록 완료!` });
       onSaved?.();
       setTimeout(() => onClose(), 1200);
     } catch {
@@ -80,7 +81,9 @@ export default function QuickLogModal({
       <div className="w-full max-w-lg bg-white rounded-t-2xl p-5 animate-slide-up" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-xl">{config.emoji}</span>
+            <div className={`h-8 w-8 rounded-full flex items-center justify-center ${config.bgColor}`}>
+              <IconByName name={config.icon} className={`h-4 w-4 ${config.color}`} />
+            </div>
             <h2 className="text-lg font-bold text-gray-900">{config.label} 기록</h2>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100">
@@ -140,9 +143,9 @@ export default function QuickLogModal({
               <div className="mb-3">
                 <label className="text-xs font-semibold text-gray-500 mb-1 block">종류</label>
                 <div className="flex gap-2">
-                  {([['wet', '💧 소변'], ['dirty', '💩 대변'], ['mixed', '🔄 혼합']] as [DiaperType, string][]).map(([type, label]) => (
-                    <button key={type} onClick={() => setDiaperType(type)} className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold border-2 transition-all ${diaperType === type ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-gray-50 border-transparent text-gray-400'}`}>
-                      {label}
+                  {([['wet', '소변', Droplets], ['dirty', '대변', Circle], ['mixed', '혼합', RefreshCw]] as [DiaperType, string, React.ComponentType<{className?: string}>][]).map(([type, label, DiaperIcon]) => (
+                    <button key={type} onClick={() => setDiaperType(type)} className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold border-2 transition-all flex items-center justify-center gap-1.5 ${diaperType === type ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-gray-50 border-transparent text-gray-400'}`}>
+                      <DiaperIcon className="h-3.5 w-3.5" /> {label}
                     </button>
                   ))}
                 </div>

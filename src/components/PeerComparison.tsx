@@ -13,7 +13,8 @@ import {
   type FetalComparisonResult,
   type FetalGrowthStandard,
 } from '@/lib/fetal-measurements';
-import { Users, TrendingUp, TrendingDown, Minus, Baby, AlertCircle, Plus, X, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import { Users, TrendingUp, TrendingDown, Minus, Baby, AlertCircle, Plus, X, Calendar, ChevronDown, ChevronUp, Microscope } from 'lucide-react';
+import { IconByName } from '@/lib/icon-map';
 
 interface PeerComparisonProps {
   userId: string;
@@ -41,7 +42,9 @@ function PercentileBar({ result }: { result: AnyComparisonResult }) {
     <div className="rounded-xl bg-white border border-gray-100 p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-xl">{result.emoji}</span>
+          <span className="h-7 w-7 rounded-full bg-gray-100 flex items-center justify-center">
+            <IconByName name={result.icon} className="h-4 w-4 text-gray-600" />
+          </span>
           <span className="text-sm font-bold text-gray-800">{result.label}</span>
         </div>
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${statusColor}`}>
@@ -150,7 +153,10 @@ function FetalMeasurementModal({
         <div className="px-5 pb-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-5">
-            <h3 className="text-lg font-bold text-gray-900">🔬 초음파 측정값 입력</h3>
+            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+              <Microscope className="h-5 w-5 text-dusty-rose" />
+              초음파 측정값 입력
+            </h3>
             <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
               <X className="h-5 w-5 text-gray-400" />
             </button>
@@ -340,7 +346,7 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2 px-1">
-        <span className="text-lg">🤰</span>
+        <Baby className="h-5 w-5 text-dusty-rose" />
         <h3 className="text-base font-bold text-gray-900">태아 성장 비교</h3>
         <span className="text-xs text-gray-400 ml-auto">
           {child?.nickname || '태명'} · 임신 {weeks}주차
@@ -349,7 +355,9 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
 
       {fetalResults.length === 0 ? (
         <div className="rounded-xl bg-gray-50 border border-gray-100 p-6 text-center">
-          <div className="text-3xl mb-2">🔬</div>
+          <div className="h-12 w-12 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-2">
+            <Microscope className="h-6 w-6 text-dusty-rose" />
+          </div>
           <p className="text-sm text-gray-500 font-semibold">
             초음파 측정값을 입력하면<br />또래와 비교해드릴게요
           </p>
@@ -406,7 +414,7 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
                     {m.fl_mm != null && <span>FL {m.fl_mm}</span>}
                     {m.hc_mm != null && <span>HC {m.hc_mm}</span>}
                     {m.ac_mm != null && <span>AC {m.ac_mm}</span>}
-                    {m.heart_rate_bpm != null && <span>💓{m.heart_rate_bpm}</span>}
+                    {m.heart_rate_bpm != null && <span>♥ {m.heart_rate_bpm}</span>}
                   </div>
                   {m.memo && <p className="text-[10px] text-gray-400 mt-1">{m.memo}</p>}
                 </div>

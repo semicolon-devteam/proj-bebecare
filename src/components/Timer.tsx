@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { addBabyLog, LOG_TYPE_CONFIG, type LogType } from '@/lib/baby-logs';
 import { X, Square } from 'lucide-react';
+import { IconByName } from '@/lib/icon-map';
 
 interface TimerState {
   active: boolean;
@@ -111,7 +112,7 @@ export default function TimerBar() {
   return (
     <div className={`sticky top-0 z-50 flex items-center justify-between px-4 py-2 ${config.bgColor} border-b border-gray-200`}>
       <div className="flex items-center gap-2">
-        <span className="text-lg">{config.emoji}</span>
+        <IconByName name={config.icon} className={`h-5 w-5 ${config.color}`} />
         <span className={`text-sm font-bold ${config.color}`}>{config.label}</span>
         <span className="text-sm font-mono font-bold text-gray-700">{elapsed}</span>
       </div>

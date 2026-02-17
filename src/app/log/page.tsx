@@ -16,7 +16,10 @@ import VoiceInput from '@/components/VoiceInput';
 import PeerComparison from '@/components/PeerComparison';
 import {
   Plus, Trash2, ChevronLeft, ChevronRight, X, BarChart3, ClipboardList, Users,
+  Baby as BabyIcon, Moon as MoonIcon, Shirt as ShirtIcon, Heart as HeartIcon,
+  Bath as BathIcon, Pill as PillIcon, Syringe as SyringeIcon, UtensilsCrossed,
 } from 'lucide-react';
+import { IconByName } from '@/lib/icon-map';
 import EmptyStateIllustration from '@/components/illustrations/EmptyStateIllustration';
 import { FadeInUp, StaggerContainer, StaggerItem, CuteLoader } from '@/components/animations/MotionWrappers';
 import {
@@ -179,9 +182,11 @@ export default function LogPage() {
                 <button
                   key={type}
                   onClick={() => { setDefaultLogType(type); setShowAddModal(true); }}
-                  className={`flex flex-col items-center gap-1 min-w-[56px] rounded-xl p-2 ${config.bgColor} hover:opacity-80 transition-opacity`}
+                  className={`flex flex-col items-center gap-1 min-w-[56px] rounded-[1.25rem] p-2 ${config.bgColor} hover:opacity-80 transition-opacity`}
                 >
-                  <span className="text-xl">{config.emoji}</span>
+                  <div className="h-8 w-8 rounded-full bg-white/60 flex items-center justify-center">
+                    <IconByName name={config.icon} className={`h-4 w-4 ${config.color}`} />
+                  </div>
                   <span className={`text-[10px] font-semibold ${config.color}`}>{config.label}</span>
                 </button>
               ))}
@@ -191,16 +196,16 @@ export default function LogPage() {
           {/* Summary bar */}
           {summary && (
             <div className="px-4 py-2.5 bg-gray-50 border-b border-border">
-              <div className="flex gap-3 text-xs text-gray-500 overflow-x-auto">
-                {summary.totalFormulaMl > 0 && <span>🍼 {summary.totalFormulaMl}ml</span>}
-                {summary.totalBabyFoodMl > 0 && <span>🥣 {summary.totalBabyFoodMl}ml</span>}
-                {summary.totalBreastCount > 0 && <span>🤱 {summary.totalBreastCount}회</span>}
+              <div className="flex gap-3 text-xs text-gray-500 overflow-x-auto items-center">
+                {summary.totalFormulaMl > 0 && <span className="flex items-center gap-1"><BabyIcon className="h-3 w-3 text-orange-400" />{summary.totalFormulaMl}ml</span>}
+                {summary.totalBabyFoodMl > 0 && <span className="flex items-center gap-1"><UtensilsCrossed className="h-3 w-3 text-green-400" />{summary.totalBabyFoodMl}ml</span>}
+                {summary.totalBreastCount > 0 && <span className="flex items-center gap-1"><HeartIcon className="h-3 w-3 text-pink-400" />{summary.totalBreastCount}회</span>}
                 {summary.totalSleepMinutes > 0 && (
-                  <span>😴 {Math.floor(summary.totalSleepMinutes / 60)}시간 {summary.totalSleepMinutes % 60}분</span>
+                  <span className="flex items-center gap-1"><MoonIcon className="h-3 w-3 text-indigo-400" />{Math.floor(summary.totalSleepMinutes / 60)}시간 {summary.totalSleepMinutes % 60}분</span>
                 )}
-                {summary.totalDiaperCount > 0 && <span>🧷 {summary.totalDiaperCount}회</span>}
-                {summary.bathCount > 0 && <span>🛁 {summary.bathCount}회</span>}
-                {summary.medicineCount > 0 && <span>💊 {summary.medicineCount}회</span>}
+                {summary.totalDiaperCount > 0 && <span className="flex items-center gap-1"><ShirtIcon className="h-3 w-3 text-amber-500" />{summary.totalDiaperCount}회</span>}
+                {summary.bathCount > 0 && <span className="flex items-center gap-1"><BathIcon className="h-3 w-3 text-cyan-400" />{summary.bathCount}회</span>}
+                {summary.medicineCount > 0 && <span className="flex items-center gap-1"><PillIcon className="h-3 w-3 text-red-400" />{summary.medicineCount}회</span>}
                 {logs.length === 0 && <span className="text-gray-300">기록이 없어요</span>}
               </div>
             </div>
@@ -240,8 +245,8 @@ export default function LogPage() {
                   return (
                     <StaggerItem key={log.id}>
                     <div className="flex items-center gap-3 rounded-xl bg-white border border-gray-100 px-4 py-3">
-                      <div className={`h-10 w-10 rounded-full flex items-center justify-center text-lg flex-shrink-0 ${config.bgColor}`}>
-                        {config.emoji}
+                      <div className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${config.bgColor}`}>
+                        <IconByName name={config.icon} className={`h-5 w-5 ${config.color}`} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -435,7 +440,7 @@ function StatsTab({ userId }: { userId: string }) {
 
       {/* Feeding chart */}
       <div className="rounded-xl bg-white border border-gray-100 p-4">
-        <h3 className="text-sm font-bold text-gray-700 mb-3">🍼 수유량 추이 (ml)</h3>
+        <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5"><BabyIcon className="h-4 w-4 text-orange-400" /> 수유량 추이 (ml)</h3>
         <ResponsiveContainer width="100%" height={180}>
           <LineChart data={feedingData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -449,7 +454,7 @@ function StatsTab({ userId }: { userId: string }) {
 
       {/* Sleep chart */}
       <div className="rounded-xl bg-white border border-gray-100 p-4">
-        <h3 className="text-sm font-bold text-gray-700 mb-3">😴 수면 시간 추이 (시간)</h3>
+        <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5"><MoonIcon className="h-4 w-4 text-indigo-400" /> 수면 시간 추이 (시간)</h3>
         <ResponsiveContainer width="100%" height={180}>
           <LineChart data={sleepData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -463,7 +468,7 @@ function StatsTab({ userId }: { userId: string }) {
 
       {/* Diaper chart */}
       <div className="rounded-xl bg-white border border-gray-100 p-4 mb-8">
-        <h3 className="text-sm font-bold text-gray-700 mb-3">🧷 기저귀 교체 횟수</h3>
+        <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5"><ShirtIcon className="h-4 w-4 text-amber-500" /> 기저귀 교체 횟수</h3>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={diaperData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

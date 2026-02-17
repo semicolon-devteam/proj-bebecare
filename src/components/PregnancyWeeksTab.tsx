@@ -19,6 +19,7 @@ import {
   Stethoscope,
   User,
 } from 'lucide-react';
+import { IconByName } from '@/lib/icon-map';
 
 interface PregnancyWeeksTabProps {
   userId: string;
@@ -363,7 +364,7 @@ function PercentileBar({ result }: { result: FetalComparisonResult }) {
     <div className="rounded-xl bg-white border border-gray-100 p-4">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-lg">{result.emoji}</span>
+          <IconByName name={result.icon} className="h-5 w-5 text-gray-600" />
           <span className="text-sm font-bold text-gray-800">{result.label}</span>
         </div>
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusColor}`}>

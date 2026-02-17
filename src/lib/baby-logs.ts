@@ -16,15 +16,15 @@ export interface BabyLog {
   created_at: string;
 }
 
-export const LOG_TYPE_CONFIG: Record<LogType, { emoji: string; label: string; color: string; bgColor: string }> = {
-  formula: { emoji: '🍼', label: '분유', color: 'text-orange-500', bgColor: 'bg-orange-100' },
-  baby_food: { emoji: '🥣', label: '이유식', color: 'text-green-500', bgColor: 'bg-green-100' },
-  breast: { emoji: '🤱', label: '모유', color: 'text-pink-500', bgColor: 'bg-pink-100' },
-  diaper: { emoji: '🧷', label: '기저귀', color: 'text-amber-600', bgColor: 'bg-amber-100' },
-  sleep: { emoji: '😴', label: '수면', color: 'text-indigo-500', bgColor: 'bg-indigo-100' },
-  bath: { emoji: '🛁', label: '목욕', color: 'text-cyan-500', bgColor: 'bg-cyan-100' },
-  medicine: { emoji: '💊', label: '투약', color: 'text-red-500', bgColor: 'bg-red-100' },
-  vaccination: { emoji: '💉', label: '예방접종', color: 'text-teal-500', bgColor: 'bg-teal-100' },
+export const LOG_TYPE_CONFIG: Record<LogType, { icon: string; label: string; color: string; bgColor: string }> = {
+  formula: { icon: 'Baby', label: '분유', color: 'text-orange-500', bgColor: 'bg-orange-100' },
+  baby_food: { icon: 'UtensilsCrossed', label: '이유식', color: 'text-green-500', bgColor: 'bg-green-100' },
+  breast: { icon: 'Heart', label: '모유', color: 'text-pink-500', bgColor: 'bg-pink-100' },
+  diaper: { icon: 'Shirt', label: '기저귀', color: 'text-amber-600', bgColor: 'bg-amber-100' },
+  sleep: { icon: 'Moon', label: '수면', color: 'text-indigo-500', bgColor: 'bg-indigo-100' },
+  bath: { icon: 'Bath', label: '목욕', color: 'text-cyan-500', bgColor: 'bg-cyan-100' },
+  medicine: { icon: 'Pill', label: '투약', color: 'text-red-500', bgColor: 'bg-red-100' },
+  vaccination: { icon: 'Syringe', label: '예방접종', color: 'text-teal-500', bgColor: 'bg-teal-100' },
 };
 
 export async function getBabyLogs(userId: string, date: string): Promise<BabyLog[]> {

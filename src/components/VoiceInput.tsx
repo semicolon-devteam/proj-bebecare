@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Mic, MicOff, Loader2, Check, X, AlertCircle } from 'lucide-react';
 import { parseVoiceInput, voiceLogToRecord, type VoiceParseResult } from '@/lib/voice-parse';
+import { IconByName } from '@/lib/icon-map';
 import { addBabyLog, LOG_TYPE_CONFIG } from '@/lib/baby-logs';
 
 interface VoiceInputProps {
@@ -282,7 +283,7 @@ export default function VoiceInput({ userId, childId, onLogSaved }: VoiceInputPr
                     const config = LOG_TYPE_CONFIG[log.log_type];
                     return (
                       <div key={i} className={`flex items-center gap-3 rounded-xl px-4 py-3 ${config.bgColor}`}>
-                        <span className="text-xl">{config.emoji}</span>
+                        <IconByName name={config.icon} className={`h-5 w-5 ${config.color}`} />
                         <div>
                           <span className={`text-sm font-bold ${config.color}`}>{config.label}</span>
                           {log.amount_ml && <span className="text-sm text-gray-500 ml-2">{log.amount_ml}ml</span>}
