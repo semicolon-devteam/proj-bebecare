@@ -3,9 +3,10 @@ import './globals.css';
 import TimerBar from '@/components/Timer';
 import BottomTabBar from '@/components/BottomTabBar';
 import LayoutWrapper from '@/components/LayoutWrapper';
+import { SITE_URL } from '@/lib/constants';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://bebecare.vercel.app'),
+  metadataBase: new URL(SITE_URL),
   title: 'BebeCare - 임신·출산·육아 슈퍼앱',
   description: 'AI 기반 맞춤 정보 제공 - 임신부터 육아까지 모든 정보를 한 곳에서',
   manifest: '/manifest.json',
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'BebeCare - 임신·출산·육아 슈퍼앱',
     description: 'AI 기반 맞춤 정보 제공 - 임신부터 육아까지 모든 정보를 한 곳에서',
-    url: 'https://bebecare.vercel.app',
+    url: SITE_URL,
     siteName: 'BebeCare',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'BebeCare - 임신·출산·육아 슈퍼앱' }],
     locale: 'ko_KR',
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
     images: ['/og-image.png'],
   },
   alternates: {
-    canonical: 'https://bebecare.vercel.app',
+    canonical: SITE_URL,
   },
   robots: {
     index: true,
