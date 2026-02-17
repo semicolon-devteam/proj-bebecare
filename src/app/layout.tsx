@@ -5,6 +5,7 @@ import BottomTabBar from '@/components/BottomTabBar';
 import LayoutWrapper from '@/components/LayoutWrapper';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://bebecare.vercel.app'),
   title: 'BebeCare - 임신·출산·육아 슈퍼앱',
   description: 'AI 기반 맞춤 정보 제공 - 임신부터 육아까지 모든 정보를 한 곳에서',
   manifest: '/manifest.json',
@@ -22,6 +23,28 @@ export const metadata: Metadata = {
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
+  },
+  openGraph: {
+    title: 'BebeCare - 임신·출산·육아 슈퍼앱',
+    description: 'AI 기반 맞춤 정보 제공 - 임신부터 육아까지 모든 정보를 한 곳에서',
+    url: 'https://bebecare.vercel.app',
+    siteName: 'BebeCare',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'BebeCare - 임신·출산·육아 슈퍼앱' }],
+    locale: 'ko_KR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'BebeCare - 임신·출산·육아 슈퍼앱',
+    description: 'AI 기반 맞춤 정보 제공 - 임신부터 육아까지 모든 정보를 한 곳에서',
+    images: ['/og-image.png'],
+  },
+  alternates: {
+    canonical: 'https://bebecare.vercel.app',
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
