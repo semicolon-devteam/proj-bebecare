@@ -7,6 +7,14 @@
   --color-sage: #7C9A82;
   --color-sage-light: #A3BDA8;
 
+  /* Semantic aliases — 단일 소스 */
+  --color-primary: #C2728A;
+  --color-primary-light: #D4A0B0;
+  --color-primary-dark: #A85C73;
+  --color-secondary: #7C9A82;
+  --color-success: #22C55E;
+  --color-warning: #EF4444;
+
   --color-surface: #FEF7F2;
   --color-surface-warm: #FFF9F5;
   --color-border: #F0E6E0;
