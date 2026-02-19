@@ -15,6 +15,7 @@ import {
 } from '@/lib/fetal-measurements';
 import { Users, TrendingUp, TrendingDown, Minus, Baby, AlertCircle, Plus, X, Calendar, ChevronDown, ChevronUp, Microscope, Heart } from 'lucide-react';
 import { IconByName } from '@/lib/icon-map';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface PeerComparisonProps {
   userId: string;
@@ -289,7 +290,7 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
   if (loading) {
     return (
       <div className="flex justify-center py-8">
-        <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
+        <LoadingSpinner text="" />
       </div>
     );
   }

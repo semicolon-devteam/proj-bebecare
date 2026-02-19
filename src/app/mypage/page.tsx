@@ -9,6 +9,7 @@ import type { Child, ChildInput } from '@/lib/children';
 import { REGION_DATA } from '@/lib/regions';
 import { ChevronLeft, Baby, Briefcase, MapPin, Settings, LogOut, Plus, Pencil, Trash2, Heart, FileText, Save, Check, Bell, BellOff, Users, Download } from 'lucide-react';
 import FamilyManager from '@/components/FamilyManager';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function MyPage() {
   const router = useRouter();
@@ -255,7 +256,7 @@ export default function MyPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
+        <LoadingSpinner />
       </div>
     );
   }

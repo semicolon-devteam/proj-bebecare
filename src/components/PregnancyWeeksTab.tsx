@@ -20,6 +20,7 @@ import {
   User,
 } from 'lucide-react';
 import { IconByName } from '@/lib/icon-map';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface PregnancyWeeksTabProps {
   userId: string;
@@ -185,7 +186,7 @@ export default function PregnancyWeeksTab({ userId }: PregnancyWeeksTabProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
+        <LoadingSpinner text="" />
       </div>
     );
   }

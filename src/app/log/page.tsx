@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
 import { getChildren } from '@/lib/children';
 import type { Child } from '@/lib/children';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import {
   getBabyLogs, getBabyLogsRange, addBabyLog, deleteBabyLog, computeDailySummary,
   LOG_TYPE_CONFIG,
@@ -226,7 +227,7 @@ export default function LogPage() {
           <div className="px-4 py-3 pb-24">
             {loading ? (
               <div className="flex justify-center py-12">
-                <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
+                <LoadingSpinner text="" />
               </div>
             ) : logs.length === 0 ? (
               <FadeInUp>
@@ -388,7 +389,7 @@ function StatsTab({ userId }: { userId: string }) {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
+        <LoadingSpinner text="" />
       </div>
     );
   }

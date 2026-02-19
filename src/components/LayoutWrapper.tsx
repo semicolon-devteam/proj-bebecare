@@ -34,11 +34,11 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const shouldShowTabBar = !loading && user && !hideTabBarRoutes.includes(pathname);
 
   return (
-    <>
+    <div className="mx-auto w-full max-w-2xl md:max-w-4xl">
       <div className={shouldShowTabBar ? 'pb-20' : ''}>
         {children}
       </div>
       <BottomTabBar isVisible={!!shouldShowTabBar} />
-    </>
+    </div>
   );
 }

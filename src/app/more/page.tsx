@@ -5,17 +5,18 @@ import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
-import { 
-  Menu, 
-  User as UserIcon, 
-  Bell, 
-  TrendingUp, 
-  Users, 
-  HelpCircle, 
-  MessageSquare, 
+import {
+  Menu,
+  User as UserIcon,
+  Bell,
+  TrendingUp,
+  Users,
+  HelpCircle,
+  MessageSquare,
   LogOut,
   ChevronRight
 } from 'lucide-react';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function MorePage() {
   const router = useRouter();
@@ -109,10 +110,7 @@ export default function MorePage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
-          <p className="text-sm text-gray-500">로딩 중...</p>
-        </div>
+        <LoadingSpinner />
       </div>
     );
   }
