@@ -125,7 +125,7 @@ export default function TimerBar() {
           <Square className="h-3 w-3" aria-hidden="true" />
           {saving ? '저장중...' : '종료'}
         </button>
-        <button onClick={cancelTimer} className="p-1 rounded-lg hover:bg-white/50">
+        <button onClick={cancelTimer} aria-label="타이머 취소" className="p-1 rounded-lg hover:bg-white/50">
           <X className="h-4 w-4 text-gray-500" aria-hidden="true" />
         </button>
       </div>

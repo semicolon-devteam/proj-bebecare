@@ -111,7 +111,7 @@ export default function FamilyManager({ userId }: FamilyManagerProps) {
                 <p className="text-[10px] text-gray-400">{m.role === 'owner' ? '관리자' : '멤버'}</p>
               </div>
               {m.user_id === userId && !isOwner && (
-                <button onClick={handleLeave} className="p-1.5 rounded-lg hover:bg-red-50">
+                <button onClick={handleLeave} aria-label="가족 나가기" className="p-1.5 rounded-lg hover:bg-red-50">
                   <LogOut className="h-4 w-4 text-red-400" aria-hidden="true" />
                 </button>
               )}
@@ -124,7 +124,7 @@ export default function FamilyManager({ userId }: FamilyManagerProps) {
           <p className="text-[10px] font-semibold text-amber-600 mb-1">초대 코드</p>
           <div className="flex items-center gap-2">
             <span className="text-lg font-mono font-bold text-amber-800 tracking-widest">{family.invite_code}</span>
-            <button onClick={copyCode} className="p-1.5 rounded-lg hover:bg-amber-100">
+            <button onClick={copyCode} aria-label="초대 코드 복사" className="p-1.5 rounded-lg hover:bg-amber-100">
               {copied ? <Check className="h-4 w-4 text-green-500" aria-hidden="true" /> : <Copy className="h-4 w-4 text-amber-500" aria-hidden="true" />}
             </button>
           </div>

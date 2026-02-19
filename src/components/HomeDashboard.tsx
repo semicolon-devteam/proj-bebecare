@@ -62,6 +62,7 @@ export default function HomeDashboard({ user }: HomeDashboardProps) {
           <div className="flex items-center gap-1">
             <button
               onClick={() => router.push('/notifications')}
+              aria-label="알림"
               className="relative rounded-full p-2 text-gray-400 hover:text-dusty-rose hover:bg-dusty-rose/5 transition-colors"
             >
               <Bell className="h-5 w-5" aria-hidden="true" />
@@ -73,6 +74,7 @@ export default function HomeDashboard({ user }: HomeDashboardProps) {
             </button>
             <button
               onClick={() => router.push('/mypage')}
+              aria-label="마이페이지"
               className="rounded-full p-2 text-gray-400 hover:text-dusty-rose hover:bg-dusty-rose/5 transition-colors"
             >
               <UserIcon className="h-5 w-5" aria-hidden="true" />

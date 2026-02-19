@@ -213,11 +213,11 @@ export default function LogPage() {
 
           {/* Date navigation */}
           <div className="flex items-center justify-between px-4 py-3 bg-amber-50 border-b border-amber-100">
-            <button onClick={() => changeDate(-1)} className="p-1.5 rounded-lg hover:bg-amber-100">
+            <button onClick={() => changeDate(-1)} aria-label="이전 날짜" className="p-1.5 rounded-lg hover:bg-amber-100">
               <ChevronLeft className="h-5 w-5 text-amber-600" aria-hidden="true" />
             </button>
             <span className="text-sm font-semibold text-amber-800">{formatDateLabel(date)}</span>
-            <button onClick={() => changeDate(1)} className="p-1.5 rounded-lg hover:bg-amber-100">
+            <button onClick={() => changeDate(1)} aria-label="다음 날짜" className="p-1.5 rounded-lg hover:bg-amber-100">
               <ChevronRight className="h-5 w-5 text-amber-600" aria-hidden="true" />
             </button>
           </div>
@@ -268,6 +268,7 @@ export default function LogPage() {
                       </div>
                       <button
                         onClick={() => handleDelete(log.id)}
+                        aria-label="기록 삭제"
                         className="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-400 transition-colors flex-shrink-0"
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
@@ -286,6 +287,7 @@ export default function LogPage() {
           {/* Manual Add FAB (right) */}
           <button
             onClick={() => setShowAddModal(true)}
+            aria-label="기록 추가"
             className="fixed bottom-24 right-6 h-14 w-14 rounded-full bg-dusty-rose text-white shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity z-20"
           >
             <Plus className="h-6 w-6" aria-hidden="true" />

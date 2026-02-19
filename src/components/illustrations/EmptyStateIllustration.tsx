@@ -11,7 +11,7 @@ export default function EmptyStateIllustration({ type, className = '' }: EmptySt
   switch (type) {
     case 'no-records':
       return (
-        <svg width={size} height={size} viewBox="0 0 140 140" fill="none" className={className}>
+        <svg width={size} height={size} viewBox="0 0 140 140" fill="none" className={className} aria-hidden="true" role="presentation">
           {/* Sleeping baby with notebook */}
           <circle cx="70" cy="70" r="65" fill="#FEF7F2" />
           {/* Notebook */}
@@ -33,7 +33,7 @@ export default function EmptyStateIllustration({ type, className = '' }: EmptySt
 
     case 'no-stats':
       return (
-        <svg width={size} height={size} viewBox="0 0 140 140" fill="none" className={className}>
+        <svg width={size} height={size} viewBox="0 0 140 140" fill="none" className={className} aria-hidden="true" role="presentation">
           <circle cx="70" cy="70" r="65" fill="#FEF7F2" />
           {/* Bar chart placeholder */}
           <rect x="30" y="80" width="14" height="25" rx="4" fill="#F8D0DA" />
@@ -51,7 +51,7 @@ export default function EmptyStateIllustration({ type, className = '' }: EmptySt
 
     case 'no-timeline':
       return (
-        <svg width={size} height={size} viewBox="0 0 140 140" fill="none" className={className}>
+        <svg width={size} height={size} viewBox="0 0 140 140" fill="none" className={className} aria-hidden="true" role="presentation">
           <circle cx="70" cy="70" r="65" fill="#FEF7F2" />
           {/* Timeline dots */}
           <circle cx="50" cy="40" r="6" fill="#F8D0DA" stroke="#D4A0B0" strokeWidth="1.5" />
@@ -69,7 +69,7 @@ export default function EmptyStateIllustration({ type, className = '' }: EmptySt
 
     case 'no-children':
       return (
-        <svg width={size} height={size} viewBox="0 0 140 140" fill="none" className={className}>
+        <svg width={size} height={size} viewBox="0 0 140 140" fill="none" className={className} aria-hidden="true" role="presentation">
           <circle cx="70" cy="70" r="65" fill="#FEF7F2" />
           {/* Baby face outline */}
           <circle cx="70" cy="58" r="22" stroke="#D4A0B0" strokeWidth="2" strokeDasharray="4 4" fill="none" />
@@ -89,7 +89,7 @@ export default function EmptyStateIllustration({ type, className = '' }: EmptySt
     case 'no-search':
     default:
       return (
-        <svg width={size} height={size} viewBox="0 0 140 140" fill="none" className={className}>
+        <svg width={size} height={size} viewBox="0 0 140 140" fill="none" className={className} aria-hidden="true" role="presentation">
           <circle cx="70" cy="70" r="65" fill="#FEF7F2" />
           {/* Magnifying glass */}
           <circle cx="60" cy="58" r="20" stroke="#D4A0B0" strokeWidth="2.5" fill="none" />

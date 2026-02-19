@@ -30,6 +30,7 @@ export default function BottomTabBar({ isVisible }: BottomTabBarProps) {
             <button
               key={id}
               data-tour={`tab-${id}`}
+              aria-label={label}
               onClick={() => router.push(path)}
               className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-1 transition-all ${
                 isActive 
@@ -40,7 +41,7 @@ export default function BottomTabBar({ isVisible }: BottomTabBarProps) {
               <span className={`flex items-center justify-center h-7 w-7 rounded-full transition-all ${
                 isActive ? 'bg-dusty-rose/10' : ''
               }`}>
-                <Icon className={`${isActive ? 'h-[18px] w-[18px]' : 'h-5 w-5'}`} />
+                <Icon className={`${isActive ? 'h-[18px] w-[18px]' : 'h-5 w-5'}`} aria-hidden="true" />
               </span>
               <span className={`text-[10px] font-semibold ${
                 isActive ? 'text-dusty-rose' : 'text-gray-400'
