@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signUp } from '@/lib/auth';
 import { CheckCircle } from 'lucide-react';
+import ErrorMessage from '@/components/ui/ErrorMessage';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -138,11 +139,7 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            {error && (
-              <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-600 font-medium">
-                {error}
-              </div>
-            )}
+            {error && <ErrorMessage message={error} />}
 
             <button
               type="submit" disabled={loading}

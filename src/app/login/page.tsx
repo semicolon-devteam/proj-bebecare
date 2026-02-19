@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from '@/lib/auth';
+import ErrorMessage from '@/components/ui/ErrorMessage';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -81,11 +82,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {error && (
-              <div className="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-600 font-medium">
-                {error}
-              </div>
-            )}
+            {error && <ErrorMessage message={error} />}
 
             <button
               type="submit" disabled={loading}

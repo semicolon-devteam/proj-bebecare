@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getMyFamily, createFamily, joinFamily, leaveFamily, type Family, type FamilyMember } from '@/lib/family';
 import { Users, Copy, Check, LogOut, Plus, UserPlus, Crown, User } from 'lucide-react';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface FamilyManagerProps {
   userId: string;
@@ -77,9 +78,7 @@ export default function FamilyManager({ userId }: FamilyManagerProps) {
   if (loading) {
     return (
       <div className="rounded-xl bg-white border border-gray-100 p-6">
-        <div className="flex justify-center">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-dusty-rose" />
-        </div>
+        <LoadingSpinner text="" />
       </div>
     );
   }

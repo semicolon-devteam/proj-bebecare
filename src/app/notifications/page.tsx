@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/auth';
 import type { User } from '@supabase/supabase-js';
 import { ChevronLeft, Bell, Baby, Briefcase, Building2, Megaphone } from 'lucide-react';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface Notification {
   id: string;
@@ -107,7 +108,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-dusty-rose" />
+        <LoadingSpinner />
       </div>
     );
   }
