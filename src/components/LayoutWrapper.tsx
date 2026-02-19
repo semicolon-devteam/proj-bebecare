@@ -34,11 +34,14 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const shouldShowTabBar = !loading && user && !hideTabBarRoutes.includes(pathname);
 
   return (
-    <div className="mx-auto w-full max-w-2xl md:max-w-4xl">
-      <div className={shouldShowTabBar ? 'pb-20' : ''}>
-        {children}
+    <>
+      <div className="mx-auto w-full max-w-2xl md:max-w-4xl">
+        <div className={shouldShowTabBar ? 'pb-20' : ''}>
+          {children}
+        </div>
       </div>
+      {/* BottomTabBar는 max-w 컨테이너 밖에서 전체 너비 사용 */}
       <BottomTabBar isVisible={!!shouldShowTabBar} />
-    </div>
+    </>
   );
 }

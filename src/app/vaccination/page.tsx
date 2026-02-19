@@ -13,7 +13,7 @@ export default function RedirectPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white">
-      <LoadingSpinner text="페이지를 이동 중..." />
+      <LoadingSpinner text="페이지를 이동 중..." size="md" />
     </div>
   );
 }
