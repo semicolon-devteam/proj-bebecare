@@ -79,7 +79,7 @@ function CircularProgress({ week, totalWeeks = 42, fruitName }: { week: number; 
       </svg>
       <div className="absolute flex flex-col items-center">
         <div className="h-12 w-12 rounded-full bg-pink-100 flex items-center justify-center">
-          <Baby className="h-6 w-6 text-dusty-rose" />
+          <Baby className="h-6 w-6 text-dusty-rose" aria-hidden="true" />
         </div>
       </div>
     </div>
@@ -97,7 +97,7 @@ function InfoSection({ icon: Icon, title, content, color }: {
     <div className="rounded-xl border border-gray-100 bg-white p-4">
       <div className="flex items-center gap-2 mb-2">
         <div className={`rounded-lg p-1.5 ${color}`}>
-          <Icon className="h-4 w-4 text-white" />
+          <Icon className="h-4 w-4 text-white" aria-hidden="true" />
         </div>
         <h4 className="text-sm font-bold text-gray-800">{title}</h4>
       </div>
@@ -194,7 +194,7 @@ export default function PregnancyWeeksTab({ userId }: PregnancyWeeksTabProps) {
   if (!expectingChild) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-        <Baby className="h-16 w-16 text-gray-300 mb-4" />
+        <Baby className="h-16 w-16 text-gray-300 mb-4" aria-hidden="true" />
         <h2 className="text-lg font-semibold text-gray-600 mb-2">임신주수 정보</h2>
         <p className="text-sm text-gray-400 leading-relaxed">
           임신 중인 아이가 등록되어 있지 않아요.<br />
@@ -234,7 +234,7 @@ export default function PregnancyWeeksTab({ userId }: PregnancyWeeksTabProps) {
           disabled={selectedWeek <= 1}
           className="rounded-full p-2 bg-gray-100 text-gray-600 disabled:opacity-30 active:bg-gray-200 transition-colors"
         >
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="h-5 w-5" aria-hidden="true" />
         </button>
 
         <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-1 max-w-[200px]">
@@ -266,7 +266,7 @@ export default function PregnancyWeeksTab({ userId }: PregnancyWeeksTabProps) {
           disabled={selectedWeek >= 42}
           className="rounded-full p-2 bg-gray-100 text-gray-600 disabled:opacity-30 active:bg-gray-200 transition-colors"
         >
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className="h-5 w-5" aria-hidden="true" />
         </button>
       </div>
 
@@ -338,7 +338,7 @@ export default function PregnancyWeeksTab({ userId }: PregnancyWeeksTabProps) {
       {fetalResults.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
-            <Stethoscope className="h-4 w-4 text-dusty-rose" />
+            <Stethoscope className="h-4 w-4 text-dusty-rose" aria-hidden="true" />
             태아 성장 비교
           </h3>
           {fetalResults.map(r => (

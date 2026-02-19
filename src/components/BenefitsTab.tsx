@@ -147,7 +147,7 @@ export default function BenefitsTab({ userId }: { userId: string }) {
       {/* Region Filter Bar */}
       <div className="sticky top-0 z-10 bg-white border-b border-border px-4 py-3">
         <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 text-dusty-rose flex-shrink-0" />
+          <MapPin className="h-4 w-4 text-dusty-rose flex-shrink-0" aria-hidden="true" />
           <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
             <button
               onClick={() => { setRegionFilter('my'); setShowRegionPicker(false); }}
@@ -185,7 +185,7 @@ export default function BenefitsTab({ userId }: { userId: string }) {
               }`}
             >
               {regionFilter === 'selected' && selectedRegion ? selectedRegion : '지역 선택'}
-              <ChevronDown className="h-3 w-3" />
+              <ChevronDown className="h-3 w-3" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -235,7 +235,7 @@ export default function BenefitsTab({ userId }: { userId: string }) {
                   : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
               }`}
             >
-              {(() => { const I = subcategoryIconMap[sub] || PinIcon; return <I className="h-3 w-3 inline-block" />; })()} {sub}
+              {(() => { const I = subcategoryIconMap[sub] || PinIcon; return <I className="h-3 w-3 inline-block" aria-hidden="true" />; })()} {sub}
             </button>
           ))}
         </div>
@@ -245,7 +245,7 @@ export default function BenefitsTab({ userId }: { userId: string }) {
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-dusty-rose" />
+            <Loader2 className="h-8 w-8 animate-spin text-dusty-rose" aria-hidden="true" />
           </div>
         ) : error ? (
           <div className="text-center py-16">
@@ -256,7 +256,7 @@ export default function BenefitsTab({ userId }: { userId: string }) {
           </div>
         ) : benefits.length === 0 ? (
           <div className="text-center py-16">
-            <Filter className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+            <Filter className="h-12 w-12 mx-auto text-gray-300 mb-3" aria-hidden="true" />
             <p className="text-sm text-gray-400">해당 조건의 혜택이 없어요</p>
           </div>
         ) : (
@@ -317,7 +317,7 @@ function BenefitCard({
             )}
             {benefit.subcategory && (
               <span className="text-[10px] text-gray-400 font-medium">
-                {(() => { const I = subcategoryIconMap[benefit.subcategory] || PinIcon; return <I className="h-3 w-3 inline-block" />; })()} {benefit.subcategory}
+                {(() => { const I = subcategoryIconMap[benefit.subcategory] || PinIcon; return <I className="h-3 w-3 inline-block" aria-hidden="true" />; })()} {benefit.subcategory}
               </span>
             )}
           </div>
@@ -346,13 +346,13 @@ function BenefitCard({
           {isBookmarked ? (
             <BookmarkCheck className="h-5 w-5 text-dusty-rose" fill="currentColor" />
           ) : (
-            <Bookmark className="h-5 w-5 text-gray-300" />
+            <Bookmark className="h-5 w-5 text-gray-300" aria-hidden="true" />
           )}
         </button>
       </div>
       {benefit.region_filter && benefit.region_filter !== '전국' && (
         <div className="mt-2 flex items-center gap-1 text-[10px] text-sage">
-          <Globe className="h-3 w-3" />
+          <Globe className="h-3 w-3" aria-hidden="true" />
           {benefit.region_filter}
         </div>
       )}
@@ -389,7 +389,7 @@ function BenefitDetailSheet({
             <div className="flex items-center gap-2 mb-1">
               {benefit.subcategory && (
                 <span className="text-xs text-sage font-medium">
-                  {(() => { const I = subcategoryIconMap[benefit.subcategory] || PinIcon; return <I className="h-3 w-3 inline-block" />; })()} {benefit.subcategory}
+                  {(() => { const I = subcategoryIconMap[benefit.subcategory] || PinIcon; return <I className="h-3 w-3 inline-block" aria-hidden="true" />; })()} {benefit.subcategory}
                 </span>
               )}
               {benefit.region_filter && (
@@ -417,11 +417,11 @@ function BenefitDetailSheet({
               {isBookmarked ? (
                 <BookmarkCheck className="h-5 w-5 text-dusty-rose" fill="currentColor" />
               ) : (
-                <Bookmark className="h-5 w-5 text-gray-400" />
+                <Bookmark className="h-5 w-5 text-gray-400" aria-hidden="true" />
               )}
             </button>
             <button onClick={onClose} className="p-2 -m-1">
-              <X className="h-5 w-5 text-gray-400" />
+              <X className="h-5 w-5 text-gray-400" aria-hidden="true" />
             </button>
           </div>
         </div>

@@ -74,7 +74,7 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
-          <ClipboardCheck className="h-4 w-4 text-sage" />
+          <ClipboardCheck className="h-4 w-4 text-sage" aria-hidden="true" />
           체크리스트
           <LeafDecor className="ml-0.5" />
         </h3>
@@ -103,9 +103,9 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
               }`}
             >
               {isDone ? (
-                <CheckSquare className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <CheckSquare className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
               ) : (
-                <Square className="h-5 w-5 text-gray-300 flex-shrink-0 mt-0.5" />
+                <Square className="h-5 w-5 text-gray-300 flex-shrink-0 mt-0.5" aria-hidden="true" />
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -136,9 +136,9 @@ export default function ChecklistCard({ userId }: ChecklistCardProps) {
           className="w-full flex items-center justify-center gap-1 text-xs text-gray-400 hover:text-gray-600 py-2"
         >
           {expanded ? (
-            <>접기 <ChevronUp className="h-3 w-3" /></>
+            <>접기 <ChevronUp className="h-3 w-3" aria-hidden="true" /></>
           ) : (
-            <>더보기 ({items.length - 5}개) <ChevronDown className="h-3 w-3" /></>
+            <>더보기 ({items.length - 5}개) <ChevronDown className="h-3 w-3" aria-hidden="true" /></>
           )}
         </button>
       )}

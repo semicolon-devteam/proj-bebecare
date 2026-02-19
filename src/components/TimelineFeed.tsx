@@ -7,7 +7,7 @@ import TimelineCard from './TimelineCard';
 import { supabase } from '@/lib/supabase';
 import { getChildren } from '@/lib/children';
 import type { Child } from '@/lib/children';
-import { ChevronDown, ChevronUp, LayoutList, MapPin, Shield, Palmtree, Clock, Coins, Briefcase, ClipboardList, Baby, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, MapPin, Shield, Palmtree, Clock, Coins, Briefcase, ClipboardList, Baby, Users } from 'lucide-react';
 import EmptyStateIllustration from '@/components/illustrations/EmptyStateIllustration';
 import { CuteLoader, FadeInUp } from '@/components/animations/MotionWrappers';
 import WorkCalculator from './WorkCalculator';
@@ -165,14 +165,14 @@ function WorkGroupedEvents({
             className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
           >
             <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-              {(() => { const IconComp = WORK_GROUP_ICONS[key] || ClipboardList; return <IconComp className="h-4 w-4 text-teal-500" />; })()}
+              {(() => { const IconComp = WORK_GROUP_ICONS[key] || ClipboardList; return <IconComp className="h-4 w-4 text-teal-500" aria-hidden="true" />; })()}
               {label}
               <span className="text-xs text-gray-400">({groupEvents.length})</span>
             </span>
             {expandedGroups.has(key) ? (
-              <ChevronUp className="h-4 w-4 text-gray-400" />
+              <ChevronUp className="h-4 w-4 text-gray-400" aria-hidden="true" />
             ) : (
-              <ChevronDown className="h-4 w-4 text-gray-400" />
+              <ChevronDown className="h-4 w-4 text-gray-400" aria-hidden="true" />
             )}
           </button>
           {expandedGroups.has(key) && (
@@ -191,13 +191,13 @@ function WorkGroupedEvents({
 function getTimeSection(ddayValue: number | null): string {
   if (ddayValue === null) return '기타';
   if (ddayValue < 0) return '지난 항목';
-  if (ddayValue <= 7) return '이번 주 확인할 것';
-  if (ddayValue <= 30) return '이번 달';
-  if (ddayValue <= 60) return '다음 달';
-  return '그 이후';
+  if (ddayValue === 0) return '오늘';
+  if (ddayValue === 1) return '내일';
+  if (ddayValue <= 7) return '이번 주';
+  return '이후';
 }
 
-const SECTION_ORDER = ['이번 주 확인할 것', '이번 달', '다음 달', '그 이후', '기타', '지난 항목'];
+const SECTION_ORDER = ['오늘', '내일', '이번 주', '이후', '기타', '지난 항목'];
 
 function TimeGroupedEvents({
   events,
@@ -221,6 +221,21 @@ function TimeGroupedEvents({
       .map(s => ({ label: s, events: map.get(s)! }));
   }, [events, profile]);
 
+  // Collect hero candidates (D-7 이내, max 3)
+  const heroIds = useMemo(() => {
+    const candidates: { id: string; dday: number }[] = [];
+    for (const section of sections) {
+      for (const event of section.events) {
+        const ddayValue = computeDdayValue(event, profile);
+        if (ddayValue !== null && ddayValue >= 0 && ddayValue <= 7) {
+          candidates.push({ id: event.id, dday: ddayValue });
+        }
+      }
+    }
+    candidates.sort((a, b) => a.dday - b.dday);
+    return new Set(candidates.slice(0, 3).map(c => c.id));
+  }, [sections, profile]);
+
   return (
     <div className="space-y-5">
       {sections.map(({ label, events: sectionEvents }) => (
@@ -228,8 +243,7 @@ function TimeGroupedEvents({
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">{label}</h3>
           <div className="space-y-3">
             {sectionEvents.map((event) => {
-              const ddayValue = computeDdayValue(event, profile);
-              const isHero = ddayValue !== null && ddayValue >= 0 && ddayValue <= 7;
+              const isHero = heroIds.has(event.id);
               return (
                 <TimelineCard key={event.id} event={event} onUpdate={onUpdate} profile={profile} isHero={isHero} />
               );
@@ -493,7 +507,7 @@ export default function TimelineFeed({ userId }: { userId: string }) {
         <div className="px-4 pb-2">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600">
-              <MapPin className="h-3 w-3" />
+              <MapPin className="h-3 w-3" aria-hidden="true" />
               {userRegionCity}
             </span>
             {otherRegionCount > 0 && (
@@ -517,12 +531,12 @@ export default function TimelineFeed({ userId }: { userId: string }) {
             className="flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors">
             {showPast ? (
               <>
-                <ChevronUp className="h-3.5 w-3.5" />
+                <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
                 지난 항목 숨기기
               </>
             ) : (
               <>
-                <ChevronDown className="h-3.5 w-3.5" />
+                <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
                 지난 항목 보기 ({pastCount})
               </>
             )}
@@ -542,12 +556,14 @@ export default function TimelineFeed({ userId }: { userId: string }) {
           <CuteLoader text={generating ? '맞춤 콘텐츠를 준비하고 있어요...' : '로딩 중...'} />
         ) : sortedEvents.length === 0 ? (
           <FadeInUp>
-            <div className="text-center py-12 space-y-3">
-              <div className="flex justify-center mb-2">
+            <div className="text-center py-16 space-y-4">
+              <div className="flex justify-center mb-3">
                 <EmptyStateIllustration type="no-timeline" />
               </div>
-              <p className="text-base font-semibold text-gray-600">아직 타임라인이 없어요</p>
-              <p className="text-sm text-gray-400">프로필 정보를 기반으로 맞춤 콘텐츠가 곧 제공됩니다</p>
+              <div className="space-y-1.5">
+                <p className="text-lg font-bold text-gray-700">맞춤 정보를 준비하고 있어요 ✨</p>
+                <p className="text-sm text-gray-400 leading-relaxed">프로필 정보를 기반으로<br />꼭 필요한 콘텐츠를 모아 드릴게요</p>
+              </div>
             </div>
           </FadeInUp>
         ) : selectedCategory === 'work' ? (

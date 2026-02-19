@@ -121,7 +121,7 @@ export default function NotificationsPage() {
             onClick={() => router.push('/')}
             className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </button>
           <h1 className="text-lg font-bold text-gray-900">알림</h1>
         </div>
@@ -133,7 +133,7 @@ export default function NotificationsPage() {
           {notifications.length === 0 ? (
             <div className="card rounded-2xl p-12 text-center">
               <div className="mx-auto h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                <Bell className="h-6 w-6 text-gray-300" />
+                <Bell className="h-6 w-6 text-gray-300" aria-hidden="true" />
               </div>
               <p className="text-base font-semibold text-gray-600">아직 알림이 없어요</p>
               <p className="text-gray-400 mt-1 text-sm">새로운 소식이 오면 여기서 확인할 수 있어요</p>
@@ -151,7 +151,7 @@ export default function NotificationsPage() {
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-50 flex items-center justify-center">
-                      <IconComp className="h-4 w-4 text-gray-400" />
+                      <IconComp className="h-4 w-4 text-gray-400" aria-hidden="true" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">

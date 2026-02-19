@@ -62,6 +62,22 @@
   --color-violet-600: #7C3AED;
 }
 
+:root {
+  /* Design tokens — warm shadow system */
+  --shadow-warm-sm: 0 1px 4px rgba(194, 114, 138, 0.04);
+  --shadow-warm: 0 2px 8px rgba(194, 114, 138, 0.06);
+  --shadow-warm-md: 0 4px 16px rgba(194, 114, 138, 0.08);
+  --shadow-warm-lg: 0 8px 24px rgba(194, 114, 138, 0.10);
+
+  /* 3-color palette */
+  --color-primary: #C2728A;       /* Baby tone — dusty rose */
+  --color-secondary: #7C9A82;     /* Sage green */
+  --color-neutral: #F0E6E0;       /* Warm neutral border */
+
+  /* Radius */
+  --radius-card: 1.25rem;
+}
+
 body {
   overflow-x: hidden;
   background-color: #FFF9F5;
@@ -71,14 +87,14 @@ body {
 @layer components {
   .card {
     background-color: #FFFFFF;
-    border: 1px solid #F0E6E0;
-    border-radius: 1.25rem;
-    box-shadow: 0 2px 8px 0 rgba(194, 114, 138, 0.06);
+    border: 1px solid var(--color-neutral);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-warm);
     transition: box-shadow 0.2s ease, transform 0.2s ease;
   }
 
   .card:hover {
-    box-shadow: 0 4px 16px rgba(194, 114, 138, 0.1);
+    box-shadow: var(--shadow-warm-md);
     transform: scale(1.005);
   }
 
@@ -87,7 +103,7 @@ body {
   }
 
   .card-hover:hover {
-    box-shadow: 0 4px 16px rgba(194, 114, 138, 0.12);
+    box-shadow: var(--shadow-warm-md);
     transform: translateY(-2px);
   }
 

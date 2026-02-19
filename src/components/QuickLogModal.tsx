@@ -87,7 +87,7 @@ export default function QuickLogModal({
             <h2 className="text-lg font-bold text-gray-900">{config.label} 기록</h2>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100">
-            <X className="h-5 w-5 text-gray-400" />
+            <X className="h-5 w-5 text-gray-400" aria-hidden="true" />
           </button>
         </div>
 
@@ -104,7 +104,7 @@ export default function QuickLogModal({
               onClick={() => setMode('timer')}
               className={`flex-1 rounded-xl py-2 text-sm font-semibold border-2 transition-all ${mode === 'timer' ? 'bg-dusty-rose/10 border-dusty-rose text-dusty-rose' : 'bg-gray-50 border-transparent text-gray-400'}`}
             >
-              <Timer className="h-3.5 w-3.5 inline-block mr-1" />타이머
+              <Timer className="h-3.5 w-3.5 inline-block mr-1" aria-hidden="true" />타이머
             </button>
           </div>
         )}
@@ -114,7 +114,7 @@ export default function QuickLogModal({
             onClick={() => onStartTimer(logType)}
             className="w-full rounded-xl bg-dusty-rose text-white py-3 font-semibold text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
           >
-            <Timer className="h-4 w-4" /> 타이머 시작
+            <Timer className="h-4 w-4" aria-hidden="true" /> 타이머 시작
           </button>
         ) : (
           <>
@@ -145,7 +145,7 @@ export default function QuickLogModal({
                 <div className="flex gap-2">
                   {([['wet', '소변', Droplets], ['dirty', '대변', Circle], ['mixed', '혼합', RefreshCw]] as [DiaperType, string, React.ComponentType<{className?: string}>][]).map(([type, label, DiaperIcon]) => (
                     <button key={type} onClick={() => setDiaperType(type)} className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold border-2 transition-all flex items-center justify-center gap-1.5 ${diaperType === type ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-gray-50 border-transparent text-gray-400'}`}>
-                      <DiaperIcon className="h-3.5 w-3.5" /> {label}
+                      <DiaperIcon className="h-3.5 w-3.5" aria-hidden="true" /> {label}
                     </button>
                   ))}
                 </div>

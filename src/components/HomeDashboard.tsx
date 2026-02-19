@@ -64,7 +64,7 @@ export default function HomeDashboard({ user }: HomeDashboardProps) {
               onClick={() => router.push('/notifications')}
               className="relative rounded-full p-2 text-gray-400 hover:text-dusty-rose hover:bg-dusty-rose/5 transition-colors"
             >
-              <Bell className="h-5 w-5" />
+              <Bell className="h-5 w-5" aria-hidden="true" />
               {unreadCount > 0 && (
                 <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-dusty-rose text-[9px] font-bold text-white">
                   {unreadCount > 99 ? '99+' : unreadCount}
@@ -75,7 +75,7 @@ export default function HomeDashboard({ user }: HomeDashboardProps) {
               onClick={() => router.push('/mypage')}
               className="rounded-full p-2 text-gray-400 hover:text-dusty-rose hover:bg-dusty-rose/5 transition-colors"
             >
-              <UserIcon className="h-5 w-5" />
+              <UserIcon className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function HomeDashboard({ user }: HomeDashboardProps) {
                     className="flex items-center gap-2 flex-shrink-0 rounded-full bg-white border border-border pl-2.5 pr-4 py-2 hover:shadow-md transition-all"
                   >
                     <span className={`h-8 w-8 rounded-full flex items-center justify-center ${colorClass}`}>
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-4 w-4" aria-hidden="true" />
                     </span>
                     <span className="text-sm font-semibold text-gray-600">{label}</span>
                   </button>

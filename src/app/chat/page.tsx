@@ -166,7 +166,7 @@ export default function ChatPage() {
       <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur-sm px-4 py-3">
         <div className="mx-auto flex max-w-4xl items-center">
           <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-dusty-rose" />
+            <MessageCircle className="h-5 w-5 text-dusty-rose" aria-hidden="true" />
             AI 상담
           </h1>
         </div>
@@ -216,7 +216,7 @@ export default function ChatPage() {
                 >
                   {message.role === 'assistant' && (
                     <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                      <MessageCircle className="h-4 w-4 text-gray-500" />
+                      <MessageCircle className="h-4 w-4 text-gray-500" aria-hidden="true" />
                     </div>
                   )}
                   <div
@@ -241,7 +241,7 @@ export default function ChatPage() {
               {isTyping && (
                 <div className="flex gap-3">
                   <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                    <MessageCircle className="h-4 w-4 text-gray-500" />
+                    <MessageCircle className="h-4 w-4 text-gray-500" aria-hidden="true" />
                   </div>
                   <div className="bg-gray-100 rounded-2xl px-4 py-3">
                     <div className="flex gap-1.5">

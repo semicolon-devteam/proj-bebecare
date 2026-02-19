@@ -110,10 +110,10 @@ export default function TodayRecommendations({ userId }: TodayRecommendationsPro
   };
 
   const getDdayIcon = (ddayValue: number | null) => {
-    if (ddayValue === null) return <Info className="h-3 w-3" />;
-    if (ddayValue <= 3) return <AlertCircle className="h-3 w-3" />;
-    if (ddayValue <= 7) return <Calendar className="h-3 w-3" />;
-    return <Info className="h-3 w-3" />;
+    if (ddayValue === null) return <Info className="h-3 w-3" aria-hidden="true" />;
+    if (ddayValue <= 3) return <AlertCircle className="h-3 w-3" aria-hidden="true" />;
+    if (ddayValue <= 7) return <Calendar className="h-3 w-3" aria-hidden="true" />;
+    return <Info className="h-3 w-3" aria-hidden="true" />;
   };
 
   const formatDday = (ddayValue: number | null): string => {

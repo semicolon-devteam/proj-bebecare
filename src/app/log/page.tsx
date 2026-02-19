@@ -134,7 +134,7 @@ export default function LogPage() {
       <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur-sm px-4 py-3">
         <div className="flex items-center">
           <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <ClipboardList className="h-5 w-5 text-dusty-rose" />
+            <ClipboardList className="h-5 w-5 text-dusty-rose" aria-hidden="true" />
             기록
           </h1>
         </div>
@@ -149,7 +149,7 @@ export default function LogPage() {
               subTab === 'logs' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400 hover:text-gray-600'
             }`}
           >
-            <ClipboardList className="h-4 w-4" />
+            <ClipboardList className="h-4 w-4" aria-hidden="true" />
             기록
           </button>
           <button
@@ -158,7 +158,7 @@ export default function LogPage() {
               subTab === 'stats' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400 hover:text-gray-600'
             }`}
           >
-            <BarChart3 className="h-4 w-4" />
+            <BarChart3 className="h-4 w-4" aria-hidden="true" />
             통계
           </button>
           <button
@@ -167,7 +167,7 @@ export default function LogPage() {
               subTab === 'peers' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400 hover:text-gray-600'
             }`}
           >
-            <Users className="h-4 w-4" />
+            <Users className="h-4 w-4" aria-hidden="true" />
             또래비교
           </button>
         </div>
@@ -197,15 +197,15 @@ export default function LogPage() {
           {summary && (
             <div className="px-4 py-2.5 bg-gray-50 border-b border-border">
               <div className="flex gap-3 text-xs text-gray-500 overflow-x-auto items-center">
-                {summary.totalFormulaMl > 0 && <span className="flex items-center gap-1"><BabyIcon className="h-3 w-3 text-orange-400" />{summary.totalFormulaMl}ml</span>}
-                {summary.totalBabyFoodMl > 0 && <span className="flex items-center gap-1"><UtensilsCrossed className="h-3 w-3 text-green-400" />{summary.totalBabyFoodMl}ml</span>}
-                {summary.totalBreastCount > 0 && <span className="flex items-center gap-1"><HeartIcon className="h-3 w-3 text-pink-400" />{summary.totalBreastCount}회</span>}
+                {summary.totalFormulaMl > 0 && <span className="flex items-center gap-1"><BabyIcon className="h-3 w-3 text-orange-400" aria-hidden="true" />{summary.totalFormulaMl}ml</span>}
+                {summary.totalBabyFoodMl > 0 && <span className="flex items-center gap-1"><UtensilsCrossed className="h-3 w-3 text-green-400" aria-hidden="true" />{summary.totalBabyFoodMl}ml</span>}
+                {summary.totalBreastCount > 0 && <span className="flex items-center gap-1"><HeartIcon className="h-3 w-3 text-pink-400" aria-hidden="true" />{summary.totalBreastCount}회</span>}
                 {summary.totalSleepMinutes > 0 && (
-                  <span className="flex items-center gap-1"><MoonIcon className="h-3 w-3 text-indigo-400" />{Math.floor(summary.totalSleepMinutes / 60)}시간 {summary.totalSleepMinutes % 60}분</span>
+                  <span className="flex items-center gap-1"><MoonIcon className="h-3 w-3 text-indigo-400" aria-hidden="true" />{Math.floor(summary.totalSleepMinutes / 60)}시간 {summary.totalSleepMinutes % 60}분</span>
                 )}
-                {summary.totalDiaperCount > 0 && <span className="flex items-center gap-1"><ShirtIcon className="h-3 w-3 text-amber-500" />{summary.totalDiaperCount}회</span>}
-                {summary.bathCount > 0 && <span className="flex items-center gap-1"><BathIcon className="h-3 w-3 text-cyan-400" />{summary.bathCount}회</span>}
-                {summary.medicineCount > 0 && <span className="flex items-center gap-1"><PillIcon className="h-3 w-3 text-red-400" />{summary.medicineCount}회</span>}
+                {summary.totalDiaperCount > 0 && <span className="flex items-center gap-1"><ShirtIcon className="h-3 w-3 text-amber-500" aria-hidden="true" />{summary.totalDiaperCount}회</span>}
+                {summary.bathCount > 0 && <span className="flex items-center gap-1"><BathIcon className="h-3 w-3 text-cyan-400" aria-hidden="true" />{summary.bathCount}회</span>}
+                {summary.medicineCount > 0 && <span className="flex items-center gap-1"><PillIcon className="h-3 w-3 text-red-400" aria-hidden="true" />{summary.medicineCount}회</span>}
                 {logs.length === 0 && <span className="text-gray-300">기록이 없어요</span>}
               </div>
             </div>
@@ -214,11 +214,11 @@ export default function LogPage() {
           {/* Date navigation */}
           <div className="flex items-center justify-between px-4 py-3 bg-amber-50 border-b border-amber-100">
             <button onClick={() => changeDate(-1)} className="p-1.5 rounded-lg hover:bg-amber-100">
-              <ChevronLeft className="h-5 w-5 text-amber-600" />
+              <ChevronLeft className="h-5 w-5 text-amber-600" aria-hidden="true" />
             </button>
             <span className="text-sm font-semibold text-amber-800">{formatDateLabel(date)}</span>
             <button onClick={() => changeDate(1)} className="p-1.5 rounded-lg hover:bg-amber-100">
-              <ChevronRight className="h-5 w-5 text-amber-600" />
+              <ChevronRight className="h-5 w-5 text-amber-600" aria-hidden="true" />
             </button>
           </div>
 
@@ -270,7 +270,7 @@ export default function LogPage() {
                         onClick={() => handleDelete(log.id)}
                         className="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-400 transition-colors flex-shrink-0"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </button>
                     </div>
                     </StaggerItem>
@@ -288,7 +288,7 @@ export default function LogPage() {
             onClick={() => setShowAddModal(true)}
             className="fixed bottom-24 right-6 h-14 w-14 rounded-full bg-dusty-rose text-white shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity z-20"
           >
-            <Plus className="h-6 w-6" />
+            <Plus className="h-6 w-6" aria-hidden="true" />
           </button>
 
           {/* Quick Log Modal */}
@@ -440,7 +440,7 @@ function StatsTab({ userId }: { userId: string }) {
 
       {/* Feeding chart */}
       <div className="rounded-xl bg-white border border-gray-100 p-4">
-        <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5"><BabyIcon className="h-4 w-4 text-orange-400" /> 수유량 추이 (ml)</h3>
+        <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5"><BabyIcon className="h-4 w-4 text-orange-400" aria-hidden="true" /> 수유량 추이 (ml)</h3>
         <ResponsiveContainer width="100%" height={180}>
           <LineChart data={feedingData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -454,7 +454,7 @@ function StatsTab({ userId }: { userId: string }) {
 
       {/* Sleep chart */}
       <div className="rounded-xl bg-white border border-gray-100 p-4">
-        <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5"><MoonIcon className="h-4 w-4 text-indigo-400" /> 수면 시간 추이 (시간)</h3>
+        <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5"><MoonIcon className="h-4 w-4 text-indigo-400" aria-hidden="true" /> 수면 시간 추이 (시간)</h3>
         <ResponsiveContainer width="100%" height={180}>
           <LineChart data={sleepData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -468,7 +468,7 @@ function StatsTab({ userId }: { userId: string }) {
 
       {/* Diaper chart */}
       <div className="rounded-xl bg-white border border-gray-100 p-4 mb-8">
-        <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5"><ShirtIcon className="h-4 w-4 text-amber-500" /> 기저귀 교체 횟수</h3>
+        <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-1.5"><ShirtIcon className="h-4 w-4 text-amber-500" aria-hidden="true" /> 기저귀 교체 횟수</h3>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={diaperData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

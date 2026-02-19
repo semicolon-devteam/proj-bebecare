@@ -140,7 +140,7 @@ function StructuredDataCard({ data, category }: { data: Record<string, string>; 
           return (
             <div key={key} className="flex items-start gap-2 rounded-lg bg-gray-50 px-3 py-2">
               <div className="h-5 w-5 rounded-full bg-white flex items-center justify-center flex-shrink-0 mt-0.5">
-                <IconComp className="h-3 w-3 text-gray-400" />
+                <IconComp className="h-3 w-3 text-gray-400" aria-hidden="true" />
               </div>
               <div className="min-w-0">
                 <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">{key}</span>
@@ -226,18 +226,18 @@ export default function TimelineCard({
   if (isHero) {
     const gradient = categoryGradient[category] || 'from-gray-50 to-gray-100';
     return (
-      <div className={`rounded-[1.25rem] bg-gradient-to-br ${gradient} border border-white/60 shadow-[0_2px_16px_rgba(194,114,138,0.06)] overflow-hidden ${!event.is_read ? 'ring-2 ring-dusty-rose/20' : ''}`}>
+      <div className={`rounded-[1.25rem] bg-gradient-to-br ${gradient} border border-white/60 shadow-[var(--shadow-warm)] overflow-hidden ${!event.is_read ? 'ring-2 ring-dusty-rose/20' : ''}`}>
         <div className="p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 flex-1 min-w-0">
               <div className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${iconBg}`}>
-                <CategoryIconComp className="h-5 w-5" />
+                <CategoryIconComp className="h-5 w-5" aria-hidden="true" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs font-semibold text-gray-500">{label}</span>
-                  {audience === 'baby' && <Baby className="h-3 w-3 text-gray-400" />}
-                  {audience === 'parent' && <Users className="h-3 w-3 text-gray-400" />}
+                  {audience === 'baby' && <Baby className="h-3 w-3 text-gray-400" aria-hidden="true" />}
+                  {audience === 'parent' && <Users className="h-3 w-3 text-gray-400" aria-hidden="true" />}
                   {dday && (
                     <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-bold ${getDdayStyle(dday)}`}>
                       {dday}
@@ -252,10 +252,10 @@ export default function TimelineCard({
             </div>
             <div className="flex items-center gap-0.5 flex-shrink-0">
               <button onClick={handleBookmark} className="p-1.5 rounded-lg hover:bg-white/60 transition-colors">
-                {bookmarked ? <Star className="h-4 w-4 text-amber-500 fill-amber-500" /> : <Star className="h-4 w-4 text-gray-300" />}
+                {bookmarked ? <Star className="h-4 w-4 text-amber-500 fill-amber-500" aria-hidden="true" /> : <Star className="h-4 w-4 text-gray-300" aria-hidden="true" />}
               </button>
               <button onClick={handleDismiss} className="p-1.5 rounded-lg hover:bg-white/60 transition-colors">
-                <X className="h-4 w-4 text-gray-300 hover:text-gray-500" />
+                <X className="h-4 w-4 text-gray-300 hover:text-gray-500" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -296,19 +296,19 @@ export default function TimelineCard({
 
   // Compact card (default)
   return (
-    <div className={`rounded-[1.25rem] bg-white border border-gray-100 shadow-[0_2px_12px_rgba(194,114,138,0.06)] overflow-hidden ${!event.is_read ? 'ring-1 ring-dusty-rose/20' : ''}`}>
+    <div className={`rounded-[1.25rem] bg-white border border-gray-100 shadow-[var(--shadow-warm)] overflow-hidden ${!event.is_read ? 'ring-1 ring-dusty-rose/20' : ''}`}>
       <div className="p-4 flex gap-3">
         {/* Left icon circle */}
         <div className={`h-9 w-9 rounded-full flex items-center justify-center flex-shrink-0 ${iconBg}`}>
-          <CategoryIconComp className="h-4 w-4" />
+          <CategoryIconComp className="h-4 w-4" aria-hidden="true" />
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 flex-1 min-w-0">
               <span className="text-xs font-semibold text-gray-500">{label}</span>
-              {audience === 'baby' && <Baby className="h-3 w-3 text-gray-400" />}
-              {audience === 'parent' && <Users className="h-3 w-3 text-gray-400" />}
+              {audience === 'baby' && <Baby className="h-3 w-3 text-gray-400" aria-hidden="true" />}
+              {audience === 'parent' && <Users className="h-3 w-3 text-gray-400" aria-hidden="true" />}
               {dday && (
                 <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold flex-shrink-0 ${getDdayStyle(dday)}`}>
                   {dday}
@@ -318,10 +318,10 @@ export default function TimelineCard({
             </div>
             <div className="flex items-center gap-0.5 flex-shrink-0">
               <button onClick={handleBookmark} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
-                {bookmarked ? <Star className="h-4 w-4 text-amber-500 fill-amber-500" /> : <Star className="h-4 w-4 text-gray-300" />}
+                {bookmarked ? <Star className="h-4 w-4 text-amber-500 fill-amber-500" aria-hidden="true" /> : <Star className="h-4 w-4 text-gray-300" aria-hidden="true" />}
               </button>
               <button onClick={handleDismiss} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
-                <X className="h-4 w-4 text-gray-300 hover:text-gray-500" />
+                <X className="h-4 w-4 text-gray-300 hover:text-gray-500" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -329,7 +329,7 @@ export default function TimelineCard({
           <div className="flex items-center justify-between mt-1">
             <h3 className="text-sm font-bold text-gray-900 leading-snug flex-1">{event.content?.title}</h3>
             <button onClick={handleExpand} className="p-1 ml-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0">
-              {expanded ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+              {expanded ? <ChevronUp className="h-4 w-4 text-gray-400" aria-hidden="true" /> : <ChevronDown className="h-4 w-4 text-gray-400" aria-hidden="true" />}
             </button>
           </div>
 

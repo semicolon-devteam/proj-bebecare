@@ -189,7 +189,7 @@ export default function OnboardingGuide() {
           onClick={close}
           className="absolute top-3 right-3 p-1 rounded-lg hover:bg-gray-100 transition-colors"
         >
-          <X className="h-4 w-4 text-gray-400" />
+          <X className="h-4 w-4 text-gray-400" aria-hidden="true" />
         </button>
 
         {/* Content */}
@@ -219,7 +219,7 @@ export default function OnboardingGuide() {
                 onClick={prev}
                 className="flex items-center gap-0.5 px-3 py-1.5 text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                 이전
               </button>
             )}
@@ -228,7 +228,7 @@ export default function OnboardingGuide() {
               className="flex items-center gap-0.5 px-4 py-2 bg-dusty-rose text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity"
             >
               {isLast ? '시작하기!' : (
-                <>다음 <ChevronRight className="h-4 w-4" /></>
+                <>다음 <ChevronRight className="h-4 w-4" aria-hidden="true" /></>
               )}
             </button>
           </div>

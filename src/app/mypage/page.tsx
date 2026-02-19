@@ -265,7 +265,7 @@ export default function MyPage() {
       <header className="border-b border-border bg-white px-4 py-3">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <button onClick={() => router.push('/')} className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </button>
           <h1 className="text-lg font-bold text-gray-900">마이페이지</h1>
           <div className="w-8" />
@@ -277,14 +277,14 @@ export default function MyPage() {
         <div className="card rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Baby className="h-4 w-4 text-gray-400" />
+              <Baby className="h-4 w-4 text-gray-400" aria-hidden="true" />
               <h3 className="font-bold text-gray-900 text-sm">내 아이</h3>
             </div>
             <button
               onClick={() => { resetChildForm(); setShowAddChild(true); }}
               className="flex items-center gap-1 rounded-lg bg-dusty-rose px-3 py-1.5 text-xs font-semibold text-white hover:bg-dusty-rose-dark transition-colors"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               아이 추가
             </button>
           </div>
@@ -301,7 +301,7 @@ export default function MyPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className={`h-8 w-8 rounded-full flex items-center justify-center ${child.status === 'expecting' ? 'bg-pink-50' : 'bg-blue-50'}`}>
-                          {child.status === 'expecting' ? <Heart className="h-4 w-4 text-dusty-rose" /> : <Baby className="h-4 w-4 text-blue-500" />}
+                          {child.status === 'expecting' ? <Heart className="h-4 w-4 text-dusty-rose" aria-hidden="true" /> : <Baby className="h-4 w-4 text-blue-500" aria-hidden="true" />}
                         </div>
                         <div>
                           <p className="text-sm font-bold text-gray-900">{child.nickname || child.name || '이름 없음'}</p>
@@ -320,10 +320,10 @@ export default function MyPage() {
                       </div>
                       <div className="flex gap-1">
                         <button onClick={() => openEditChild(child)} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
-                          <Pencil className="h-3.5 w-3.5 text-gray-400" />
+                          <Pencil className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                         </button>
                         <button onClick={() => handleDeleteChild(child.id)} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
-                          <Trash2 className="h-3.5 w-3.5 text-gray-300 hover:text-red-400" />
+                          <Trash2 className="h-3.5 w-3.5 text-gray-300 hover:text-red-400" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -413,9 +413,9 @@ export default function MyPage() {
           <div className={`mx-auto h-12 w-12 rounded-full flex items-center justify-center ${
             stage === 'pregnant' ? 'bg-pink-50' : stage === 'postpartum' ? 'bg-blue-50' : 'bg-gray-50'
           }`}>
-            {stage === 'pregnant' ? <Heart className="h-6 w-6 text-dusty-rose" /> :
-             stage === 'postpartum' ? <Baby className="h-6 w-6 text-blue-500" /> :
-             <FileText className="h-6 w-6 text-gray-400" />}
+            {stage === 'pregnant' ? <Heart className="h-6 w-6 text-dusty-rose" aria-hidden="true" /> :
+             stage === 'postpartum' ? <Baby className="h-6 w-6 text-blue-500" aria-hidden="true" /> :
+             <FileText className="h-6 w-6 text-gray-400" aria-hidden="true" />}
           </div>
           <h2 className="text-lg font-bold text-gray-900">
             {stage === 'pregnant' ? '임신 중' : stage === 'postpartum' ? '출산 후' : '임신 준비 중'}
@@ -426,7 +426,7 @@ export default function MyPage() {
         {/* Working status */}
         <div className="card rounded-xl p-5 space-y-3">
           <div className="flex items-center gap-2">
-            <Briefcase className="h-4 w-4 text-gray-400" />
+            <Briefcase className="h-4 w-4 text-gray-400" aria-hidden="true" />
             <h3 className="font-bold text-gray-900 text-sm">직장 여부</h3>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -444,7 +444,7 @@ export default function MyPage() {
         {/* Region */}
         <div className="card rounded-xl p-5 space-y-3">
           <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-gray-400" />
+            <MapPin className="h-4 w-4 text-gray-400" aria-hidden="true" />
             <h3 className="font-bold text-gray-900 text-sm">지역</h3>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -471,16 +471,16 @@ export default function MyPage() {
         <button onClick={handleSaveProfile} disabled={saving}
           className="w-full flex items-center justify-center gap-2 rounded-xl bg-dusty-rose py-3.5 text-sm font-bold text-white hover:bg-dusty-rose-dark disabled:opacity-50 transition-colors">
           {saving ? '저장 중...' : saved ? (
-            <><Check className="h-4 w-4" /> 저장 완료!</>
+            <><Check className="h-4 w-4" aria-hidden="true" /> 저장 완료!</>
           ) : (
-            <><Save className="h-4 w-4" /> 저장하기</>
+            <><Save className="h-4 w-4" aria-hidden="true" /> 저장하기</>
           )}
         </button>
 
         {/* Push Notification */}
         <div className="card rounded-xl p-5 space-y-3">
           <div className="flex items-center gap-2">
-            <Bell className="h-4 w-4 text-gray-400" />
+            <Bell className="h-4 w-4 text-gray-400" aria-hidden="true" />
             <h3 className="font-bold text-gray-900 text-sm">푸시 알림</h3>
           </div>
           <p className="text-xs text-gray-500">맞춤정보 D-Day 알림을 푸시로 받을 수 있어요.</p>
@@ -494,9 +494,9 @@ export default function MyPage() {
             } disabled:opacity-50`}
           >
             {pushLoading ? '처리 중...' : pushEnabled ? (
-              <><BellOff className="h-4 w-4" /> 알림 끄기</>
+              <><BellOff className="h-4 w-4" aria-hidden="true" /> 알림 끄기</>
             ) : (
-              <><Bell className="h-4 w-4" /> 알림 켜기</>
+              <><Bell className="h-4 w-4" aria-hidden="true" /> 알림 켜기</>
             )}
           </button>
           {pushEnabled === false && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'denied' && (
@@ -511,7 +511,7 @@ export default function MyPage() {
         {userId && (
           <div className="card rounded-xl p-5 space-y-3">
             <div className="flex items-center gap-2">
-              <Download className="h-4 w-4 text-gray-400" />
+              <Download className="h-4 w-4 text-gray-400" aria-hidden="true" />
               <h3 className="font-bold text-gray-900 text-sm">성장 보고서</h3>
             </div>
             <p className="text-xs text-gray-500">기록 데이터를 보고서로 내보내세요. (인쇄/PDF 저장 가능)</p>
@@ -532,12 +532,12 @@ export default function MyPage() {
         {/* Account */}
         <div className="card rounded-xl p-5 space-y-3">
           <div className="flex items-center gap-2">
-            <Settings className="h-4 w-4 text-gray-400" />
+            <Settings className="h-4 w-4 text-gray-400" aria-hidden="true" />
             <h3 className="font-bold text-gray-900 text-sm">계정</h3>
           </div>
           <button onClick={handleSignOut}
             className="w-full flex items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors">
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-4 w-4" aria-hidden="true" />
             로그아웃
           </button>
         </div>

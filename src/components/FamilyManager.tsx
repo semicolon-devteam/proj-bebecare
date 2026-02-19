@@ -91,7 +91,7 @@ export default function FamilyManager({ userId }: FamilyManagerProps) {
       <div className="rounded-xl bg-white border border-gray-100 p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-dusty-rose" />
+            <Users className="h-5 w-5 text-dusty-rose" aria-hidden="true" />
             <h3 className="text-sm font-bold text-gray-900">{family.name}</h3>
           </div>
           <span className="text-xs text-gray-400">{members.length}명</span>
@@ -102,7 +102,7 @@ export default function FamilyManager({ userId }: FamilyManagerProps) {
           {members.map(m => (
             <div key={m.id} className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2">
               <div className="h-8 w-8 rounded-full bg-dusty-rose/10 flex items-center justify-center">
-                {m.role === 'owner' ? <Crown className="h-4 w-4 text-dusty-rose" /> : <User className="h-4 w-4 text-dusty-rose" />}
+                {m.role === 'owner' ? <Crown className="h-4 w-4 text-dusty-rose" aria-hidden="true" /> : <User className="h-4 w-4 text-dusty-rose" aria-hidden="true" />}
               </div>
               <div className="flex-1">
                 <p className="text-sm font-semibold text-gray-700">
@@ -112,7 +112,7 @@ export default function FamilyManager({ userId }: FamilyManagerProps) {
               </div>
               {m.user_id === userId && !isOwner && (
                 <button onClick={handleLeave} className="p-1.5 rounded-lg hover:bg-red-50">
-                  <LogOut className="h-4 w-4 text-red-400" />
+                  <LogOut className="h-4 w-4 text-red-400" aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -125,7 +125,7 @@ export default function FamilyManager({ userId }: FamilyManagerProps) {
           <div className="flex items-center gap-2">
             <span className="text-lg font-mono font-bold text-amber-800 tracking-widest">{family.invite_code}</span>
             <button onClick={copyCode} className="p-1.5 rounded-lg hover:bg-amber-100">
-              {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4 text-amber-500" />}
+              {copied ? <Check className="h-4 w-4 text-green-500" aria-hidden="true" /> : <Copy className="h-4 w-4 text-amber-500" aria-hidden="true" />}
             </button>
           </div>
           <p className="text-[10px] text-amber-500 mt-1">가족에게 이 코드를 공유하세요</p>
@@ -138,7 +138,7 @@ export default function FamilyManager({ userId }: FamilyManagerProps) {
   return (
     <div className="rounded-xl bg-white border border-gray-100 p-4 space-y-4">
       <div className="flex items-center gap-2">
-        <Users className="h-5 w-5 text-gray-400" />
+        <Users className="h-5 w-5 text-gray-400" aria-hidden="true" />
         <h3 className="text-sm font-bold text-gray-900">가족 동기화</h3>
       </div>
 
@@ -150,14 +150,14 @@ export default function FamilyManager({ userId }: FamilyManagerProps) {
               onClick={() => setMode('create')}
               className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-dusty-rose py-3 text-sm font-semibold text-white hover:opacity-90"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4" aria-hidden="true" />
               가족 만들기
             </button>
             <button
               onClick={() => setMode('join')}
               className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border-2 border-dusty-rose py-3 text-sm font-semibold text-dusty-rose hover:bg-dusty-rose/5"
             >
-              <UserPlus className="h-4 w-4" />
+              <UserPlus className="h-4 w-4" aria-hidden="true" />
               초대 코드 입력
             </button>
           </div>
