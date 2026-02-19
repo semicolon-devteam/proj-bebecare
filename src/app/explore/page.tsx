@@ -106,7 +106,7 @@ function ExploreContent() {
       <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur-sm px-4 py-3">
         <div className="flex items-center">
           <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-dusty-rose" />
+            <BookOpen className="h-5 w-5 text-dusty-rose" aria-hidden="true" />
             정보
           </h1>
         </div>
@@ -125,7 +125,7 @@ function ExploreContent() {
                   : 'border-transparent text-gray-400 hover:text-gray-600'
               }`}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-4 w-4" aria-hidden="true" />
               {label}
             </button>
           ))}

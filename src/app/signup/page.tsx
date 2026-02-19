@@ -58,7 +58,7 @@ export default function SignUpPage() {
         <div className="w-full max-w-md">
           <div className="card rounded-2xl p-12 text-center">
             <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-sage/10 mb-6">
-              <CheckCircle className="h-8 w-8 text-sage" />
+              <CheckCircle className="h-8 w-8 text-sage" aria-hidden="true" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               회원가입이 완료되었습니다!

@@ -122,11 +122,11 @@ export default function TimerBar() {
           disabled={saving}
           className="flex items-center gap-1 rounded-lg bg-dusty-rose px-3 py-1.5 text-xs font-bold text-white hover:opacity-90 disabled:opacity-50"
         >
-          <Square className="h-3 w-3" />
+          <Square className="h-3 w-3" aria-hidden="true" />
           {saving ? '저장중...' : '종료'}
         </button>
         <button onClick={cancelTimer} className="p-1 rounded-lg hover:bg-white/50">
-          <X className="h-4 w-4 text-gray-500" />
+          <X className="h-4 w-4 text-gray-500" aria-hidden="true" />
         </button>
       </div>
     </div>

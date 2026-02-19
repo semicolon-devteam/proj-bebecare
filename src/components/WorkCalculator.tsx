@@ -55,7 +55,7 @@ export default function WorkCalculator({ dueDate, childBirthDate }: Props) {
     const week12End = addDays(pregnancyStart, 12 * 7);
     results.push({
       label: '임신초기 근로단축',
-      icon: <Clock className="h-3.5 w-3.5" />,
+      icon: <Clock className="h-3.5 w-3.5" aria-hidden="true" />,
       start: pregnancyStart,
       end: week12End,
       color: 'bg-amber-100 text-amber-700 border-amber-200',
@@ -66,7 +66,7 @@ export default function WorkCalculator({ dueDate, childBirthDate }: Props) {
     const week36Start = addDays(pregnancyStart, 36 * 7);
     results.push({
       label: '임신후기 근로단축',
-      icon: <Clock className="h-3.5 w-3.5" />,
+      icon: <Clock className="h-3.5 w-3.5" aria-hidden="true" />,
       start: week36Start,
       end: baseDate,
       color: 'bg-orange-100 text-orange-700 border-orange-200',
@@ -78,7 +78,7 @@ export default function WorkCalculator({ dueDate, childBirthDate }: Props) {
     const materLeaveEnd = addDays(baseDate, 44);
     results.push({
       label: '출산전후휴가',
-      icon: <Heart className="h-3.5 w-3.5" />,
+      icon: <Heart className="h-3.5 w-3.5" aria-hidden="true" />,
       start: materLeaveStart,
       end: materLeaveEnd,
       color: 'bg-pink-100 text-pink-700 border-pink-200',
@@ -88,7 +88,7 @@ export default function WorkCalculator({ dueDate, childBirthDate }: Props) {
     // 배우자 출산휴가 (출산일로부터 10일)
     results.push({
       label: '배우자 출산휴가',
-      icon: <Briefcase className="h-3.5 w-3.5" />,
+      icon: <Briefcase className="h-3.5 w-3.5" aria-hidden="true" />,
       start: baseDate,
       end: addDays(baseDate, 9),
       color: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -100,7 +100,7 @@ export default function WorkCalculator({ dueDate, childBirthDate }: Props) {
     const parentLeaveEnd = addYears(parentLeaveStart, 1);
     results.push({
       label: '육아휴직',
-      icon: <Baby className="h-3.5 w-3.5" />,
+      icon: <Baby className="h-3.5 w-3.5" aria-hidden="true" />,
       start: parentLeaveStart,
       end: parentLeaveEnd,
       color: 'bg-teal-100 text-teal-700 border-teal-200',
@@ -110,7 +110,7 @@ export default function WorkCalculator({ dueDate, childBirthDate }: Props) {
     // 육아기 근로시간 단축 (육아휴직 대신 또는 이후, 최대 2년)
     results.push({
       label: '육아기 근로단축',
-      icon: <Clock className="h-3.5 w-3.5" />,
+      icon: <Clock className="h-3.5 w-3.5" aria-hidden="true" />,
       start: parentLeaveStart,
       end: addYears(parentLeaveStart, 2),
       color: 'bg-violet-100 text-violet-700 border-violet-200',
@@ -134,13 +134,13 @@ export default function WorkCalculator({ dueDate, childBirthDate }: Props) {
         className="w-full flex items-center justify-between"
       >
         <div className="flex items-center gap-2">
-          <Calculator className="h-4 w-4 text-teal-600" />
+          <Calculator className="h-4 w-4 text-teal-600" aria-hidden="true" />
           <h3 className="text-sm font-bold text-teal-800">출산 기간 자동 계산</h3>
         </div>
         {collapsed ? (
-          <ChevronDown className="h-4 w-4 text-teal-400" />
+          <ChevronDown className="h-4 w-4 text-teal-400" aria-hidden="true" />
         ) : (
-          <ChevronUp className="h-4 w-4 text-teal-400" />
+          <ChevronUp className="h-4 w-4 text-teal-400" aria-hidden="true" />
         )}
       </button>
       {!collapsed && <div className="space-y-2 mt-3">
@@ -170,7 +170,7 @@ export default function WorkCalculator({ dueDate, childBirthDate }: Props) {
                 )}
               </div>
               <div className={`text-[11px] mt-1 ${isPast ? 'text-gray-300' : 'text-gray-500'}`}>
-                <Calendar className="h-3 w-3 inline mr-1" />
+                <Calendar className="h-3 w-3 inline mr-1" aria-hidden="true" />
                 {formatDate(p.start)} ~ {formatDate(p.end)}
               </div>
               {p.note && (

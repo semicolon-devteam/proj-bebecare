@@ -75,7 +75,7 @@ export default function BabyProfileCard({ userId }: BabyProfileCardProps) {
     <div className="card p-5" style={{ background: 'linear-gradient(135deg, #FFF0F3 0%, #F0F7F1 100%)' }}>
       <div className="flex items-center gap-4">
         <div className="h-14 w-14 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F8D0DA 0%, #D4A0B0 100%)' }}>
-          <Baby className="h-7 w-7 text-white" />
+          <Baby className="h-7 w-7 text-white" aria-hidden="true" />
         </div>
         <div className="flex-1">
           <h2 className="font-bold text-lg text-gray-800">{child.nickname || '아기'}</h2>

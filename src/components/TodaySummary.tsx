@@ -52,7 +52,7 @@ export default function TodaySummary({ userId, refreshKey }: TodaySummaryProps) 
         <div className="card p-4 text-center">
           <div className="flex items-center justify-center mb-2">
             <div className="h-9 w-9 rounded-full bg-orange-50 flex items-center justify-center">
-              <Milk className="h-4 w-4 text-orange-400" />
+              <Milk className="h-4 w-4 text-orange-400" aria-hidden="true" />
             </div>
           </div>
           <div className="space-y-1">
@@ -68,7 +68,7 @@ export default function TodaySummary({ userId, refreshKey }: TodaySummaryProps) 
         <div className="card p-4 text-center">
           <div className="flex items-center justify-center mb-2">
             <div className="h-9 w-9 rounded-full bg-indigo-50 flex items-center justify-center">
-              <Moon className="h-4 w-4 text-indigo-400" />
+              <Moon className="h-4 w-4 text-indigo-400" aria-hidden="true" />
             </div>
           </div>
           <div className="space-y-1">
@@ -83,7 +83,7 @@ export default function TodaySummary({ userId, refreshKey }: TodaySummaryProps) 
         <div className="card p-4 text-center">
           <div className="flex items-center justify-center mb-2">
             <div className="h-9 w-9 rounded-full bg-amber-50 flex items-center justify-center">
-              <Baby className="h-4 w-4 text-amber-400" />
+              <Baby className="h-4 w-4 text-amber-400" aria-hidden="true" />
             </div>
           </div>
           <div className="space-y-1">

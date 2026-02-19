@@ -123,7 +123,7 @@ export default function MorePage() {
       <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur-sm px-4 py-3">
         <div className="flex items-center">
           <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <Menu className="h-5 w-5 text-dusty-rose" />
+            <Menu className="h-5 w-5 text-dusty-rose" aria-hidden="true" />
             더보기
           </h1>
         </div>
@@ -137,7 +137,7 @@ export default function MorePage() {
             <div className="card p-4 bg-gradient-to-r from-dusty-rose/5 to-sage/5">
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-full bg-dusty-rose/20 flex items-center justify-center">
-                  <UserIcon className="h-6 w-6 text-dusty-rose" />
+                  <UserIcon className="h-6 w-6 text-dusty-rose" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
                   <h2 className="font-semibold text-gray-900">
@@ -192,7 +192,7 @@ export default function MorePage() {
                       </span>
                     )}
                     {item.available && (
-                      <ChevronRight className="h-4 w-4 text-gray-400" />
+                      <ChevronRight className="h-4 w-4 text-gray-400" aria-hidden="true" />
                     )}
                   </div>
                 </button>
@@ -207,7 +207,7 @@ export default function MorePage() {
               className="w-full p-4 rounded-xl bg-red-50 border border-red-100 hover:bg-red-100 transition-colors text-left flex items-center gap-3"
             >
               <div className="h-10 w-10 rounded-lg bg-red-100 flex items-center justify-center">
-                <LogOut className="h-5 w-5 text-red-500" />
+                <LogOut className="h-5 w-5 text-red-500" aria-hidden="true" />
               </div>
               <div>
                 <h3 className="font-semibold text-red-600">로그아웃</h3>

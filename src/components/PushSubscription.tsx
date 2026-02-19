@@ -114,7 +114,7 @@ export default function PushSubscription() {
     <div className="mx-auto max-w-3xl px-4">
       <div className="card rounded-xl p-3.5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Bell className="h-5 w-5 text-dusty-rose flex-shrink-0" />
+          <Bell className="h-5 w-5 text-dusty-rose flex-shrink-0" aria-hidden="true" />
           <p className="text-sm text-gray-600">
             알림을 켜면 맞춤 육아 정보를 받을 수 있어요
           </p>
@@ -132,7 +132,7 @@ export default function PushSubscription() {
             className="rounded-lg p-1.5 text-gray-300 hover:text-gray-500 hover:bg-gray-50 transition-colors"
             aria-label="닫기"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>

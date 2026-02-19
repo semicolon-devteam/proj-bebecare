@@ -222,7 +222,7 @@ export default function VoiceInput({ userId, childId, onLogSaved }: VoiceInputPr
           className="fixed bottom-24 left-6 h-14 w-14 rounded-full bg-sage text-white shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity z-20"
           aria-label="음성으로 기록"
         >
-          <Mic className="h-6 w-6" />
+          <Mic className="h-6 w-6" aria-hidden="true" />
         </button>
       )}
 
@@ -233,7 +233,7 @@ export default function VoiceInput({ userId, childId, onLogSaved }: VoiceInputPr
             {/* Close button */}
             <div className="flex justify-end mb-2">
               <button onClick={() => { if (recognitionRef.current) recognitionRef.current.abort(); reset(); }} className="p-1.5 rounded-lg hover:bg-gray-100">
-                <X className="h-5 w-5 text-gray-400" />
+                <X className="h-5 w-5 text-gray-400" aria-hidden="true" />
               </button>
             </div>
 
@@ -244,7 +244,7 @@ export default function VoiceInput({ userId, childId, onLogSaved }: VoiceInputPr
                   onClick={stopListening}
                   className="mx-auto h-20 w-20 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg animate-pulse mb-4"
                 >
-                  <MicOff className="h-8 w-8" />
+                  <MicOff className="h-8 w-8" aria-hidden="true" />
                 </button>
                 <p className="text-lg font-bold text-gray-900 mb-2">듣고 있어요...</p>
                 <p className="text-sm text-gray-500 min-h-[2.5rem]">
@@ -264,7 +264,7 @@ export default function VoiceInput({ userId, childId, onLogSaved }: VoiceInputPr
             {/* Processing state */}
             {state === 'processing' && (
               <div className="text-center py-8">
-                <Loader2 className="h-12 w-12 text-dusty-rose animate-spin mx-auto mb-4" />
+                <Loader2 className="h-12 w-12 text-dusty-rose animate-spin mx-auto mb-4" aria-hidden="true" />
                 <p className="text-lg font-bold text-gray-900 mb-1">분석 중...</p>
                 <p className="text-sm text-gray-500">&ldquo;{transcript}&rdquo;</p>
               </div>
@@ -325,7 +325,7 @@ export default function VoiceInput({ userId, childId, onLogSaved }: VoiceInputPr
             {/* Saving state */}
             {state === 'saving' && (
               <div className="text-center py-8">
-                <Loader2 className="h-12 w-12 text-dusty-rose animate-spin mx-auto mb-4" />
+                <Loader2 className="h-12 w-12 text-dusty-rose animate-spin mx-auto mb-4" aria-hidden="true" />
                 <p className="text-lg font-bold text-gray-900">저장 중...</p>
               </div>
             )}
@@ -334,7 +334,7 @@ export default function VoiceInput({ userId, childId, onLogSaved }: VoiceInputPr
             {state === 'done' && (
               <div className="text-center py-8">
                 <div className="mx-auto h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
-                  <Check className="h-8 w-8 text-green-600" />
+                  <Check className="h-8 w-8 text-green-600" aria-hidden="true" />
                 </div>
                 <p className="text-lg font-bold text-gray-900">저장 완료!</p>
               </div>
@@ -344,7 +344,7 @@ export default function VoiceInput({ userId, childId, onLogSaved }: VoiceInputPr
             {state === 'error' && (
               <div className="text-center py-6">
                 <div className="mx-auto h-16 w-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
-                  <AlertCircle className="h-8 w-8 text-red-400" />
+                  <AlertCircle className="h-8 w-8 text-red-400" aria-hidden="true" />
                 </div>
                 <p className="text-sm text-gray-500 mb-4">{errorMsg}</p>
                 <div className="flex gap-3">

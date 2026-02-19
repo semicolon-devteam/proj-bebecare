@@ -252,7 +252,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
           <div className="rounded-2xl bg-gradient-to-br from-sage-green/10 to-sage-green/5 border border-sage-green/20 p-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sage-green/20">
-                <Baby className="h-5 w-5 text-sage-green" />
+                <Baby className="h-5 w-5 text-sage-green" aria-hidden="true" />
               </div>
               <div>
                 <h3 className="font-semibold text-gray-900">
@@ -290,7 +290,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
               return (
                 <div className="mt-3 pt-3 border-t border-sage-green/20">
                   <p className="text-xs font-medium text-sage-green mb-2 flex items-center gap-1">
-                    <AlertCircle className="h-3.5 w-3.5" />
+                    <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
                     이번 달 접종 대상
                   </p>
                   <div className="flex flex-wrap gap-1.5">
@@ -314,7 +314,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
       {children.length === 0 && (
         <div className="px-4 pt-4 pb-2">
           <div className="rounded-2xl bg-gray-50 border border-gray-100 p-4 text-center">
-            <Syringe className="h-8 w-8 mx-auto text-gray-300 mb-2" />
+            <Syringe className="h-8 w-8 mx-auto text-gray-300 mb-2" aria-hidden="true" />
             <p className="text-sm text-gray-500">
               자녀를 등록하면 맞춤 접종 현황을<br />확인할 수 있어요
             </p>
@@ -325,7 +325,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
       {/* Timeline */}
       <div className="px-4 pb-4">
         <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
-          <Calendar className="h-4 w-4 text-dusty-rose" />
+          <Calendar className="h-4 w-4 text-dusty-rose" aria-hidden="true" />
           예방접종 스케줄
         </h3>
 
@@ -391,9 +391,9 @@ export default function VaccinationTab({ userId }: { userId: string }) {
                               }`}
                             >
                               {toggling ? (
-                                <Loader2 className="h-3 w-3 animate-spin" />
+                                <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
                               ) : done ? (
-                                <Check className="h-3 w-3" />
+                                <Check className="h-3 w-3" aria-hidden="true" />
                               ) : null}
                             </button>
                           )}
@@ -412,7 +412,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
                                 {info.disease}
                               </p>
                             </div>
-                            <ChevronRight className="h-4 w-4 text-gray-300 flex-shrink-0" />
+                            <ChevronRight className="h-4 w-4 text-gray-300 flex-shrink-0" aria-hidden="true" />
                           </button>
                         </div>
                       );
@@ -445,7 +445,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
             <div className="flex items-start justify-between px-5 pb-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-dusty-rose/10">
-                  <Shield className="h-5 w-5 text-dusty-rose" />
+                  <Shield className="h-5 w-5 text-dusty-rose" aria-hidden="true" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900">
@@ -458,7 +458,7 @@ export default function VaccinationTab({ userId }: { userId: string }) {
                 onClick={() => setDetailVaccine(null)}
                 className="p-1 rounded-full hover:bg-gray-100"
               >
-                <X className="h-5 w-5 text-gray-400" />
+                <X className="h-5 w-5 text-gray-400" aria-hidden="true" />
               </button>
             </div>
 

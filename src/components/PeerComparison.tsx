@@ -48,7 +48,7 @@ function PercentileBar({ result }: { result: AnyComparisonResult }) {
           <span className="text-sm font-bold text-gray-800">{result.label}</span>
         </div>
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${statusColor}`}>
-          <StatusIcon className="h-3 w-3" />
+          <StatusIcon className="h-3 w-3" aria-hidden="true" />
           {result.statusLabel}
         </span>
       </div>
@@ -154,11 +154,11 @@ function FetalMeasurementModal({
           {/* Header */}
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Microscope className="h-5 w-5 text-dusty-rose" />
+              <Microscope className="h-5 w-5 text-dusty-rose" aria-hidden="true" />
               초음파 측정값 입력
             </h3>
             <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
-              <X className="h-5 w-5 text-gray-400" />
+              <X className="h-5 w-5 text-gray-400" aria-hidden="true" />
             </button>
           </div>
 
@@ -166,7 +166,7 @@ function FetalMeasurementModal({
           <div className="mb-5">
             <label className="text-xs font-semibold text-gray-500 mb-1.5 block">임신 주차</label>
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-dusty-rose" />
+              <Calendar className="h-4 w-4 text-dusty-rose" aria-hidden="true" />
               <input
                 type="number"
                 min={8}
@@ -297,7 +297,7 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
   if (mode === 'none') {
     return (
       <div className="text-center py-12 px-4">
-        <Baby className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+        <Baby className="h-12 w-12 text-gray-300 mx-auto mb-3" aria-hidden="true" />
         <p className="text-sm font-semibold text-gray-500">아이 정보가 필요해요</p>
         <p className="text-xs text-gray-400 mt-1">마이페이지에서 아이 정보를 등록해주세요</p>
       </div>
@@ -310,7 +310,7 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-2 px-1">
-          <Users className="h-5 w-5 text-dusty-rose" />
+          <Users className="h-5 w-5 text-dusty-rose" aria-hidden="true" />
           <h3 className="text-base font-bold text-gray-900">또래 비교</h3>
           <span className="text-xs text-gray-400 ml-auto">
             {child?.nickname || '아이'} · {ageMonths}개월
@@ -319,7 +319,7 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
 
         {bornResults.length === 0 ? (
           <div className="rounded-xl bg-gray-50 border border-gray-100 p-6 text-center">
-            <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+            <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" aria-hidden="true" />
             <p className="text-sm text-gray-500 font-semibold">또래 비교 데이터가 준비 중이에요</p>
             <p className="text-xs text-gray-400 mt-1">오늘 수유·수면·기저귀 기록을 추가하면 또래와 비교해드릴게요</p>
           </div>
@@ -346,7 +346,7 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2 px-1">
-        <Baby className="h-5 w-5 text-dusty-rose" />
+        <Baby className="h-5 w-5 text-dusty-rose" aria-hidden="true" />
         <h3 className="text-base font-bold text-gray-900">태아 성장 비교</h3>
         <span className="text-xs text-gray-400 ml-auto">
           {child?.nickname || '태명'} · 임신 {weeks}주차
@@ -356,7 +356,7 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
       {fetalResults.length === 0 ? (
         <div className="rounded-xl bg-gray-50 border border-gray-100 p-6 text-center">
           <div className="h-12 w-12 rounded-full bg-pink-100 flex items-center justify-center mx-auto mb-2">
-            <Microscope className="h-6 w-6 text-dusty-rose" />
+            <Microscope className="h-6 w-6 text-dusty-rose" aria-hidden="true" />
           </div>
           <p className="text-sm text-gray-500 font-semibold">
             초음파 측정값을 입력하면<br />또래와 비교해드릴게요
@@ -368,7 +368,7 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
             onClick={() => setShowModal(true)}
             className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-dusty-rose text-white text-sm font-semibold rounded-xl"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-4 w-4" aria-hidden="true" />
             측정값 입력하기
           </button>
         </div>
@@ -387,14 +387,14 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
               onClick={() => setShowModal(true)}
               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-dusty-rose/10 text-dusty-rose text-sm font-semibold rounded-xl"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4" aria-hidden="true" />
               새 측정값
             </button>
             <button
               onClick={() => setShowHistory(h => !h)}
               className="flex items-center gap-1 px-4 py-2.5 bg-gray-50 text-gray-500 text-sm font-semibold rounded-xl"
             >
-              {showHistory ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              {showHistory ? <ChevronUp className="h-4 w-4" aria-hidden="true" /> : <ChevronDown className="h-4 w-4" aria-hidden="true" />}
               이력
             </button>
           </div>
@@ -414,7 +414,7 @@ export default function PeerComparison({ userId }: PeerComparisonProps) {
                     {m.fl_mm != null && <span>FL {m.fl_mm}</span>}
                     {m.hc_mm != null && <span>HC {m.hc_mm}</span>}
                     {m.ac_mm != null && <span>AC {m.ac_mm}</span>}
-                    {m.heart_rate_bpm != null && <span className="inline-flex items-center gap-0.5"><Heart className="h-3 w-3 text-pink-400" />{m.heart_rate_bpm}</span>}
+                    {m.heart_rate_bpm != null && <span className="inline-flex items-center gap-0.5"><Heart className="h-3 w-3 text-pink-400" aria-hidden="true" />{m.heart_rate_bpm}</span>}
                   </div>
                   {m.memo && <p className="text-[10px] text-gray-400 mt-1">{m.memo}</p>}
                 </div>
