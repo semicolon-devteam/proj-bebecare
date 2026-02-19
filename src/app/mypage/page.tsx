@@ -264,7 +264,7 @@ export default function MyPage() {
     <div className="min-h-screen bg-surface">
       <header className="border-b border-border bg-white px-4 py-3">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <button onClick={() => router.push('/')} className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
+          <button onClick={() => router.push('/')} aria-label="뒤로가기" className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors">
             <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </button>
           <h1 className="text-lg font-bold text-gray-900">마이페이지</h1>
@@ -319,10 +319,10 @@ export default function MyPage() {
                         </div>
                       </div>
                       <div className="flex gap-1">
-                        <button onClick={() => openEditChild(child)} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+                        <button onClick={() => openEditChild(child)} aria-label="아이 정보 수정" className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
                           <Pencil className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
                         </button>
-                        <button onClick={() => handleDeleteChild(child.id)} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+                        <button onClick={() => handleDeleteChild(child.id)} aria-label="아이 삭제" className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
                           <Trash2 className="h-3.5 w-3.5 text-gray-300 hover:text-red-400" aria-hidden="true" />
                         </button>
                       </div>

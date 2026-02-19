@@ -157,7 +157,7 @@ function FetalMeasurementModal({
               <Microscope className="h-5 w-5 text-dusty-rose" aria-hidden="true" />
               초음파 측정값 입력
             </h3>
-            <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
+            <button onClick={onClose} aria-label="닫기" className="p-1 rounded-full hover:bg-gray-100">
               <X className="h-5 w-5 text-gray-400" aria-hidden="true" />
             </button>
           </div>

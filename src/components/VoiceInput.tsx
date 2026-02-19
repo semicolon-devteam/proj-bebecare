@@ -232,7 +232,7 @@ export default function VoiceInput({ userId, childId, onLogSaved }: VoiceInputPr
           <div className="w-full max-w-lg bg-white rounded-t-2xl p-5 animate-slide-up" onClick={e => e.stopPropagation()}>
             {/* Close button */}
             <div className="flex justify-end mb-2">
-              <button onClick={() => { if (recognitionRef.current) recognitionRef.current.abort(); reset(); }} className="p-1.5 rounded-lg hover:bg-gray-100">
+              <button onClick={() => { if (recognitionRef.current) recognitionRef.current.abort(); reset(); }} aria-label="닫기" className="p-1.5 rounded-lg hover:bg-gray-100">
                 <X className="h-5 w-5 text-gray-400" aria-hidden="true" />
               </button>
             </div>

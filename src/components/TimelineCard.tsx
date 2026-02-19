@@ -251,10 +251,10 @@ export default function TimelineCard({
               </div>
             </div>
             <div className="flex items-center gap-0.5 flex-shrink-0">
-              <button onClick={handleBookmark} className="p-1.5 rounded-lg hover:bg-white/60 transition-colors">
+              <button onClick={handleBookmark} aria-label="북마크" className="p-1.5 rounded-lg hover:bg-white/60 transition-colors">
                 {bookmarked ? <Star className="h-4 w-4 text-amber-500 fill-amber-500" aria-hidden="true" /> : <Star className="h-4 w-4 text-gray-300" aria-hidden="true" />}
               </button>
-              <button onClick={handleDismiss} className="p-1.5 rounded-lg hover:bg-white/60 transition-colors">
+              <button onClick={handleDismiss} aria-label="닫기" className="p-1.5 rounded-lg hover:bg-white/60 transition-colors">
                 <X className="h-4 w-4 text-gray-300 hover:text-gray-500" aria-hidden="true" />
               </button>
             </div>
@@ -317,10 +317,10 @@ export default function TimelineCard({
               {!event.is_read && <span className="h-1.5 w-1.5 rounded-full bg-dusty-rose flex-shrink-0" />}
             </div>
             <div className="flex items-center gap-0.5 flex-shrink-0">
-              <button onClick={handleBookmark} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+              <button onClick={handleBookmark} aria-label="북마크" className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
                 {bookmarked ? <Star className="h-4 w-4 text-amber-500 fill-amber-500" aria-hidden="true" /> : <Star className="h-4 w-4 text-gray-300" aria-hidden="true" />}
               </button>
-              <button onClick={handleDismiss} className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+              <button onClick={handleDismiss} aria-label="닫기" className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
                 <X className="h-4 w-4 text-gray-300 hover:text-gray-500" aria-hidden="true" />
               </button>
             </div>
@@ -328,7 +328,7 @@ export default function TimelineCard({
 
           <div className="flex items-center justify-between mt-1">
             <h3 className="text-sm font-bold text-gray-900 leading-snug flex-1">{event.content?.title}</h3>
-            <button onClick={handleExpand} className="p-1 ml-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0">
+            <button onClick={handleExpand} aria-label={expanded ? '접기' : '펼치기'} className="p-1 ml-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0">
               {expanded ? <ChevronUp className="h-4 w-4 text-gray-400" aria-hidden="true" /> : <ChevronDown className="h-4 w-4 text-gray-400" aria-hidden="true" />}
             </button>
           </div>

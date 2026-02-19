@@ -2,7 +2,7 @@
 
 export default function LandingIllustration({ className = '' }: { className?: string }) {
   return (
-    <svg width="160" height="160" viewBox="0 0 160 160" fill="none" className={className}>
+    <svg width="160" height="160" viewBox="0 0 160 160" fill="none" className={className} aria-hidden="true" role="presentation">
       {/* Background circle */}
       <circle cx="80" cy="80" r="75" fill="#FEF0E8" />
       <circle cx="80" cy="80" r="72" stroke="#D4A0B0" strokeWidth="1" strokeDasharray="6 4" opacity="0.3" />

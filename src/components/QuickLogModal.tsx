@@ -86,7 +86,7 @@ export default function QuickLogModal({
             </div>
             <h2 className="text-lg font-bold text-gray-900">{config.label} 기록</h2>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100">
+          <button onClick={onClose} aria-label="닫기" className="p-1.5 rounded-lg hover:bg-gray-100">
             <X className="h-5 w-5 text-gray-400" aria-hidden="true" />
           </button>
         </div>

@@ -119,6 +119,7 @@ export default function NotificationsPage() {
         <div className="mx-auto flex max-w-4xl items-center gap-3">
           <button
             onClick={() => router.push('/')}
+            aria-label="뒤로가기"
             className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
           >
             <ChevronLeft className="h-5 w-5" aria-hidden="true" />
