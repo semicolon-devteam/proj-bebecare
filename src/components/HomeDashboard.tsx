@@ -54,9 +54,9 @@ export default function HomeDashboard({ user }: HomeDashboardProps) {
   return (
     <div className="flex h-[100dvh] flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-border backdrop-blur-sm px-4 py-3" style={{ backgroundColor: 'rgba(255, 249, 245, 0.95)' }}>
+      <header className="sticky top-0 z-30 border-b border-border backdrop-blur-sm px-4 py-3 nav-blur">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <h1 className="text-xl font-bold text-dusty-rose" style={{ letterSpacing: '0.05em', fontWeight: 700 }}>
+          <h1 className="text-xl font-bold text-dusty-rose tracking-wide">
             BebeCare
           </h1>
           <div className="flex items-center gap-1">
@@ -87,7 +87,7 @@ export default function HomeDashboard({ user }: HomeDashboardProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6" style={{ backgroundColor: '#FEF7F2' }}>
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 bg-surface">
         <div className="mx-auto max-w-4xl space-y-6">
           <FadeInUp delay={0}>
             <div data-tour="baby-profile">

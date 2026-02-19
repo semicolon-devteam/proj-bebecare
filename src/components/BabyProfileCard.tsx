@@ -72,9 +72,9 @@ export default function BabyProfileCard({ userId }: BabyProfileCardProps) {
   };
 
   return (
-    <div className="card p-5" style={{ background: 'linear-gradient(135deg, #FFF0F3 0%, #F0F7F1 100%)' }}>
+    <div className="card p-5 bg-gradient-profile">
       <div className="flex items-center gap-4">
-        <div className="h-14 w-14 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F8D0DA 0%, #D4A0B0 100%)' }}>
+        <div className="h-14 w-14 rounded-full flex items-center justify-center bg-gradient-avatar">
           <Baby className="h-7 w-7 text-white" aria-hidden="true" />
         </div>
         <div className="flex-1">

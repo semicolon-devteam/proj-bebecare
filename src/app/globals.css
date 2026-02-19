@@ -119,6 +119,30 @@ body {
   .animate-slide-up {
     animation: slideUp 0.3s ease-out;
   }
+
+  .bg-gradient-landing {
+    background: linear-gradient(180deg, #FFF9F5 0%, #FEF0E8 100%);
+  }
+
+  .bg-gradient-card {
+    background: linear-gradient(135deg, #FFFFFF 0%, #FFF5F0 100%);
+  }
+
+  .bg-gradient-cta {
+    background: linear-gradient(135deg, #C2728A 0%, #D4A0B0 100%);
+  }
+
+  .bg-gradient-profile {
+    background: linear-gradient(135deg, #FFF0F3 0%, #F0F7F1 100%);
+  }
+
+  .bg-gradient-avatar {
+    background: linear-gradient(135deg, #F8D0DA 0%, #D4A0B0 100%);
+  }
+
+  .nav-blur {
+    background-color: rgba(255, 249, 245, 0.95);
+  }
 }
 
 @keyframes slideUp {

@@ -22,7 +22,7 @@ export default function BottomTabBar({ isVisible }: BottomTabBarProps) {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border safe-area-inset-bottom" style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(12px)' }}>
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border safe-area-inset-bottom bg-white/95 backdrop-blur-md">
       <div className="flex h-16 px-3">
         {tabs.map(({ id, path, label, icon: Icon }) => {
           const isActive = pathname === path;

@@ -14,7 +14,7 @@ export default async function Home() {
       redirect('/onboarding');
     }
     return (
-      <div className="flex min-h-screen flex-col" style={{ backgroundColor: '#FFF9F5' }}>
+      <div className="flex min-h-screen flex-col bg-surface-warm">
         <HomeDashboard user={{ id: user.id, email: user.email ?? undefined }} />
       </div>
     );
@@ -22,17 +22,15 @@ export default async function Home() {
 
   // Landing page — server rendered for SEO
   return (
-    <div className="flex min-h-screen flex-col" style={{ backgroundColor: '#FFF9F5' }}>
+    <div className="flex min-h-screen flex-col bg-surface-warm">
       <div
-        className="flex min-h-screen items-center justify-center px-5 py-8"
-        style={{ background: 'linear-gradient(180deg, #FFF9F5 0%, #FEF0E8 100%)' }}
+        className="flex min-h-screen items-center justify-center px-5 py-8 bg-gradient-landing"
       >
         <div className="w-full max-w-lg space-y-8">
           {/* Hero */}
           <div className="text-center space-y-6">
             <div
-              className="card rounded-3xl px-6 py-10"
-              style={{ background: 'linear-gradient(135deg, #FFFFFF 0%, #FFF5F0 100%)' }}
+              className="card rounded-3xl px-6 py-10 bg-gradient-card"
             >
               {/* Inline SVG illustration for SSR */}
               <div className="flex justify-center mb-6">
@@ -47,7 +45,7 @@ export default async function Home() {
                   <circle cx="96" cy="68" r="5" fill="#FFB3B3" opacity="0.4" />
                 </svg>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-dusty-rose" style={{ letterSpacing: '0.05em' }}>
+              <h1 className="text-4xl md:text-5xl font-bold text-dusty-rose tracking-wide">
                 BebeCare
               </h1>
               <p className="mt-3 text-lg font-semibold text-gray-700">
@@ -75,8 +73,7 @@ export default async function Home() {
             <div className="grid grid-cols-2 gap-3">
               <Link
                 href="/login"
-                className="rounded-2xl px-6 py-4 font-semibold text-white shadow-md hover:shadow-lg transition-all text-center"
-                style={{ background: 'linear-gradient(135deg, #C2728A 0%, #D4A0B0 100%)' }}
+                className="rounded-2xl px-6 py-4 font-semibold text-white shadow-md hover:shadow-lg transition-all text-center bg-gradient-cta"
               >
                 로그인
               </Link>
