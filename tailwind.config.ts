@@ -9,8 +9,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#3B82F6', // 파란색 (건강)
-        secondary: '#F59E0B', // 주황색 (보험)
+        primary: '#C2728A', // Dusty Rose (브랜드 주색상)
+        secondary: '#7C9A82', // Sage Green (브랜드 보조색상)
         success: '#10B981', // 초록색 (완료)
         warning: '#EF4444', // 빨간색 (높은 우선순위)
       },
