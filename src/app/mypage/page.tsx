@@ -10,6 +10,12 @@ import { REGION_DATA } from '@/lib/regions';
 import { ChevronLeft, Baby, Briefcase, MapPin, Settings, LogOut, Plus, Pencil, Trash2, Heart, FileText, Save, Check, Bell, BellOff, Users, Download } from 'lucide-react';
 import FamilyManager from '@/components/FamilyManager';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Avatar } from '@/components/ui/Avatar';
 
 export default function MyPage() {
   const router = useRouter();
@@ -275,19 +281,19 @@ export default function MyPage() {
 
       <div className="mx-auto max-w-2xl px-4 py-6 space-y-4">
         {/* Children list */}
-        <div className="card rounded-xl p-5 space-y-4">
+        <Card className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Baby className="h-4 w-4 text-gray-400" aria-hidden="true" />
               <h3 className="font-bold text-gray-900 text-sm">내 아이</h3>
             </div>
-            <button
+            <Button
               onClick={() => { resetChildForm(); setShowAddChild(true); }}
-              className="flex items-center gap-1 rounded-lg bg-dusty-rose px-3 py-1.5 text-xs font-semibold text-white hover:bg-dusty-rose-dark transition-colors"
+              size="sm"
+              icon={<Plus className="h-3.5 w-3.5" />}
             >
-              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               아이 추가
-            </button>
+            </Button>
           </div>
 
           {children.length === 0 ? (
@@ -298,12 +304,12 @@ export default function MyPage() {
                 const week = getChildWeek(child);
                 const age = getChildAge(child);
                 return (
-                  <div key={child.id} className="rounded-lg border border-border p-3.5 space-y-1.5">
+                  <Card key={child.id} padding="sm" className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className={`h-8 w-8 rounded-full flex items-center justify-center ${child.status === 'expecting' ? 'bg-pink-50' : 'bg-blue-50'}`}>
+                        <Avatar size="sm">
                           {child.status === 'expecting' ? <Heart className="h-4 w-4 text-dusty-rose" aria-hidden="true" /> : <Baby className="h-4 w-4 text-blue-500" aria-hidden="true" />}
-                        </div>
+                        </Avatar>
                         <div>
                           <p className="text-sm font-bold text-gray-900">{child.nickname || child.name || '이름 없음'}</p>
                           <p className="text-xs text-gray-500">
@@ -320,24 +326,24 @@ export default function MyPage() {
                         </div>
                       </div>
                       <div className="flex gap-1">
-                        <button onClick={() => openEditChild(child)} aria-label="아이 정보 수정" className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
-                          <Pencil className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
-                        </button>
-                        <button onClick={() => handleDeleteChild(child.id)} aria-label="아이 삭제" className="p-1.5 rounded-lg hover:bg-gray-50 transition-colors">
-                          <Trash2 className="h-3.5 w-3.5 text-gray-300 hover:text-red-400" aria-hidden="true" />
-                        </button>
+                        <Button variant="ghost" size="sm" onClick={() => openEditChild(child)} aria-label="아이 정보 수정">
+                          <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteChild(child.id)} aria-label="아이 삭제">
+                          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Button>
                       </div>
                     </div>
-                  </div>
+                  </Card>
                 );
               })}
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Add/Edit child form */}
         {showAddChild && (
-          <div className="card rounded-xl p-5 space-y-4 border-2 border-dusty-rose/30">
+          <Card className="space-y-4 border-2 border-dusty-rose/30">
             <h3 className="font-bold text-gray-900 text-sm">{editingChild ? '아이 정보 수정' : '아이 추가'}</h3>
 
             <div className="grid grid-cols-2 gap-2">
@@ -361,21 +367,31 @@ export default function MyPage() {
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">별명/이름 (선택)</label>
-              <input type="text" value={childNickname} onChange={(e) => setChildNickname(e.target.value)}
-                placeholder="예: 첫째, 콩이" className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-dusty-rose/20 focus:border-dusty-rose" />
+              <Input 
+                type="text" 
+                value={childNickname} 
+                onChange={(e) => setChildNickname(e.target.value)}
+                placeholder="예: 첫째, 콩이"
+              />
             </div>
 
             {childStatus === 'expecting' && (
               <>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1">마지막 생리 시작일</label>
-                  <input type="date" value={childPregnancyStart} onChange={(e) => handleLastPeriodChange(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-dusty-rose/20 focus:border-dusty-rose" />
+                  <Input 
+                    type="date" 
+                    value={childPregnancyStart} 
+                    onChange={(e) => handleLastPeriodChange(e.target.value)}
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1">출산 예정일</label>
-                  <input type="date" value={childDueDate} onChange={(e) => setChildDueDate(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-dusty-rose/20 focus:border-dusty-rose" />
+                  <Input 
+                    type="date" 
+                    value={childDueDate} 
+                    onChange={(e) => setChildDueDate(e.target.value)}
+                  />
                 </div>
               </>
             )}
@@ -384,8 +400,11 @@ export default function MyPage() {
               <>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1">출산일</label>
-                  <input type="date" value={childBirthDate} onChange={(e) => setChildBirthDate(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-dusty-rose/20 focus:border-dusty-rose" />
+                  <Input 
+                    type="date" 
+                    value={childBirthDate} 
+                    onChange={(e) => setChildBirthDate(e.target.value)}
+                  />
                 </div>
                 <div className="flex gap-2">
                   {[{ value: 'male', label: '남아' }, { value: 'female', label: '여아' }].map((g) => (
@@ -399,18 +418,27 @@ export default function MyPage() {
             )}
 
             <div className="flex gap-3">
-              <button onClick={() => { setShowAddChild(false); resetChildForm(); }}
-                className="flex-1 rounded-lg border border-border py-2.5 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors">취소</button>
-              <button onClick={handleSaveChild} disabled={saving}
-                className="flex-1 rounded-lg bg-dusty-rose py-2.5 text-sm font-semibold text-white disabled:opacity-50 hover:bg-dusty-rose-dark transition-colors">
-                {saving ? '저장 중...' : editingChild ? '수정하기' : '추가하기'}
-              </button>
+              <Button 
+                variant="outline" 
+                onClick={() => { setShowAddChild(false); resetChildForm(); }}
+                className="flex-1"
+              >
+                취소
+              </Button>
+              <Button 
+                onClick={handleSaveChild} 
+                disabled={saving}
+                loading={saving}
+                className="flex-1"
+              >
+                {editingChild ? '수정하기' : '추가하기'}
+              </Button>
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Current status */}
-        <div className="card rounded-xl p-5 text-center space-y-2">
+        <Card className="text-center space-y-2">
           <div className={`mx-auto h-12 w-12 rounded-full flex items-center justify-center ${
             stage === 'pregnant' ? 'bg-pink-50' : stage === 'postpartum' ? 'bg-blue-50' : 'bg-gray-50'
           }`}>
@@ -422,10 +450,10 @@ export default function MyPage() {
             {stage === 'pregnant' ? '임신 중' : stage === 'postpartum' ? '출산 후' : '임신 준비 중'}
           </h2>
           <p className="text-xs text-gray-400">아이 정보 기반으로 자동 설정됩니다</p>
-        </div>
+        </Card>
 
         {/* Working status */}
-        <div className="card rounded-xl p-5 space-y-3">
+        <Card className="space-y-3">
           <div className="flex items-center gap-2">
             <Briefcase className="h-4 w-4 text-gray-400" aria-hidden="true" />
             <h3 className="font-bold text-gray-900 text-sm">직장 여부</h3>
@@ -440,10 +468,10 @@ export default function MyPage() {
                 !isWorking ? 'bg-dusty-rose text-white' : 'bg-gray-50 text-gray-500 border border-border'
               }`}>전업맘</button>
           </div>
-        </div>
+        </Card>
 
         {/* Region */}
-        <div className="card rounded-xl p-5 space-y-3">
+        <Card className="space-y-3">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-gray-400" aria-hidden="true" />
             <h3 className="font-bold text-gray-900 text-sm">지역</h3>
@@ -466,20 +494,21 @@ export default function MyPage() {
               </select>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Save button */}
-        <button onClick={handleSaveProfile} disabled={saving}
-          className="w-full flex items-center justify-center gap-2 rounded-xl bg-dusty-rose py-3.5 text-sm font-bold text-white hover:bg-dusty-rose-dark disabled:opacity-50 transition-colors">
-          {saving ? '저장 중...' : saved ? (
-            <><Check className="h-4 w-4" aria-hidden="true" /> 저장 완료!</>
-          ) : (
-            <><Save className="h-4 w-4" aria-hidden="true" /> 저장하기</>
-          )}
-        </button>
+        <Button 
+          onClick={handleSaveProfile} 
+          disabled={saving}
+          loading={saving}
+          className="w-full"
+          icon={saved ? <Check className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+        >
+          {saved ? '저장 완료!' : '저장하기'}
+        </Button>
 
         {/* Push Notification */}
-        <div className="card rounded-xl p-5 space-y-3">
+        <Card className="space-y-3">
           <div className="flex items-center gap-2">
             <Bell className="h-4 w-4 text-gray-400" aria-hidden="true" />
             <h3 className="font-bold text-gray-900 text-sm">푸시 알림</h3>
@@ -503,14 +532,14 @@ export default function MyPage() {
           {pushEnabled === false && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'denied' && (
             <p className="text-xs text-red-500">⚠️ 브라우저에서 알림이 차단되어 있습니다. 브라우저 설정에서 허용해주세요.</p>
           )}
-        </div>
+        </Card>
 
         {/* Family */}
         {userId && <FamilyManager userId={userId} />}
 
         {/* Growth Report */}
         {userId && (
-          <div className="card rounded-xl p-5 space-y-3">
+          <Card className="space-y-3">
             <div className="flex items-center gap-2">
               <Download className="h-4 w-4 text-gray-400" aria-hidden="true" />
               <h3 className="font-bold text-gray-900 text-sm">성장 보고서</h3>
@@ -527,21 +556,24 @@ export default function MyPage() {
                 </button>
               ))}
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Account */}
-        <div className="card rounded-xl p-5 space-y-3">
+        <Card className="space-y-3">
           <div className="flex items-center gap-2">
             <Settings className="h-4 w-4 text-gray-400" aria-hidden="true" />
             <h3 className="font-bold text-gray-900 text-sm">계정</h3>
           </div>
-          <button onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors">
-            <LogOut className="h-4 w-4" aria-hidden="true" />
+          <Button 
+            onClick={handleSignOut}
+            variant="outline"
+            className="w-full"
+            icon={<LogOut className="h-4 w-4" />}
+          >
             로그아웃
-          </button>
-        </div>
+          </Button>
+        </Card>
 
         <div className="h-8" />
       </div>

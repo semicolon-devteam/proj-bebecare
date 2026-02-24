@@ -8,6 +8,9 @@ import type { User } from '@supabase/supabase-js';
 import { MessageCircle } from 'lucide-react';
 import { CuteLoader, FadeInUp } from '@/components/animations/MotionWrappers';
 import ReactMarkdown from 'react-markdown';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Card } from '@/components/ui/Card';
 
 interface Message {
   id: string;
@@ -193,14 +196,15 @@ export default function ChatPage() {
                   '직장맘으로서 준비할 것들이 뭐야?',
                 ].map((example, index) => (
                   <FadeInUp key={index} delay={index * 0.05}>
-                    <button
+                    <Card 
+                      hover="lift" 
                       onClick={() => handleSendMessage(example)}
-                      className="card card-hover p-4 text-left w-full"
+                      className="p-4 cursor-pointer"
                     >
                       <p className="text-sm text-gray-700">
                         {example}
                       </p>
-                    </button>
+                    </Card>
                   </FadeInUp>
                 ))}
               </div>
@@ -261,22 +265,21 @@ export default function ChatPage() {
       {/* Chat Input - above BottomTabBar */}
       <div className="fixed bottom-16 left-0 right-0 z-30 border-t border-border bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
         <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
-          <div className="flex items-center gap-2 rounded-xl border border-border bg-surface p-1.5">
-            <input
-              type="text"
+          <div className="flex items-center gap-2">
+            <Input
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="메시지를 입력하세요..."
-              className="flex-1 bg-transparent px-3 py-2 text-sm text-gray-800 placeholder-gray-400 outline-none"
               disabled={isTyping}
+              className="flex-1"
             />
-            <button
+            <Button
               type="submit"
               disabled={!inputValue.trim() || isTyping}
-              className="flex-shrink-0 rounded-lg bg-dusty-rose px-4 py-2 text-sm font-semibold text-white hover:bg-dusty-rose-dark disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              size="md"
             >
               전송
-            </button>
+            </Button>
           </div>
         </form>
       </div>
