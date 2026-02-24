@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export interface ProfileData {
   stage?: string;
@@ -98,9 +99,14 @@ export async function addChild(userId: string, childData: ChildData) {
 
 /**
  * 온보딩 완료 여부 확인
+ * @param supabaseClient - Server 또는 Client Supabase 인스턴스
+ * @param userId - 사용자 ID
  */
-export async function isOnboardingCompleted(userId: string): Promise<boolean> {
-  const { data, error } = await supabase
+export async function isOnboardingCompleted(
+  supabaseClient: SupabaseClient,
+  userId: string
+): Promise<boolean> {
+  const { data, error } = await supabaseClient
     .from('profiles')
     .select('onboarding_completed')
     .eq('user_id', userId)
