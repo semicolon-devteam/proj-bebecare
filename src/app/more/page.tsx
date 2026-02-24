@@ -17,6 +17,9 @@ import {
   ChevronRight
 } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 
 export default function MorePage() {
   const router = useRouter();
@@ -132,7 +135,7 @@ export default function MorePage() {
         <div className="px-4 py-6 space-y-6">
           {/* User Info Card */}
           {user && (
-            <div className="card p-4 bg-gradient-to-r from-dusty-rose/5 to-sage/5">
+            <Card padding="sm" className="bg-gradient-to-r from-dusty-rose/5 to-sage/5">
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-full bg-dusty-rose/20 flex items-center justify-center">
                   <UserIcon className="h-6 w-6 text-dusty-rose" aria-hidden="true" />
@@ -144,7 +147,7 @@ export default function MorePage() {
                   <p className="text-sm text-gray-500">{user.email}</p>
                 </div>
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Menu Items */}
