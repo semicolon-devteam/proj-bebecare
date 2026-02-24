@@ -9,7 +9,7 @@ export default async function Home() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (user) {
-    const completed = await isOnboardingCompleted(user.id);
+    const completed = await isOnboardingCompleted(supabase, user.id);
     if (!completed) {
       redirect('/onboarding');
     }
