@@ -3,15 +3,27 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!url || !anonKey) {
+    throw new Error('Supabase config missing');
+  }
+  
+  return createClient(url, anonKey);
+}
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!url || !serviceKey) {
+    return null;
+  }
+  
+  return createClient(url, serviceKey);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,6 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const supabase = getSupabaseClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
@@ -30,6 +43,11 @@ export async function POST(request: NextRequest) {
     const { endpoint, p256dh, auth } = await request.json();
     if (!endpoint || !p256dh || !auth) {
       return NextResponse.json({ error: 'Missing subscription data' }, { status: 400 });
+    }
+
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Service not configured' }, { status: 503 });
     }
 
     const { error } = await supabaseAdmin
@@ -58,6 +76,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const supabase = getSupabaseClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
@@ -68,6 +87,11 @@ export async function DELETE(request: NextRequest) {
     const { endpoint } = await request.json();
     if (!endpoint) {
       return NextResponse.json({ error: 'Missing endpoint' }, { status: 400 });
+    }
+
+    const supabaseAdmin = getSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: 'Service not configured' }, { status: 503 });
     }
 
     const { error } = await supabaseAdmin

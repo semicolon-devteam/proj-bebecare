@@ -1,170 +1,70 @@
 @import "tailwindcss";
 
-@theme {
-  --color-dusty-rose: #C2728A;
-  --color-dusty-rose-light: #D4A0B0;
-  --color-dusty-rose-dark: #A85C73;
-  --color-sage: #7C9A82;
-  --color-sage-light: #A3BDA8;
-
-  --color-surface: #FEF7F2;
-  --color-surface-warm: #FFF9F5;
-  --color-border: #F0E6E0;
-
-  --color-gray-50: #F9FAFB;
-  --color-gray-100: #F3F4F6;
-  --color-gray-200: #E5E7EB;
-  --color-gray-300: #D1D5DB;
-  --color-gray-400: #9CA3AF;
-  --color-gray-500: #6B7280;
-  --color-gray-600: #4B5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1F2937;
-  --color-gray-900: #111827;
-
-  --color-red-50: #FEF2F2;
-  --color-red-500: #EF4444;
-  --color-red-600: #DC2626;
-  --color-red-700: #B91C1C;
-
-  --color-blue-50: #EFF6FF;
-  --color-blue-500: #3B82F6;
-  --color-blue-600: #2563EB;
-
-  --color-amber-500: #F59E0B;
-  --color-orange-500: #F97316;
-
-  --color-green-50: #F0FDF4;
-  --color-green-500: #22C55E;
-  --color-green-600: #16A34A;
-
-  --color-pink-50: #FDF2F8;
-  --color-pink-100: #FCE7F3;
-  --color-pink-600: #DB2777;
-
-  --color-purple-50: #FAF5FF;
-  --color-purple-100: #F3E8FF;
-  --color-purple-600: #9333EA;
-
-  --color-indigo-50: #EEF2FF;
-  --color-indigo-600: #4F46E5;
-
-  --color-teal-50: #F0FDFA;
-  --color-teal-600: #0D9488;
-
-  --color-cyan-50: #ECFEFF;
-  --color-cyan-600: #0891B2;
-
-  --color-emerald-50: #ECFDF5;
-  --color-emerald-600: #059669;
-
-  --color-violet-50: #F5F3FF;
-  --color-violet-600: #7C3AED;
-}
+/* 
+ * BebeCare Global Styles
+ * Design System: DESIGN_SYSTEM.md
+ * Tailwind Config: tailwind.config.ts
+ */
 
 :root {
-  /* Design tokens — warm shadow system */
-  --shadow-warm-sm: 0 1px 4px rgba(194, 114, 138, 0.04);
-  --shadow-warm: 0 2px 8px rgba(194, 114, 138, 0.06);
-  --shadow-warm-md: 0 4px 16px rgba(194, 114, 138, 0.08);
-  --shadow-warm-lg: 0 8px 24px rgba(194, 114, 138, 0.10);
-
-  /* 3-color palette */
-  --color-primary: #C2728A;       /* Baby tone — dusty rose */
-  --color-secondary: #7C9A82;     /* Sage green */
-  --color-neutral: #F0E6E0;       /* Warm neutral border */
-
-  /* Radius */
-  --radius-card: 1.25rem;
+  /* Legacy support - deprecated, use Tailwind utilities */
+  --color-primary: #C2728A;
+  --color-secondary: #7C9A82;
+  --color-neutral: #F0E6E0;
 }
 
 body {
   overflow-x: hidden;
-  background-color: #FFF9F5;
-  color: #111827;
+  background-color: #FFF9F5; /* surface-warm */
+  color: #111827; /* gray-900 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@layer components {
-  .card {
-    background-color: #FFFFFF;
-    border: 1px solid var(--color-neutral);
-    border-radius: var(--radius-card);
-    box-shadow: var(--shadow-warm);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+/* Custom scrollbar (optional, for desktop) */
+@media (min-width: 1024px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
 
-  .card:hover {
-    box-shadow: var(--shadow-warm-md);
-    transform: scale(1.005);
+  ::-webkit-scrollbar-track {
+    background: #F9FAFB; /* gray-50 */
   }
 
-  .card-hover {
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  ::-webkit-scrollbar-thumb {
+    background: #D1D5DB; /* gray-300 */
+    border-radius: 4px;
   }
 
-  .card-hover:hover {
-    box-shadow: var(--shadow-warm-md);
-    transform: translateY(-2px);
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
-
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
-  }
-
-  .bg-gradient-landing {
-    background: linear-gradient(180deg, #FFF9F5 0%, #FEF0E8 100%);
-  }
-
-  .bg-gradient-card {
-    background: linear-gradient(135deg, #FFFFFF 0%, #FFF5F0 100%);
-  }
-
-  .bg-gradient-cta {
-    background: linear-gradient(135deg, #C2728A 0%, #D4A0B0 100%);
-  }
-
-  .bg-gradient-profile {
-    background: linear-gradient(135deg, #FFF0F3 0%, #F0F7F1 100%);
-  }
-
-  .bg-gradient-avatar {
-    background: linear-gradient(135deg, #F8D0DA 0%, #D4A0B0 100%);
-  }
-
-  .nav-blur {
-    background-color: rgba(255, 249, 245, 0.95);
-  }
-
-  /* Accessibility: focus-visible */
-  *:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-  }
-
-  /* Remove default focus ring for mouse users */
-  *:focus:not(:focus-visible) {
-    outline: none;
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9CA3AF; /* gray-400 */
   }
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
+/* Print styles */
+@media print {
+  body {
+    background-color: white;
   }
-  to {
-    transform: translateY(0);
+
+  .no-print {
+    display: none !important;
   }
 }
 
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Legacy animations (kept for backward compatibility) */
 @keyframes celebration-particle {
   0% {
     opacity: 1;
@@ -189,14 +89,29 @@ body {
 }
 
 .animate-celebration-particle:nth-child(odd) {
-  --tx: 25px; --ty: -35px; --tx2: 40px; --ty2: -65px;
+  --tx: 25px;
+  --ty: -35px;
+  --tx2: 40px;
+  --ty2: -65px;
 }
+
 .animate-celebration-particle:nth-child(even) {
-  --tx: -20px; --ty: -40px; --tx2: -35px; --ty2: -70px;
+  --tx: -20px;
+  --ty: -40px;
+  --tx2: -35px;
+  --ty2: -70px;
 }
+
 .animate-celebration-particle:nth-child(3n) {
-  --tx: 0px; --ty: -45px; --tx2: 10px; --ty2: -80px;
+  --tx: 0px;
+  --ty: -45px;
+  --tx2: 10px;
+  --ty2: -80px;
 }
+
 .animate-celebration-particle:nth-child(4n) {
-  --tx: -30px; --ty: -25px; --tx2: -45px; --ty2: -55px;
+  --tx: -30px;
+  --ty: -25px;
+  --tx2: -45px;
+  --ty2: -55px;
 }
