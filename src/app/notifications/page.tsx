@@ -7,6 +7,8 @@ import { getCurrentUser } from '@/lib/auth';
 import type { User } from '@supabase/supabase-js';
 import { ChevronLeft, Bell, Baby, Briefcase, Building2, Megaphone } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 
 interface Notification {
   id: string;
@@ -118,13 +120,14 @@ export default function NotificationsPage() {
       {/* Header */}
       <header className="border-b border-border bg-white px-4 py-3">
         <div className="mx-auto flex max-w-4xl items-center gap-3">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => router.push('/')}
             aria-label="뒤로가기"
-            className="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
-          >
-            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-          </button>
+            className="p-1.5 text-gray-400 hover:text-gray-600"
+            icon={<ChevronLeft className="h-5 w-5" />}
+          />
           <h1 className="text-lg font-bold text-gray-900">알림</h1>
         </div>
       </header>
@@ -133,13 +136,13 @@ export default function NotificationsPage() {
       <div className="flex-1 px-4 py-6 bg-surface">
         <div className="mx-auto max-w-3xl space-y-2">
           {notifications.length === 0 ? (
-            <div className="card rounded-2xl p-12 text-center">
+            <Card className="p-12 text-center">
               <div className="mx-auto h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                 <Bell className="h-6 w-6 text-gray-300" aria-hidden="true" />
               </div>
               <p className="text-base font-semibold text-gray-600">아직 알림이 없어요</p>
               <p className="text-gray-400 mt-1 text-sm">새로운 소식이 오면 여기서 확인할 수 있어요</p>
-            </div>
+            </Card>
           ) : (
             notifications.map((notif) => {
               const IconComp = getCategoryIcon(notif.category);
