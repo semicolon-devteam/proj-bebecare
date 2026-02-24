@@ -13,3 +13,4 @@ export * from './Badge';
 export * from './Avatar';
 export * from './Modal';
 export * from './Toast';
+export * from './ErrorMessage';

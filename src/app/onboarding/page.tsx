@@ -7,7 +7,8 @@ import { createOrUpdateProfile } from '@/lib/profile';
 import { addChild, deriveStageFromChildren } from '@/lib/children';
 import type { ChildInput } from '@/lib/children';
 import { REGION_DATA } from '@/lib/regions';
-import { FileText, Baby, Briefcase, MapPin, Heart } from 'lucide-react';
+import { FileText, Baby, Briefcase, MapPin, Heart, Plus, Trash2 } from 'lucide-react';
+import { Button, Input, Label, Select, Card, Badge } from '@/components/ui';
 
 interface ChildRow {
   status: 'expecting' | 'born';
@@ -165,41 +166,55 @@ export default function OnboardingPage() {
   const progressPercent = (currentStep / totalSteps) * 100;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white p-4">
-      <div className="w-full max-w-lg">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-landing p-4">
+      <div className="w-full max-w-2xl">
         {/* Progress bar */}
         <div className="mb-6">
-          <div className="mb-2 flex items-center justify-between text-sm font-medium text-gray-500">
+          <div className="mb-2 flex items-center justify-between text-body-sm font-medium text-gray-500">
             <span>프로필 설정</span>
             <span>{currentStep} / {totalSteps}</span>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
-            <div className="h-full rounded-full bg-dusty-rose transition-all duration-500" style={{ width: `${progressPercent}%` }} />
+          <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+            <div 
+              className="h-full rounded-full bg-gradient-cta transition-all duration-500" 
+              style={{ width: `${progressPercent}%` }} 
+            />
           </div>
         </div>
 
-        <div className="card rounded-2xl p-8">
+        <Card shadow="xl" padding="lg">
           {/* Step 1: Stage */}
           {step === 1 && (
             <div className="space-y-6">
               <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold text-gray-900">환영합니다!</h2>
-                <p className="text-gray-500">현재 상황을 알려주세요</p>
+                <h2 className="text-h2 font-bold text-gray-900">환영합니다!</h2>
+                <p className="text-body text-gray-500">현재 상황을 알려주세요</p>
               </div>
-              <div className="space-y-3">
+              <div className="grid gap-3">
                 {([
-                  { value: 'planning' as const, icon: FileText, label: '임신 계획 중' },
-                  { value: 'expecting' as const, icon: Heart, label: '임신 중' },
-                  { value: 'born' as const, icon: Baby, label: '출산 완료 · 육아 중' },
+                  { value: 'planning' as const, icon: FileText, label: '임신 계획 중', color: 'bg-purple-50 hover:bg-purple-100 border-purple-200' },
+                  { value: 'expecting' as const, icon: Heart, label: '임신 중', color: 'bg-pink-50 hover:bg-pink-100 border-pink-200' },
+                  { value: 'born' as const, icon: Baby, label: '출산 완료 · 육아 중', color: 'bg-blue-50 hover:bg-blue-100 border-blue-200' },
                 ]).map((option) => (
-                  <button key={option.value} onClick={() => setHasChildren(option.value)}
-                    className={`w-full flex items-center gap-3 rounded-xl p-4 text-left font-semibold transition-all ${
-                      hasChildren === option.value
-                        ? 'bg-dusty-rose text-white shadow-sm'
-                        : 'card hover:border-gray-300'
-                    }`}>
-                    <option.icon className="h-5 w-5 flex-shrink-0" />
-                    {option.label}
+                  <button 
+                    key={option.value} 
+                    onClick={() => setHasChildren(option.value)}
+                    className={`
+                      w-full flex items-center gap-4 rounded-xl p-5 text-left font-semibold 
+                      border-2 transition-all
+                      ${hasChildren === option.value
+                        ? 'bg-dusty-rose-500 text-white border-dusty-rose-500 shadow-warm-md scale-[1.02]'
+                        : `${option.color} text-gray-700`
+                      }
+                    `}
+                  >
+                    <div className={`
+                      h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0
+                      ${hasChildren === option.value ? 'bg-white/20' : 'bg-white'}
+                    `}>
+                      <option.icon className={`h-6 w-6 ${hasChildren === option.value ? 'text-white' : 'text-gray-600'}`} />
+                    </div>
+                    <span className="text-body-lg">{option.label}</span>
                   </button>
                 ))}
               </div>
@@ -210,68 +225,116 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div className="space-y-6">
               <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold text-gray-900">아이 정보 등록</h2>
-                <p className="text-gray-500">아이 정보를 입력해주세요</p>
+                <h2 className="text-h2 font-bold text-gray-900">아이 정보 등록</h2>
+                <p className="text-body text-gray-500">
+                  {hasChildren === 'expecting' ? '출산 예정일을 입력해주세요' : '아이의 생년월일을 입력해주세요'}
+                </p>
               </div>
-              <div className="space-y-4 max-h-[45vh] overflow-y-auto pr-1">
+              <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-1">
                 {children.map((child, index) => (
-                  <div key={index} className="card rounded-xl p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-gray-500">아이 {index + 1}</span>
-                      <div className="flex gap-2">
-                        <button onClick={() => toggleChildStatus(index)}
-                          className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
-                            child.status === 'expecting' ? 'bg-pink-50 text-dusty-rose' : 'bg-blue-50 text-blue-600'
-                          }`}>
-                          {child.status === 'expecting' ? '임신 중' : '출산'}
-                        </button>
-                        {children.length > 1 && (
-                          <button onClick={() => removeChild(index)} className="text-sm text-red-400 hover:text-red-600 font-semibold">삭제</button>
-                        )}
-                      </div>
-                    </div>
-
-                    <input type="text" placeholder="별명 (선택)" value={child.nickname}
-                      onChange={(e) => updateChild(index, 'nickname', e.target.value)}
-                      className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 outline-none focus:border-dusty-rose focus:ring-1 focus:ring-dusty-rose/20 transition-all" />
-
-                    {child.status === 'expecting' ? (
-                      <>
-                        <div>
-                          <span className="mb-1 block text-xs font-semibold text-gray-500">마지막 생리 시작일</span>
-                          <input type="date" value={child.lastPeriodDate}
-                            onChange={(e) => updateChild(index, 'lastPeriodDate', e.target.value)}
-                            className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 outline-none focus:border-dusty-rose focus:ring-1 focus:ring-dusty-rose/20 transition-all" />
+                  <Card key={index} shadow="sm" padding="md" className="border-2 border-gray-200">
+                    <div className="space-y-4">
+                      {/* Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Baby className="h-5 w-5 text-dusty-rose-500" />
+                          <span className="text-body font-semibold text-gray-700">아이 {index + 1}</span>
                         </div>
-                        <div>
-                          <span className="mb-1 block text-xs font-semibold text-gray-500">출산 예정일</span>
-                          <input type="date" value={child.dueDate}
-                            onChange={(e) => updateChild(index, 'dueDate', e.target.value)}
-                            className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 outline-none focus:border-dusty-rose focus:ring-1 focus:ring-dusty-rose/20 transition-all" />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <input type="date" value={child.birthDate}
-                          onChange={(e) => updateChild(index, 'birthDate', e.target.value)}
-                          className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 outline-none focus:border-dusty-rose focus:ring-1 focus:ring-dusty-rose/20 transition-all" />
                         <div className="flex gap-2">
-                          {[{ value: 'male', label: '남아' }, { value: 'female', label: '여아' }].map((g) => (
-                            <button key={g.value} onClick={() => updateChild(index, 'gender', g.value)}
-                              className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
-                                child.gender === g.value ? 'bg-dusty-rose text-white' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
-                              }`}>{g.label}</button>
-                          ))}
+                          <Badge 
+                            variant={child.status === 'expecting' ? 'default' : 'info'}
+                            onClick={() => toggleChildStatus(index)}
+                            className="cursor-pointer"
+                          >
+                            {child.status === 'expecting' ? '임신 중' : '출산'}
+                          </Badge>
+                          {children.length > 1 && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => removeChild(index)}
+                              icon={<Trash2 className="h-4 w-4" />}
+                            >
+                              삭제
+                            </Button>
+                          )}
                         </div>
-                      </>
-                    )}
-                  </div>
+                      </div>
+
+                      {/* Nickname */}
+                      <div>
+                        <Label htmlFor={`nickname-${index}`}>별명 (선택)</Label>
+                        <Input
+                          id={`nickname-${index}`}
+                          type="text"
+                          placeholder="예: 첫째, 둘째"
+                          value={child.nickname}
+                          onChange={(e) => updateChild(index, 'nickname', e.target.value)}
+                        />
+                      </div>
+
+                      {/* Dates */}
+                      {child.status === 'expecting' ? (
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor={`lmp-${index}`}>마지막 생리 시작일</Label>
+                            <Input
+                              id={`lmp-${index}`}
+                              type="date"
+                              value={child.lastPeriodDate}
+                              onChange={(e) => updateChild(index, 'lastPeriodDate', e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`due-${index}`}>출산 예정일</Label>
+                            <Input
+                              id={`due-${index}`}
+                              type="date"
+                              value={child.dueDate}
+                              onChange={(e) => updateChild(index, 'dueDate', e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div>
+                            <Label htmlFor={`birth-${index}`} required>생년월일</Label>
+                            <Input
+                              id={`birth-${index}`}
+                              type="date"
+                              value={child.birthDate}
+                              onChange={(e) => updateChild(index, 'birthDate', e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label>성별 (선택)</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              {[{ value: 'male', label: '남아' }, { value: 'female', label: '여아' }].map((g) => (
+                                <Button
+                                  key={g.value}
+                                  variant={child.gender === g.value ? 'primary' : 'outline'}
+                                  onClick={() => updateChild(index, 'gender', g.value)}
+                                  fullWidth
+                                >
+                                  {g.label}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </Card>
                 ))}
               </div>
-              <button onClick={addChildRow}
-                className="w-full rounded-lg border-2 border-dashed border-gray-200 py-3 text-sm font-semibold text-gray-400 hover:border-dusty-rose hover:text-dusty-rose transition-colors">
-                + 아이 추가
-              </button>
+              <Button
+                variant="outline"
+                fullWidth
+                onClick={addChildRow}
+                icon={<Plus className="h-4 w-4" />}
+              >
+                아이 추가
+              </Button>
             </div>
           )}
 
@@ -279,20 +342,33 @@ export default function OnboardingPage() {
           {step === 3 && (
             <div className="space-y-6">
               <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold text-gray-900">직장 여부</h2>
-                <p className="text-gray-500">현재 직장에 다니고 계신가요?</p>
+                <h2 className="text-h2 font-bold text-gray-900">직장 여부</h2>
+                <p className="text-body text-gray-500">현재 직장에 다니고 계신가요?</p>
               </div>
-              <div className="space-y-3">
+              <div className="grid gap-3">
                 {([
-                  { value: true, icon: Briefcase, label: '네, 직장에 다니고 있어요' },
-                  { value: false, icon: MapPin, label: '아니요' },
+                  { value: true, icon: Briefcase, label: '네, 직장에 다니고 있어요', color: 'bg-green-50 hover:bg-green-100 border-green-200' },
+                  { value: false, icon: MapPin, label: '아니요', color: 'bg-gray-50 hover:bg-gray-100 border-gray-200' },
                 ] as const).map((option) => (
-                  <button key={String(option.value)} onClick={() => setIsWorking(option.value)}
-                    className={`w-full flex items-center gap-3 rounded-xl p-4 text-left font-semibold transition-all ${
-                      isWorking === option.value ? 'bg-dusty-rose text-white shadow-sm' : 'card hover:border-gray-300'
-                    }`}>
-                    <option.icon className="h-5 w-5 flex-shrink-0" />
-                    {option.label}
+                  <button 
+                    key={String(option.value)} 
+                    onClick={() => setIsWorking(option.value)}
+                    className={`
+                      w-full flex items-center gap-4 rounded-xl p-5 text-left font-semibold 
+                      border-2 transition-all
+                      ${isWorking === option.value
+                        ? 'bg-dusty-rose-500 text-white border-dusty-rose-500 shadow-warm-md scale-[1.02]'
+                        : `${option.color} text-gray-700`
+                      }
+                    `}
+                  >
+                    <div className={`
+                      h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0
+                      ${isWorking === option.value ? 'bg-white/20' : 'bg-white'}
+                    `}>
+                      <option.icon className={`h-6 w-6 ${isWorking === option.value ? 'text-white' : 'text-gray-600'}`} />
+                    </div>
+                    <span className="text-body-lg">{option.label}</span>
                   </button>
                 ))}
               </div>
@@ -303,27 +379,33 @@ export default function OnboardingPage() {
           {step === 4 && (
             <div className="space-y-6">
               <div className="text-center space-y-2">
-                <h2 className="text-2xl font-bold text-gray-900">지역 선택</h2>
-                <p className="text-gray-500">거주 지역을 선택해주세요</p>
+                <h2 className="text-h2 font-bold text-gray-900">지역 선택</h2>
+                <p className="text-body text-gray-500">거주 지역을 선택해주세요</p>
               </div>
               <div className="space-y-4">
-                <label className="block">
-                  <span className="mb-1 block text-sm font-semibold text-gray-600">시/도</span>
-                  <select value={province} onChange={(e) => { setProvince(e.target.value); setCity(''); }}
-                    className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 outline-none focus:border-dusty-rose focus:ring-1 focus:ring-dusty-rose/20 transition-all">
+                <div>
+                  <Label htmlFor="province" required>시/도</Label>
+                  <Select 
+                    id="province"
+                    value={province} 
+                    onChange={(e) => { setProvince(e.target.value); setCity(''); }}
+                  >
                     <option value="">선택해주세요</option>
                     {Object.keys(REGION_DATA).map((r) => <option key={r} value={r}>{r}</option>)}
-                  </select>
-                </label>
+                  </Select>
+                </div>
                 {province && (
-                  <label className="block">
-                    <span className="mb-1 block text-sm font-semibold text-gray-600">시/군/구</span>
-                    <select value={city} onChange={(e) => setCity(e.target.value)}
-                      className="w-full rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-gray-800 outline-none focus:border-dusty-rose focus:ring-1 focus:ring-dusty-rose/20 transition-all">
+                  <div>
+                    <Label htmlFor="city" required>시/군/구</Label>
+                    <Select 
+                      id="city"
+                      value={city} 
+                      onChange={(e) => setCity(e.target.value)}
+                    >
                       <option value="">선택해주세요</option>
                       {REGION_DATA[province]?.map((c) => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </label>
+                    </Select>
+                  </div>
                 )}
               </div>
             </div>
@@ -332,20 +414,39 @@ export default function OnboardingPage() {
           {/* Navigation */}
           <div className="mt-8 flex gap-3">
             {step > 1 && (
-              <button onClick={prevStep}
-                className="flex-1 rounded-xl border border-border py-3.5 font-semibold text-gray-500 hover:bg-gray-50 transition-colors">이전</button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={prevStep}
+                className="flex-1"
+              >
+                이전
+              </Button>
             )}
             {step < 4 ? (
-              <button onClick={nextStep} disabled={!canProceed()}
-                className="flex-1 rounded-xl bg-dusty-rose py-3.5 font-semibold text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-dusty-rose-dark transition-colors">다음</button>
+              <Button 
+                variant="primary"
+                size="lg"
+                onClick={nextStep} 
+                disabled={!canProceed()}
+                className="flex-1"
+              >
+                다음
+              </Button>
             ) : (
-              <button onClick={handleSubmit} disabled={!canProceed() || saving}
-                className="flex-1 rounded-xl bg-dusty-rose py-3.5 font-semibold text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-dusty-rose-dark transition-colors">
+              <Button 
+                variant="primary"
+                size="lg"
+                onClick={handleSubmit} 
+                disabled={!canProceed() || saving}
+                loading={saving}
+                className="flex-1"
+              >
                 {saving ? '저장 중...' : '시작하기'}
-              </button>
+              </Button>
             )}
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
