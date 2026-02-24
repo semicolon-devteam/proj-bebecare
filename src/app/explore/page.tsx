@@ -11,6 +11,8 @@ import TimelineFeed from '@/components/TimelineFeed';
 import BenefitsTab from '@/components/BenefitsTab';
 import VaccinationTab from '@/components/VaccinationTab';
 import PregnancyWeeksTab from '@/components/PregnancyWeeksTab';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 
 type ExploreTab = 'custom' | 'benefits' | 'vaccination' | 'pregnancy';
 
