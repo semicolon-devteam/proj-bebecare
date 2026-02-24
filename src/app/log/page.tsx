@@ -26,6 +26,8 @@ import { FadeInUp, StaggerContainer, StaggerItem, CuteLoader } from '@/component
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 
 function formatTime(dateStr: string): string {
   const d = new Date(dateStr);
