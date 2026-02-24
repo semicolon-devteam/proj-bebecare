@@ -56,7 +56,7 @@ export async function createOrUpdateProfile(userId: string, profileData: Profile
 
     if (error) {
       console.error('Error updating profile:', error);
-      return null;
+      throw new Error(`프로필 업데이트 실패: ${error.message}`);
     }
     return data;
   } else {
@@ -68,7 +68,7 @@ export async function createOrUpdateProfile(userId: string, profileData: Profile
 
     if (error) {
       console.error('Error creating profile:', error);
-      return null;
+      throw new Error(`프로필 생성 실패: ${error.message}`);
     }
     return data;
   }

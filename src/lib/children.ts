@@ -44,7 +44,7 @@ export async function getChildren(userId: string): Promise<Child[]> {
 /**
  * 아이 추가
  */
-export async function addChild(userId: string, input: ChildInput): Promise<Child | null> {
+export async function addChild(userId: string, input: ChildInput): Promise<Child> {
   const { data, error } = await supabase
     .from('children')
     .insert({
@@ -62,7 +62,7 @@ export async function addChild(userId: string, input: ChildInput): Promise<Child
 
   if (error) {
     console.error('Error adding child:', error);
-    return null;
+    throw new Error(`아이 정보 추가 실패: ${error.message}`);
   }
   return data as Child;
 }

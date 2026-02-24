@@ -155,7 +155,8 @@ export default function OnboardingPage() {
       router.push('/');
     } catch (error) {
       console.error('Error saving profile:', error);
-      alert('저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+      const errorMessage = error instanceof Error ? error.message : '저장 중 오류가 발생했습니다.';
+      alert(`${errorMessage}\n\n다시 시도해주세요.`);
     } finally {
       setSaving(false);
     }
