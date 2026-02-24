@@ -26,6 +26,8 @@ import { FadeInUp, StaggerContainer, StaggerItem, CuteLoader } from '@/component
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 
 function formatTime(dateStr: string): string {
   const d = new Date(dateStr);
@@ -144,33 +146,39 @@ export default function LogPage() {
       {/* Sub tabs: 기록 | 통계 */}
       <div className="border-b border-border bg-white px-4">
         <div className="flex">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setSubTab('logs')}
-            className={`flex items-center gap-1.5 flex-1 py-3 justify-center text-sm font-semibold transition-colors border-b-2 ${
-              subTab === 'logs' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400 hover:text-gray-600'
+            className={`flex-1 rounded-none border-b-2 ${
+              subTab === 'logs' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400'
             }`}
+            icon={<ClipboardList className="h-4 w-4" />}
           >
-            <ClipboardList className="h-4 w-4" aria-hidden="true" />
             기록
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setSubTab('stats')}
-            className={`flex items-center gap-1.5 flex-1 py-3 justify-center text-sm font-semibold transition-colors border-b-2 ${
-              subTab === 'stats' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400 hover:text-gray-600'
+            className={`flex-1 rounded-none border-b-2 ${
+              subTab === 'stats' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400'
             }`}
+            icon={<BarChart3 className="h-4 w-4" />}
           >
-            <BarChart3 className="h-4 w-4" aria-hidden="true" />
             통계
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setSubTab('peers')}
-            className={`flex items-center gap-1.5 flex-1 py-3 justify-center text-sm font-semibold transition-colors border-b-2 ${
-              subTab === 'peers' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400 hover:text-gray-600'
+            className={`flex-1 rounded-none border-b-2 ${
+              subTab === 'peers' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400'
             }`}
+            icon={<Users className="h-4 w-4" />}
           >
-            <Users className="h-4 w-4" aria-hidden="true" />
             또래비교
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -214,13 +222,23 @@ export default function LogPage() {
 
           {/* Date navigation */}
           <div className="flex items-center justify-between px-4 py-3 bg-amber-50 border-b border-amber-100">
-            <button onClick={() => changeDate(-1)} aria-label="이전 날짜" className="p-1.5 rounded-lg hover:bg-amber-100">
-              <ChevronLeft className="h-5 w-5 text-amber-600" aria-hidden="true" />
-            </button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => changeDate(-1)}
+              aria-label="이전 날짜"
+              className="p-1.5 hover:bg-amber-100"
+              icon={<ChevronLeft className="h-5 w-5 text-amber-600" />}
+            />
             <span className="text-sm font-semibold text-amber-800">{formatDateLabel(date)}</span>
-            <button onClick={() => changeDate(1)} aria-label="다음 날짜" className="p-1.5 rounded-lg hover:bg-amber-100">
-              <ChevronRight className="h-5 w-5 text-amber-600" aria-hidden="true" />
-            </button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => changeDate(1)}
+              aria-label="다음 날짜"
+              className="p-1.5 hover:bg-amber-100"
+              icon={<ChevronRight className="h-5 w-5 text-amber-600" />}
+            />
           </div>
 
           {/* Log list */}
@@ -267,13 +285,14 @@ export default function LogPage() {
                         </div>
                         {log.memo && <p className="text-xs text-gray-500 mt-1">{log.memo}</p>}
                       </div>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleDelete(log.id)}
                         aria-label="기록 삭제"
-                        className="p-1.5 rounded-lg hover:bg-red-50 text-gray-300 hover:text-red-400 transition-colors flex-shrink-0"
-                      >
-                        <Trash2 className="h-4 w-4" aria-hidden="true" />
-                      </button>
+                        className="p-1.5 hover:bg-red-50 text-gray-300 hover:text-red-400 flex-shrink-0"
+                        icon={<Trash2 className="h-4 w-4" />}
+                      />
                     </div>
                     </StaggerItem>
                   );
@@ -286,13 +305,14 @@ export default function LogPage() {
           <VoiceInput userId={userId} childId={selectedChildId} onLogSaved={loadLogs} />
 
           {/* Manual Add FAB (right) */}
-          <button
+          <Button
+            variant="primary"
+            size="md"
             onClick={() => setShowAddModal(true)}
             aria-label="기록 추가"
-            className="fixed bottom-24 right-6 h-14 w-14 rounded-full bg-dusty-rose text-white shadow-lg flex items-center justify-center hover:opacity-90 transition-opacity z-20"
-          >
-            <Plus className="h-6 w-6" aria-hidden="true" />
-          </button>
+            className="fixed bottom-24 right-6 h-14 w-14 rounded-full shadow-lg z-20"
+            icon={<Plus className="h-6 w-6" />}
+          />
 
           {/* Quick Log Modal */}
           {showAddModal && userId && (
