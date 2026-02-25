@@ -2,6 +2,10 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
+import { Card } from '@/components/ui/Card';
 
 export default function AdminNotificationsPage() {
   const [userId, setUserId] = useState('');
@@ -67,71 +71,70 @@ export default function AdminNotificationsPage() {
       <h1 className="text-2xl font-bold mb-6">🔔 알림 테스트 어드민</h1>
 
       {/* Manual Send */}
-      <div className="bg-white border rounded-xl p-4 mb-6">
+      <Card className="mb-6">
         <h2 className="text-lg font-semibold mb-3">📤 수동 알림 발송</h2>
         <p className="text-xs text-gray-500 mb-3">Push + 인앱 알림을 동시에 보냅니다.</p>
 
         <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
-            <input
+            <Input
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               placeholder="9da88c2a-22a2-4606-810c-def6d503c5a4"
-              className="w-full border rounded-lg px-3 py-2 text-sm"
             />
             <p className="text-xs text-gray-400 mt-1">Reus 테스트: 9da88c2a-22a2-4606-810c-def6d503c5a4</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">제목</label>
-            <input
+            <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="테스트 알림입니다"
-              className="w-full border rounded-lg px-3 py-2 text-sm"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">내용</label>
-            <textarea
+            <Textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               placeholder="알림 내용을 입력하세요"
               rows={3}
-              className="w-full border rounded-lg px-3 py-2 text-sm resize-none"
             />
           </div>
-          <button
+          <Button
             onClick={handleSendTest}
             disabled={loading || !userId || !title}
-            className="w-full bg-dusty-rose text-white rounded-lg py-2.5 text-sm font-medium disabled:opacity-50"
+            fullWidth
+            variant="primary"
           >
             {loading ? '발송 중...' : '테스트 알림 발송 (Push + 인앱)'}
-          </button>
+          </Button>
           {result && (
             <pre className="text-xs bg-gray-50 rounded-lg p-3 whitespace-pre-wrap">{result}</pre>
           )}
         </div>
-      </div>
+      </Card>
 
       {/* Cron Trigger */}
-      <div className="bg-white border rounded-xl p-4 mb-6">
+      <Card className="mb-6">
         <h2 className="text-lg font-semibold mb-3">⏰ Cron 수동 실행</h2>
         <p className="text-xs text-gray-500 mb-3">
           타임라인 기반 알림 cron을 수동으로 실행합니다.<br />
           D-7, D-3, D-0 기준으로 알림을 생성합니다.
         </p>
-        <button
+        <Button
           onClick={handleTriggerCron}
           disabled={cronLoading}
-          className="w-full bg-gray-800 text-white rounded-lg py-2.5 text-sm font-medium disabled:opacity-50"
+          fullWidth
+          variant="secondary"
         >
           {cronLoading ? '실행 중...' : 'Cron 실행'}
-        </button>
+        </Button>
         {cronResult && (
           <pre className="mt-3 text-xs bg-gray-50 rounded-lg p-3 whitespace-pre-wrap overflow-x-auto">{cronResult}</pre>
         )}
-      </div>
+      </Card>
 
       {/* Info */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
