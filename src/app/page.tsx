@@ -3,7 +3,9 @@ import { redirect } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { isOnboardingCompleted } from '@/lib/profile';
 import HomeDashboard from '@/components/HomeDashboard';
-import { Button, Card, Badge } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import { Baby, Heart, MessageCircle, Calendar, Bell, Shield } from 'lucide-react';
 
 export default async function Home() {
