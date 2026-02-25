@@ -1,0 +1,38 @@
+# Workflow name
+name: 'Chromatic Deployment'
+
+# Event for the workflow
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+# List of jobs
+jobs:
+  chromatic-deployment:
+    # Operating System
+    runs-on: ubuntu-latest
+    # Job steps
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Publish to Chromatic
+        uses: chromaui/action@latest
+        with:
+          # Chromatic project token (add to GitHub Secrets)
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          # Build Storybook
+          buildScriptName: build-storybook

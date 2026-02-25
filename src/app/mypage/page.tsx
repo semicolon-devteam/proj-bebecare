@@ -7,15 +7,14 @@ import { getProfile, createOrUpdateProfile } from '@/lib/profile';
 import { getChildren, addChild, updateChild, deleteChild, deriveStageFromChildren } from '@/lib/children';
 import type { Child, ChildInput } from '@/lib/children';
 import { REGION_DATA } from '@/lib/regions';
-import { ChevronLeft, Baby, Briefcase, MapPin, Settings, LogOut, Plus, Pencil, Trash2, Heart, FileText, Save, Check, Bell, BellOff, Users, Download } from 'lucide-react';
+import { ChevronLeft, Baby, Briefcase, MapPin, Settings, LogOut, Plus, Pencil, Trash2, Heart, FileText, Save, Check, Bell, BellOff, Download } from 'lucide-react';
 import FamilyManager from '@/components/FamilyManager';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
 import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
+import { Radio } from '@/components/ui/Radio';
 
 export default function MyPage() {
   const router = useRouter();
@@ -346,23 +345,21 @@ export default function MyPage() {
           <Card className="space-y-4 border-2 border-dusty-rose/30">
             <h3 className="font-bold text-gray-900 text-sm">{editingChild ? '아이 정보 수정' : '아이 추가'}</h3>
 
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setChildStatus('expecting')}
-                className={`rounded-lg py-2.5 text-sm font-semibold transition-all ${
-                  childStatus === 'expecting' ? 'bg-dusty-rose text-white' : 'bg-gray-50 text-gray-500 border border-border'
-                }`}
-              >
-                임신 중
-              </button>
-              <button
-                onClick={() => setChildStatus('born')}
-                className={`rounded-lg py-2.5 text-sm font-semibold transition-all ${
-                  childStatus === 'born' ? 'bg-dusty-rose text-white' : 'bg-gray-50 text-gray-500 border border-border'
-                }`}
-              >
-                출산 후
-              </button>
+            <div className="space-y-2">
+              <Radio
+                name="child-status"
+                value="expecting"
+                label="임신 중"
+                checked={childStatus === 'expecting'}
+                onChange={(e) => e.target.checked && setChildStatus('expecting')}
+              />
+              <Radio
+                name="child-status"
+                value="born"
+                label="출산 후"
+                checked={childStatus === 'born'}
+                onChange={(e) => e.target.checked && setChildStatus('born')}
+              />
             </div>
 
             <div>
@@ -458,15 +455,21 @@ export default function MyPage() {
             <Briefcase className="h-4 w-4 text-gray-400" aria-hidden="true" />
             <h3 className="font-bold text-gray-900 text-sm">직장 여부</h3>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <button onClick={() => setIsWorking(true)}
-              className={`rounded-lg py-2.5 text-sm font-semibold transition-all ${
-                isWorking ? 'bg-dusty-rose text-white' : 'bg-gray-50 text-gray-500 border border-border'
-              }`}>직장맘</button>
-            <button onClick={() => setIsWorking(false)}
-              className={`rounded-lg py-2.5 text-sm font-semibold transition-all ${
-                !isWorking ? 'bg-dusty-rose text-white' : 'bg-gray-50 text-gray-500 border border-border'
-              }`}>전업맘</button>
+          <div className="space-y-2">
+            <Radio
+              name="working-status"
+              value="working"
+              label="직장맘"
+              checked={isWorking}
+              onChange={(e) => e.target.checked && setIsWorking(true)}
+            />
+            <Radio
+              name="working-status"
+              value="not-working"
+              label="전업맘"
+              checked={!isWorking}
+              onChange={(e) => e.target.checked && setIsWorking(false)}
+            />
           </div>
         </Card>
 
