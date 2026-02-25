@@ -11,7 +11,7 @@ import TimelineFeed from '@/components/TimelineFeed';
 import BenefitsTab from '@/components/BenefitsTab';
 import VaccinationTab from '@/components/VaccinationTab';
 import PregnancyWeeksTab from '@/components/PregnancyWeeksTab';
-import { Button } from '@/components/ui/Button';
+import { Tabs, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
 
 type ExploreTab = 'custom' | 'benefits' | 'vaccination' | 'pregnancy';
 
@@ -113,54 +113,55 @@ function ExploreContent() {
         </div>
       </header>
 
-      {/* Tab Bar */}
-      <div className="border-b border-border bg-white px-4">
-        <div className="flex overflow-x-auto scrollbar-hide">
-          {availableTabs.map(({ key, label, icon: Icon }) => (
-            <Button
-              key={key}
-              variant="ghost"
-              size="sm"
-              onClick={() => handleTabChange(key)}
-              className={`flex-shrink-0 rounded-none border-b-2 ${
-                activeTab === key
-                  ? 'border-dusty-rose text-dusty-rose'
-                  : 'border-transparent text-gray-400'
-              }`}
-              icon={<Icon className="h-4 w-4" />}
-            >
-              {label}
-            </Button>
-          ))}
+      {/* Tab Bar & Content */}
+      <Tabs defaultValue="custom" value={activeTab} onValueChange={(v) => handleTabChange(v as ExploreTab)} className="flex flex-col flex-1">
+        <div className="border-b border-border bg-white px-4">
+          <div className="flex overflow-x-auto scrollbar-hide">
+            {availableTabs.map(({ key, label, icon: Icon }) => (
+              <TabsTrigger
+                key={key}
+                value={key}
+                className="flex-shrink-0 rounded-none border-b-2 data-[state=active]:border-dusty-rose data-[state=active]:text-dusty-rose border-transparent text-gray-400 bg-transparent shadow-none px-4 py-3"
+              >
+                <Icon className="h-4 w-4 mr-1.5" aria-hidden="true" />
+                {label}
+              </TabsTrigger>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Content Area */}
-      <div className="flex-1 overflow-y-auto bg-surface pb-24">
-        {activeTab === 'custom' && user && (
-          <div className="h-full">
-            <TimelineFeed userId={user.id} />
-          </div>
-        )}
-        
-        {activeTab === 'benefits' && user && (
-          <div className="h-full">
-            <BenefitsTab userId={user.id} />
-          </div>
-        )}
+        <TabsContent value="custom" className="flex-1 overflow-y-auto bg-surface pb-24 mt-0">
+          {user && (
+            <div className="h-full">
+              <TimelineFeed userId={user.id} />
+            </div>
+          )}
+        </TabsContent>
 
-        {activeTab === 'vaccination' && user && (
-          <div className="h-full">
-            <VaccinationTab userId={user.id} />
-          </div>
-        )}
+        <TabsContent value="benefits" className="flex-1 overflow-y-auto bg-surface pb-24 mt-0">
+          {user && (
+            <div className="h-full">
+              <BenefitsTab userId={user.id} />
+            </div>
+          )}
+        </TabsContent>
 
-        {activeTab === 'pregnancy' && user && (
-          <div className="h-full">
-            <PregnancyWeeksTab userId={user.id} />
-          </div>
-        )}
-      </div>
+        <TabsContent value="vaccination" className="flex-1 overflow-y-auto bg-surface pb-24 mt-0">
+          {user && (
+            <div className="h-full">
+              <VaccinationTab userId={user.id} />
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="pregnancy" className="flex-1 overflow-y-auto bg-surface pb-24 mt-0">
+          {user && (
+            <div className="h-full">
+              <PregnancyWeeksTab userId={user.id} />
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
