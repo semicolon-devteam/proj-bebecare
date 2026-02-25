@@ -7,18 +7,18 @@ import { getChildren } from '@/lib/children';
 import type { Child } from '@/lib/children';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import {
-  getBabyLogs, getBabyLogsRange, addBabyLog, deleteBabyLog, computeDailySummary,
+  getBabyLogs, getBabyLogsRange, deleteBabyLog, computeDailySummary,
   LOG_TYPE_CONFIG,
-  type BabyLog, type LogType, type DiaperType, type DailySummary,
+  type BabyLog, type LogType, type DailySummary,
 } from '@/lib/baby-logs';
 import { useTimer } from '@/components/Timer';
 import QuickLogModal from '@/components/QuickLogModal';
 import VoiceInput from '@/components/VoiceInput';
 import PeerComparison from '@/components/PeerComparison';
 import {
-  Plus, Trash2, ChevronLeft, ChevronRight, X, BarChart3, ClipboardList, Users,
+  Plus, Trash2, ChevronLeft, ChevronRight, BarChart3, ClipboardList, Users,
   Baby as BabyIcon, Moon as MoonIcon, Shirt as ShirtIcon, Heart as HeartIcon,
-  Bath as BathIcon, Pill as PillIcon, Syringe as SyringeIcon, UtensilsCrossed,
+  Bath as BathIcon, Pill as PillIcon, UtensilsCrossed,
 } from 'lucide-react';
 import { IconByName } from '@/lib/icon-map';
 import EmptyStateIllustration from '@/components/illustrations/EmptyStateIllustration';
@@ -27,7 +27,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
 
 function formatTime(dateStr: string): string {
   const d = new Date(dateStr);
@@ -144,46 +144,34 @@ export default function LogPage() {
       </header>
 
       {/* Sub tabs: 기록 | 통계 */}
-      <div className="border-b border-border bg-white px-4">
-        <div className="flex">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSubTab('logs')}
-            className={`flex-1 rounded-none border-b-2 ${
-              subTab === 'logs' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400'
-            }`}
-            icon={<ClipboardList className="h-4 w-4" />}
-          >
-            기록
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSubTab('stats')}
-            className={`flex-1 rounded-none border-b-2 ${
-              subTab === 'stats' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400'
-            }`}
-            icon={<BarChart3 className="h-4 w-4" />}
-          >
-            통계
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSubTab('peers')}
-            className={`flex-1 rounded-none border-b-2 ${
-              subTab === 'peers' ? 'border-dusty-rose text-dusty-rose' : 'border-transparent text-gray-400'
-            }`}
-            icon={<Users className="h-4 w-4" />}
-          >
-            또래비교
-          </Button>
+      <Tabs defaultValue="logs" value={subTab} onValueChange={(v) => setSubTab(v as SubTab)} className="flex flex-col">
+        <div className="border-b border-border bg-white px-4">
+          <TabsList className="w-full bg-transparent p-0 h-auto gap-0">
+            <TabsTrigger 
+              value="logs" 
+              className="flex-1 rounded-none border-b-2 data-[state=active]:border-dusty-rose data-[state=active]:text-dusty-rose border-transparent text-gray-400 bg-transparent shadow-none px-3 py-3"
+            >
+              <ClipboardList className="h-4 w-4 mr-1.5" aria-hidden="true" />
+              기록
+            </TabsTrigger>
+            <TabsTrigger 
+              value="stats" 
+              className="flex-1 rounded-none border-b-2 data-[state=active]:border-dusty-rose data-[state=active]:text-dusty-rose border-transparent text-gray-400 bg-transparent shadow-none px-3 py-3"
+            >
+              <BarChart3 className="h-4 w-4 mr-1.5" aria-hidden="true" />
+              통계
+            </TabsTrigger>
+            <TabsTrigger 
+              value="peers" 
+              className="flex-1 rounded-none border-b-2 data-[state=active]:border-dusty-rose data-[state=active]:text-dusty-rose border-transparent text-gray-400 bg-transparent shadow-none px-3 py-3"
+            >
+              <Users className="h-4 w-4 mr-1.5" aria-hidden="true" />
+              또래비교
+            </TabsTrigger>
+          </TabsList>
         </div>
-      </div>
 
-      {subTab === 'logs' ? (
-        <>
+      <TabsContent value="logs" className="mt-0">
           {/* Quick log buttons */}
           <div className="px-4 py-3 bg-white border-b border-border">
             <div className="flex gap-2 overflow-x-auto pb-1">
@@ -324,18 +312,20 @@ export default function LogPage() {
               onStartTimer={(type) => { startTimer(type, userId, selectedChildId); setShowAddModal(false); }}
             />
           )}
-        </>
-      ) : subTab === 'stats' ? (
-        /* Stats Tab */
-        userId && <StatsTab userId={userId} />
-      ) : (
-        /* Peers Tab */
-        userId && (
-          <div className="px-4 py-4 pb-24">
-            <PeerComparison userId={userId} />
-          </div>
-        )
-      )}
+        </TabsContent>
+
+        <TabsContent value="stats" className="mt-0">
+          {userId && <StatsTab userId={userId} />}
+        </TabsContent>
+
+        <TabsContent value="peers" className="mt-0">
+          {userId && (
+            <div className="px-4 py-4 pb-24">
+              <PeerComparison userId={userId} />
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
